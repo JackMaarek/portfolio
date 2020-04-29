@@ -21,7 +21,7 @@ services:
     environment:
       PGUSER: postgres
       PGPASSWORD: postgres
-      PGDATABASE: database_name
+      PGDATABASE: portfolio
       PGPORT: 5432
       PGHOST: db
     ports:

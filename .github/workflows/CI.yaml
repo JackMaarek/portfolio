@@ -80,4 +80,4 @@ jobs:
           elixir-version: 1.10.2
           otp-version: 22.2
       - name: Test backend files
-        run: mix deps.get && mix test test/api_app/ test/api_app_web/views
+        run: mix deps.get && mix test

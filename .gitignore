@@ -102,3 +102,4 @@ erl_crash.dump
 /installer/deps
 
 # Database volume
+pgdata

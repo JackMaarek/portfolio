@@ -7,16 +7,16 @@
 # General application configuration
 use Mix.Config
 
-config :porfolio,
-  ecto_repos: [Porfolio.Repo]
+config :portfolio,
+  ecto_repos: [Portfolio.Repo]
 
 # Configures the endpoint
-config :porfolio, PorfolioWeb.Endpoint,
+config :portfolio, PortfolioWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "S4oZAM7BOmVQI+FevVsjcZC6aYnk/8bdRINfht0jyZ7JZdrVqD8+gV7OUtMFFDS7",
-  render_errors: [view: PorfolioWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Porfolio.PubSub, adapter: Phoenix.PubSub.PG2],
-  live_view: [signing_salt: "+vjY3Vmt"]
+  secret_key_base: "WMGxEdl5lGKWvwOy/CPr/Cb8g99D2a9eZmbrXWIWzvHH3vVjNeOEecpuDgn9Mz+z",
+  render_errors: [view: PortfolioWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: Portfolio.PubSub,
+  live_view: [signing_salt: "o/84FJxc"]
 
 # Configures Elixir's Logger
 config :logger, :console,

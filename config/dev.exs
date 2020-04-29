@@ -1,7 +1,7 @@
 use Mix.Config
 
 # Configure your database
-config :porfolio, Porfolio.Repo,
+config :portfolio, Portfolio.Repo,
   username: System.get_env("PGUSER"),
   password: System.get_env("PGPASSWORD"),
   database: System.get_env("PGDATABASE"),
@@ -15,7 +15,7 @@ config :porfolio, Porfolio.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
-config :porfolio, PorfolioWeb.Endpoint,
+config :portfolio, PortfolioWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
@@ -55,13 +55,13 @@ config :porfolio, PorfolioWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :porfolio, PorfolioWeb.Endpoint,
+config :portfolio, PortfolioWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/porfolio_web/(live|views)/.*(ex)$",
-      ~r"lib/porfolio_web/templates/.*(eex)$"
+      ~r"lib/portfolio_web/(live|views)/.*(ex)$",
+      ~r"lib/portfolio_web/templates/.*(eex)$"
     ]
   ]
 

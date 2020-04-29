@@ -1,4 +1,4 @@
-defmodule PorfolioWeb.ChannelCase do
+defmodule PortfolioWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -11,7 +11,7 @@ defmodule PorfolioWeb.ChannelCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use PorfolioWeb.ChannelCase, async: true`, although
+  by setting `use PortfolioWeb.ChannelCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -20,18 +20,19 @@ defmodule PorfolioWeb.ChannelCase do
   using do
     quote do
       # Import conveniences for testing with channels
-      use Phoenix.ChannelTest
+      import Phoenix.ChannelTest
+      import PortfolioWeb.ChannelCase
 
       # The default endpoint for testing
-      @endpoint PorfolioWeb.Endpoint
+      @endpoint PortfolioWeb.Endpoint
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Porfolio.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Portfolio.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Porfolio.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Portfolio.Repo, {:shared, self()})
     end
 
     :ok

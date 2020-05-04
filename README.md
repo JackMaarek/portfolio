@@ -40,14 +40,14 @@ Refer to the [DOCKER.md](DOCKER.md)
 
 ## Development process
 
-1. Most of the time I assign a ticket on the [application board](https://github.com/JackMaarek/portfolio/projects/2). Those application tickets are technical tasks coming from user stories that are more about the needs of the project itself detailed in the [project board](https://github.com/JackMaarek/portfolio/projects/1). As I want to follow agile methodology this process has grate advantages.
+1. Most of the time I assign a ticket on the [application board](https://github.com/JackMaarek/portfolio/projects/2). Those application tickets are technical tasks coming from user stories that are more about the needs of the project itself detailed in the [project board](https://github.com/JackMaarek/portfolio/projects/1). As I want to follow agile methodology this process has great advantages.
 2. When I start working on a ticket, I move the concerned one to `In Progress`.
 3. Then I create a branch specifically for this ticket with a name that follows the [conventions specified below](#branch-naming-convention).
 4. I Commit regularly at each significant step with unambiguous commit messages (see [COMMIT_CONVENTIONS](COMMIT_CONVENTIONS.md) file).
-5. Then create a merge request that follows the [conventions specified below](#pull-requests-pr) to the develop or master branch depending on the complexity.
+5. When a feature is nearly done I create a merge request that follows the [conventions specified below](#pull-requests-pr) targeting develop or master branch depending on the complexity.
 6. On the [appplication board](https://github.com/JackMaarek/Elm-project/projects/2), move the ticket to the status `In Review`.
 7. Assign the merge request to a maintainer, still me in those kind of projects.
-8. Wait until the CI checks are passed, if not some back and forth to fix the issues.
+8. Wait until the CI checks are passed, if not some back and forth will be needed to fix the issues.
 9. The pull request will then be merged into the develop branch and the concerned ticket will be moved to `Done`.
 10. If everything's working fine I rebase master from develop.
 11. Finally I move the user story in th [project board](https://github.com/JackMaarek/portfolio/projects/1) to `Done.

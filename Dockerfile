@@ -10,11 +10,16 @@ RUN mix local.hex --force &&\
 RUN apt-get update && \
   ## install inotify-tool for phoenix hot reload
   apt-get install -y inotify-tools && \
+  # install nodejs and npm on globaly
+  curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh && \
+  bash nodesource_setup.sh && \
   # Install postgres client
   apt-get install -y postgresql-client && \
   # Clear apt cache
    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /phoenix
+
+COPY . /phoenix
 
 EXPOSE 4000

@@ -13,9 +13,8 @@ services:
     ports:
       - "5432:5432"
   phoenix:
-    build: .docker/phoenix/.
+    build: .
     volumes:
-      - .:/phoenix
       - .docker/phoenix/phoenix-setup.sh:/phoenix-setup.sh
     command: ../phoenix-setup.sh
     environment:

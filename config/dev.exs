@@ -1,11 +1,13 @@
 use Mix.Config
 
+IO.puts(System.get_env("PGUSER"))
+
 # Configure your database
 config :porfolio, Porfolio.Repo,
-  username: System.get_env("PGUSER"),
-  password: System.get_env("PGPASSWORD"),
-  database: System.get_env("PGDATABASE"),
-  hostname: System.get_env("PGHOST"),
+  username: 'postgres',
+  password: 'postgres',
+  database: 'portfolio',
+  hostname: 'localhost',
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
@@ -27,6 +29,10 @@ config :porfolio, PorfolioWeb.Endpoint,
       "development",
       "--watch-stdin",
       cd: Path.expand("../assets", __DIR__)
+    ],
+    sass: [
+      "--watch",
+      "assets/scss:assets/css"
     ]
   ]
 

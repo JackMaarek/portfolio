@@ -1,6 +1,6 @@
 defmodule Portfolio.Accounts.Encryption do
   alias Comeonin.Bcrypt
-  alias Portfolio.Accounts.User
+  alias Porfolio.Accounts.User
 
   def hash_password(password), do: Bcrypt.hashpwsalt(password)
 

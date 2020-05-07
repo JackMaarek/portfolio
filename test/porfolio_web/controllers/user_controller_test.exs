@@ -4,7 +4,10 @@ defmodule PorfolioWeb.UserControllerTest do
   alias Porfolio.Accounts
 
   @create_attrs %{encrypted_password: "some encrypted_password", username: "some username"}
-  @update_attrs %{encrypted_password: "some updated encrypted_password", username: "some updated username"}
+  @update_attrs %{
+    encrypted_password: "some updated encrypted_password",
+    username: "some updated username"
+  }
   @invalid_attrs %{encrypted_password: nil, username: nil}
 
   def fixture(:user) do
@@ -75,6 +78,7 @@ defmodule PorfolioWeb.UserControllerTest do
     test "deletes chosen user", %{conn: conn, user: user} do
       conn = delete(conn, Routes.user_path(conn, :delete, user))
       assert redirected_to(conn) == Routes.user_path(conn, :index)
+
       assert_error_sent 404, fn ->
         get(conn, Routes.user_path(conn, :show, user))
       end

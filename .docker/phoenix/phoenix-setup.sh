@@ -19,5 +19,7 @@ if [[ -z `psql -Atqc "\\list $PGDATABASE"` ]]; then
 else
   mix deps.get
   mix deps.compile
+  cd assets && npm install
+  cd ../
   exec mix phx.server
 fi

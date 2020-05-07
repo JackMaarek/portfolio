@@ -11,8 +11,8 @@ RUN apt-get update && \
   ## install inotify-tool for phoenix hot reload
   apt-get install -y inotify-tools && \
   # install nodejs and npm on globaly
-  curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh && \
-  bash nodesource_setup.sh && \
+  curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+   apt-get install -y -q nodejs && \
   # Install postgres client
   apt-get install -y postgresql-client && \
   # Clear apt cache

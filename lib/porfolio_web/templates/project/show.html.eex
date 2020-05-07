@@ -1,0 +1,23 @@
+<h1>Show Project</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @project.name %>
+  </li>
+
+  <li>
+    <strong>Content:</strong>
+    <%= @project.content %>
+  </li>
+
+  <li>
+    <strong>Is published:</strong>
+    <%= @project.is_published %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.project_path(@conn, :edit, @project) %></span>
+<span><%= link "Back", to: Routes.project_path(@conn, :index) %></span>

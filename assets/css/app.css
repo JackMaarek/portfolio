@@ -1,3 +1,36 @@
 /* This file is for your main application css. */
 
 @import "./phoenix.css";
+
+@import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+@import "../node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css";
+
+#header{
+    border-bottom: none;
+    position: absolute;
+}
+
+#sideBar{
+    position:fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.card-img>img{
+    width: 100%;
+}
+
+#homepage-content{
+    display: inline-block;
+}
+
+#split-one{
+    width: 50%;
+    display: inline-block;
+}
+
+#split-two{
+    width: 50%;
+    display: inline-block;
+}

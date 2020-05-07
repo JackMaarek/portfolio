@@ -1,0 +1,13 @@
+<nav role="navigation" class="navbar navbar-expand-lg navbar-light bg-light">
+  <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+      <%=
+      "/images/logo.png"
+      |> img_tag()
+      |> link(to: Routes.page_path(@conn, :index), class: "navbar-brand", style: "width: 30px;")
+      %>
+      </li>
+      <li class="nav-item"><%= link "Projects", to: Routes.project_path(@conn, :index), class: 'nav-link'%></li>
+      <li class="nav-item"><%= link "Articles", to: Routes.project_path(@conn, :index), class: 'nav-link'%></li>
+  </ul>
+</nav>

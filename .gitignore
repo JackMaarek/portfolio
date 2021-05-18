@@ -66,16 +66,16 @@ Temporary Items
 .apdisk
 
 ### Elixir template
-/_build
-/cover
-/deps
-/doc
-/.fetch
-erl_crash.dump
-*.ez
-*.beam
-/config/*.secret.exs
-.elixir_ls/
+/portfolio/_build
+/portfolio/tmp
+/portfolio/doc
+/portfolio/deps
+portfolio/.fetch
+portfolio/erl_crash.dump
+portfolio/*.ez
+portfolio/*.beam
+portfolio/config/*.secret.exs
+portfolio/.elixir_ls/
 
 ### Phoenix template
 # gitignore template for Phoenix projects
@@ -87,13 +87,13 @@ erl_crash.dump
 /tmp
 
 # Static artifacts
-/node_modules
-/assets/node_modules
+portfolio/node_modules
+portfolio/assets/node_modules
 
 # Since we are building assets from web/static,
 # we ignore priv/static. You may want to comment
 # this depending on your deployment strategy.
-/priv/static/
+portfolio/priv/static/
 
 # Installer-related files
 /installer/_build
@@ -101,3 +101,5 @@ erl_crash.dump
 /installer/doc
 /installer/deps
 
+# Postges data
+/pgdata/

@@ -32,6 +32,6 @@ jobs:
       - name: Install Hex dependencies
         run: cd portfolio && mix deps.get
       - name: Run linter
-        run: mix credo
+        run: cd portfolio && mix credo
       - name: Run tests
-        run: mix test
+        run: cd portfolio && mix test

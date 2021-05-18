@@ -31,9 +31,7 @@ jobs:
           otp-version: 22.2
       - name: Install backend dependencies
         run: cd portfolio && mix deps.get
-    if: "! contains(toJSON(github.event.commits.*.message), 'ci_skip_lint')"
       - name: Run linter
         run: mix format
-    elseif: "! contains(toJSON(github.event.commits.*.message), 'ci_skip_test')"
       - name: Run tests
         run: mix test

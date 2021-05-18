@@ -30,7 +30,7 @@ jobs:
           elixir-version: 1.10.2
           otp-version: 22.2
       - name: Install backend dependencies
-        run: mix deps.get
+        run: cd portfolio && mix deps.get
 
   linter:
     if: "! contains(toJSON(github.event.commits.*.message), 'ci_skip_lint')"
@@ -55,7 +55,7 @@ jobs:
           elixir-version: 1.10.2
           otp-version: 22.2
       - name: Format backend files
-        run: mix deps.get && mix format
+        run: cd portfolio && mix deps.get && mix format
 
   test:
     if: "! contains(toJSON(github.event.commits.*.message), 'ci_skip_test')"
@@ -80,4 +80,4 @@ jobs:
           elixir-version: 1.10.2
           otp-version: 22.2
       - name: Test backend files
-        run: mix deps.get && mix test
+        run: cd portfolio && mix deps.get && mix test

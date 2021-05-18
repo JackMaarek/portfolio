@@ -103,3 +103,4 @@ portfolio/priv/static/
 
 # Postges data
 /pgdata/
+pgdata/pgdata

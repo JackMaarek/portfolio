@@ -50,7 +50,6 @@ defmodule Portfolio.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:phx_gen_auth, "~> 0.7", only: [:dev], runtime: false},
       {:ecto_enum, "~> 1.4"}
-
     ]
   end
 

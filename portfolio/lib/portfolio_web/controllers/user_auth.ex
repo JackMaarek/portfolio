@@ -139,7 +139,6 @@ defmodule PortfolioWeb.UserAuth do
     end
   end
 
-
   defp maybe_store_return_to(%{method: "GET"} = conn) do
     put_session(conn, :user_return_to, current_path(conn))
   end

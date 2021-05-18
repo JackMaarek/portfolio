@@ -24,14 +24,14 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v2
-      - name: Setup elixir
+      - name: Setup project
         uses: erlef/setup-elixir@v1
         with:
           elixir-version: 1.10.2
           otp-version: 22.2
-      - name: Install backend dependencies
+      - name: Install Hex dependencies
         run: cd portfolio && mix deps.get
       - name: Run linter
-        run: mix format
+        run: mix credo
       - name: Run tests
         run: mix test

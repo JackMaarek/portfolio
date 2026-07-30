@@ -162,6 +162,7 @@ function TopologyCanvas() {
       context.clearRect(0, 0, width, height);
       const pulse = (Math.sin(time * 0.0012) + 1) / 2;
       const active = Math.floor((time * 0.0015) % links.length);
+      const [activeFrom, activeTo] = links[active];
       let hoveredNode = -1;
       let closestDistance = 88;
 
@@ -194,19 +195,25 @@ function TopologyCanvas() {
         const distance = Math.hypot(nodeX - pointerX, nodeY - pointerY);
         const proximity = Math.max(0, 1 - distance / 88);
         const isHovered = index === hoveredNode;
-        const radius = 3 + proximity * 9 + (index % 3 === 0 ? pulse * 2 : 0);
+        const isAutoActive = index === activeFrom || index === activeTo;
+        const radius =
+          3 +
+          proximity * 9 +
+          (isAutoActive ? 3 + pulse * 2 : index % 3 === 0 ? pulse * 2 : 0);
         context.beginPath();
         context.arc(nodeX, nodeY, radius, 0, Math.PI * 2);
         context.fillStyle =
-          proximity > 0 ? "rgba(226,255,85,.98)" : "rgba(236,234,255,.8)";
-        context.shadowBlur = isHovered ? 24 : 0;
+          proximity > 0 || isAutoActive
+            ? "rgba(226,255,85,.98)"
+            : "rgba(236,234,255,.8)";
+        context.shadowBlur = isHovered ? 24 : isAutoActive ? 12 + pulse * 8 : 0;
         context.shadowColor = "rgba(226,255,85,.75)";
         context.fill();
         context.shadowBlur = 0;
-        if (index === 2 || index === 5 || index === 8) {
+        if (isAutoActive || index === 2 || index === 5 || index === 8) {
           context.beginPath();
           context.arc(nodeX, nodeY, radius + 8, 0, Math.PI * 2);
-          context.strokeStyle = isHovered
+          context.strokeStyle = isHovered || isAutoActive
             ? "rgba(226,255,85,.65)"
             : `rgba(172,164,255,${0.18 + pulse * 0.18})`;
           context.stroke();

@@ -311,15 +311,15 @@ export function Portfolio() {
             Platform Engineer spécialisé Kubernetes, GitOps et Infrastructure
             as Code
           </h1>
-          <div className="hero-statement" aria-label="Des plateformes cloud qui tiennent en production">
-            <span className="statement-line"><i>Des plateformes cloud</i></span>
-            <span className="statement-line"><i>qui tiennent</i></span>
-            <span className="statement-line accent-line"><i>en production.</i></span>
+          <div className="hero-statement" aria-label="Le cloud, prêt pour la production">
+            <span className="statement-line"><i>Le cloud,</i></span>
+            <span className="statement-line"><i>prêt pour</i></span>
+            <span className="statement-line accent-line"><i>la production.</i></span>
           </div>
           <div className="hero-summary" data-reveal>
             <p>
-              Je conçois les fondations techniques qui permettent aux équipes
-              de déployer vite, de façon reproductible et sécurisée.
+              J’industrialise l’infrastructure. Vos équipes déploient plus vite,
+              avec moins de risques.
             </p>
             <span>Kubernetes · AWS · Terraform · ArgoCD</span>
           </div>
@@ -333,7 +333,7 @@ export function Portfolio() {
             <span>48.8566° N</span>
             <span>02.3522° E</span>
           </div>
-          <p>6+ années · Banque · Santé · Cyber · Défense</p>
+          <p>6+ années · Banque · Santé · Cyber</p>
         </div>
       </section>
 
@@ -345,12 +345,11 @@ export function Portfolio() {
         <p className="section-label">01 / À propos</p>
         <div className="manifesto-copy" data-reveal>
           <p>
-            Du <span>code back-end</span> aux plateformes Kubernetes
-            multi-clusters.
+            Du <span>back-end</span> au multi-cluster.
           </p>
           <p>
-            Une approche pragmatique de l’automatisation, de la sécurité et de
-            la <span>fiabilité en production.</span>
+            J’automatise l’infrastructure, sécurise les flux et fiabilise
+            <span> chaque mise en production.</span>
           </p>
         </div>
         <aside data-reveal>
@@ -362,7 +361,7 @@ export function Portfolio() {
       <section id="expertise" className="capabilities">
         <div className="section-heading" data-reveal>
           <p className="section-label">02 / Expertise</p>
-          <h2>Ce que je mets<br />en production.</h2>
+          <h2>Ce que je<br />construis.</h2>
         </div>
         <div className="capability-list">
           {capabilities.map((capability) => (
@@ -383,7 +382,7 @@ export function Portfolio() {
       <section id="experience" className="experience">
         <div className="section-heading experience-heading" data-reveal>
           <p className="section-label">03 / Parcours</p>
-          <h2>Construire.<br />Sécuriser.<br />Transmettre.</h2>
+          <h2>Livrer.<br />Fiabiliser.<br />Passer à l’échelle.</h2>
           <p className="experience-intro">
             De 2018 à aujourd’hui, du développement back-end aux enjeux de
             plateforme, dans des secteurs où la rigueur compte.

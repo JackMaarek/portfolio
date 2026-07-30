@@ -327,12 +327,8 @@ export function Portfolio() {
         <div className="hero-foot">
           <a className="round-link" href="#experience" {...tune("magnetic")}>
             <span>Explorer</span>
-            <span aria-hidden="true">↓</span>
+            <span className="round-link-arrow" aria-hidden="true">↓</span>
           </a>
-          <div className="coordinates">
-            <span>48.8566° N</span>
-            <span>02.3522° E</span>
-          </div>
           <p>6+ années · Banque · Santé · Cyber</p>
         </div>
       </section>

@@ -464,7 +464,7 @@ export function Portfolio() {
       </section>
 
       <section className="results scroll-scene" data-scroll-scene>
-        <p className="section-label">05 / Quelques repères</p>
+        <p className="section-label">05 / Impact mesurable</p>
         <div className="result-grid">
           <article data-reveal>
             <strong>−50%</strong>
@@ -475,8 +475,8 @@ export function Portfolio() {
             <p>équipes accompagnées au quotidien sur leurs processus de delivery.</p>
           </article>
           <article data-reveal>
-            <strong>0</strong>
-            <p>credential statique dans la chaîne CI/CD de la plateforme de référence.</p>
+            <strong>1</strong>
+            <p>commande pour générer un environnement Kubernetes reproductible, prêt à être synchronisé par ArgoCD.</p>
           </article>
         </div>
       </section>

@@ -10,15 +10,15 @@ import {
 const experiences = [
   {
     period: "2025 — aujourd’hui",
-    role: "Consultant technique & Business Development",
+    role: "Consultant technique",
     company: "PerspeQtive",
-    sector: "Défense · Spatial · Imagerie SAR",
+    sector: "R&D appliquée · Imagerie SAR",
     summary:
-      "Co-développement d’un logiciel quantum-inspired appliqué à l’imagerie SAR, exécuté sur GPU standard et orchestré sur AWS en mode event-driven.",
+      "Conception de la plateforme d’exécution d’un algorithme quantum-inspired appliqué à l’imagerie SAR : workloads GPU sur AWS, orchestration event-driven et déploiements Kubernetes pilotés par GitOps.",
     points: [
-      "Déploiement de la chaîne d’analyse sur EKS avec S3, ArgoCD et Helm.",
-      "Positionnement du produit auprès de l’écosystème défense et spatial français.",
-      "Qualification d’acteurs comme l’ONERA, Quantonation, l’IGN/Cnam et Thales.",
+      "Architecture de la chaîne d’exécution sur EKS avec S3, ArgoCD et Helm.",
+      "Orchestration event-driven des traitements SAR sur instances GPU AWS.",
+      "Adaptation de mon socle Kubernetes/GitOps personnel aux contraintes du projet.",
     ],
     tech: ["EKS", "ArgoCD", "Helm", "S3", "GPU", "SAR"],
   },

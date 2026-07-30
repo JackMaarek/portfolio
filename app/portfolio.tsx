@@ -474,10 +474,6 @@ export function Portfolio() {
             <strong>≈150</strong>
             <p>équipes accompagnées au quotidien sur leurs processus de delivery.</p>
           </article>
-          <article data-reveal>
-            <strong>1</strong>
-            <p>commande pour générer un environnement Kubernetes reproductible, prêt à être synchronisé par ArgoCD.</p>
-          </article>
         </div>
       </section>
 

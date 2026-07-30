@@ -116,8 +116,9 @@ function TopologyCanvas() {
     let animationFrame = 0;
     let width = 0;
     let height = 0;
-    let pointerX = 0.66;
-    let pointerY = 0.44;
+    let pointerX = -1000;
+    let pointerY = -1000;
+    const interactionSurface = canvas.closest<HTMLElement>(".hero");
     const nodes = [
       [0.12, 0.28],
       [0.34, 0.16],
@@ -148,40 +149,66 @@ function TopologyCanvas() {
 
     const move = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
-      pointerX = (event.clientX - rect.left) / rect.width;
-      pointerY = (event.clientY - rect.top) / rect.height;
+      pointerX = event.clientX - rect.left;
+      pointerY = event.clientY - rect.top;
+    };
+
+    const leave = () => {
+      pointerX = -1000;
+      pointerY = -1000;
     };
 
     const draw = (time: number) => {
       context.clearRect(0, 0, width, height);
       const pulse = (Math.sin(time * 0.0012) + 1) / 2;
       const active = Math.floor((time * 0.0015) % links.length);
+      let hoveredNode = -1;
+      let closestDistance = 88;
 
-      context.lineWidth = 1;
+      nodes.forEach(([x, y], index) => {
+        const distance = Math.hypot(x * width - pointerX, y * height - pointerY);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          hoveredNode = index;
+        }
+      });
+
       links.forEach(([from, to], index) => {
         const [fromX, fromY] = nodes[from];
         const [toX, toY] = nodes[to];
+        const isHoveredLink = from === hoveredNode || to === hoveredNode;
         context.beginPath();
         context.moveTo(fromX * width, fromY * height);
         context.lineTo(toX * width, toY * height);
+        context.lineWidth = isHoveredLink ? 1.7 : 1;
         context.strokeStyle =
-          index === active ? "rgba(226,255,85,.95)" : "rgba(201,197,255,.2)";
+          isHoveredLink || index === active
+            ? "rgba(226,255,85,.9)"
+            : "rgba(201,197,255,.2)";
         context.stroke();
       });
 
       nodes.forEach(([x, y], index) => {
-        const distance = Math.hypot(x - pointerX, y - pointerY);
-        const proximity = Math.max(0, 1 - distance * 2.8);
-        const radius = 3 + proximity * 8 + (index % 3 === 0 ? pulse * 2 : 0);
+        const nodeX = x * width;
+        const nodeY = y * height;
+        const distance = Math.hypot(nodeX - pointerX, nodeY - pointerY);
+        const proximity = Math.max(0, 1 - distance / 88);
+        const isHovered = index === hoveredNode;
+        const radius = 3 + proximity * 9 + (index % 3 === 0 ? pulse * 2 : 0);
         context.beginPath();
-        context.arc(x * width, y * height, radius, 0, Math.PI * 2);
+        context.arc(nodeX, nodeY, radius, 0, Math.PI * 2);
         context.fillStyle =
-          proximity > 0.25 ? "rgba(226,255,85,.95)" : "rgba(236,234,255,.8)";
+          proximity > 0 ? "rgba(226,255,85,.98)" : "rgba(236,234,255,.8)";
+        context.shadowBlur = isHovered ? 24 : 0;
+        context.shadowColor = "rgba(226,255,85,.75)";
         context.fill();
+        context.shadowBlur = 0;
         if (index === 2 || index === 5 || index === 8) {
           context.beginPath();
-          context.arc(x * width, y * height, radius + 8, 0, Math.PI * 2);
-          context.strokeStyle = `rgba(172,164,255,${0.18 + pulse * 0.18})`;
+          context.arc(nodeX, nodeY, radius + 8, 0, Math.PI * 2);
+          context.strokeStyle = isHovered
+            ? "rgba(226,255,85,.65)"
+            : `rgba(172,164,255,${0.18 + pulse * 0.18})`;
           context.stroke();
         }
       });
@@ -191,12 +218,14 @@ function TopologyCanvas() {
 
     resize();
     window.addEventListener("resize", resize);
-    canvas.addEventListener("pointermove", move);
+    interactionSurface?.addEventListener("pointermove", move);
+    interactionSurface?.addEventListener("pointerleave", leave);
     animationFrame = requestAnimationFrame(draw);
     return () => {
       cancelAnimationFrame(animationFrame);
       window.removeEventListener("resize", resize);
-      canvas.removeEventListener("pointermove", move);
+      interactionSurface?.removeEventListener("pointermove", move);
+      interactionSurface?.removeEventListener("pointerleave", leave);
     };
   }, []);
 

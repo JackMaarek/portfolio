@@ -143,7 +143,7 @@ function TopologyCanvas() {
       "Database",
       "GPU",
       "S3",
-      "Observability",
+      "Metrics",
     ];
     const persistentLabels = new Set([5, 8, 9]);
     const links = [
@@ -151,6 +151,9 @@ function TopologyCanvas() {
       [3, 6], [4, 5], [4, 7], [5, 8], [6, 8], [6, 10], [7, 8],
       [8, 9], [9, 10],
     ];
+    const deploymentRoute = [0, 1, 2, 5, 8, 9];
+    const segmentDuration = 820;
+    const routeHoldDuration = 1500;
 
     const resize = () => {
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -175,8 +178,21 @@ function TopologyCanvas() {
     const draw = (time: number) => {
       context.clearRect(0, 0, width, height);
       const pulse = (Math.sin(time * 0.0012) + 1) / 2;
-      const active = Math.floor((time * 0.0015) % links.length);
-      const [activeFrom, activeTo] = links[active];
+      const travelDuration = (deploymentRoute.length - 1) * segmentDuration;
+      const routeElapsed = time % (travelDuration + routeHoldDuration);
+      const routeIsComplete = routeElapsed >= travelDuration;
+      const completedSegments = routeIsComplete
+        ? deploymentRoute.length - 1
+        : Math.floor(routeElapsed / segmentDuration);
+      const activeRouteStep = Math.min(
+        completedSegments,
+        deploymentRoute.length - 2,
+      );
+      const activeFrom = deploymentRoute[activeRouteStep];
+      const activeTo = deploymentRoute[activeRouteStep + 1];
+      const segmentProgress = routeIsComplete
+        ? 1
+        : (routeElapsed % segmentDuration) / segmentDuration;
       let hoveredNode = -1;
       let closestDistance = 88;
 
@@ -188,20 +204,44 @@ function TopologyCanvas() {
         }
       });
 
-      links.forEach(([from, to], index) => {
+      links.forEach(([from, to]) => {
         const [fromX, fromY] = nodes[from];
         const [toX, toY] = nodes[to];
         const isHoveredLink = from === hoveredNode || to === hoveredNode;
+        const routeSegmentIndex = deploymentRoute.findIndex(
+          (node, index) =>
+            index < deploymentRoute.length - 1 &&
+            node === from &&
+            deploymentRoute[index + 1] === to,
+        );
+        const isCompletedRoute =
+          routeSegmentIndex >= 0 && routeSegmentIndex < completedSegments;
         context.beginPath();
         context.moveTo(fromX * width, fromY * height);
         context.lineTo(toX * width, toY * height);
         context.lineWidth = isHoveredLink ? 1.7 : 1;
         context.strokeStyle =
-          isHoveredLink || index === active
+          isHoveredLink
             ? "rgba(226,255,85,.9)"
+            : isCompletedRoute
+              ? "rgba(226,255,85,.58)"
             : "rgba(201,197,255,.2)";
         context.stroke();
       });
+
+      if (!routeIsComplete) {
+        const [fromX, fromY] = nodes[activeFrom];
+        const [toX, toY] = nodes[activeTo];
+        context.beginPath();
+        context.moveTo(fromX * width, fromY * height);
+        context.lineTo(
+          (fromX + (toX - fromX) * segmentProgress) * width,
+          (fromY + (toY - fromY) * segmentProgress) * height,
+        );
+        context.lineWidth = 1.8;
+        context.strokeStyle = "rgba(226,255,85,.95)";
+        context.stroke();
+      }
 
       nodes.forEach(([x, y], index) => {
         const nodeX = x * width;
@@ -210,14 +250,23 @@ function TopologyCanvas() {
         const proximity = Math.max(0, 1 - distance / 88);
         const isHovered = index === hoveredNode;
         const isAutoActive = index === activeFrom || index === activeTo;
+        const routeNodeIndex = deploymentRoute.indexOf(index);
+        const isRouteReached =
+          routeNodeIndex >= 0 && routeNodeIndex <= completedSegments;
         const radius =
           3 +
           proximity * 9 +
-          (isAutoActive ? 3 + pulse * 2 : index % 3 === 0 ? pulse * 2 : 0);
+          (isAutoActive
+            ? 3 + pulse * 2
+            : isRouteReached
+              ? 1.5
+              : index % 3 === 0
+                ? pulse * 2
+                : 0);
         context.beginPath();
         context.arc(nodeX, nodeY, radius, 0, Math.PI * 2);
         context.fillStyle =
-          proximity > 0 || isAutoActive
+          proximity > 0 || isAutoActive || isRouteReached
             ? "rgba(226,255,85,.98)"
             : "rgba(236,234,255,.8)";
         context.shadowBlur = isHovered ? 24 : isAutoActive ? 12 + pulse * 8 : 0;
@@ -250,6 +299,10 @@ function TopologyCanvas() {
         let labelX = nodeX + 14;
         let labelY = nodeY - 30;
 
+        if (index === 10) {
+          labelX = nodeX + 10;
+          labelY = nodeY + 14;
+        }
         if (labelX + labelWidth > width - 4) {
           labelX = nodeX - labelWidth - 14;
         }

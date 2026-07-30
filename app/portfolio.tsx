@@ -446,7 +446,7 @@ export function Portfolio() {
           </p>
           <div className="project-columns">
             <p>
-              platform-botV2 prépare et configure les environnements. ArgoCD,
+              platform-bot prépare et configure les environnements. ArgoCD,
               Helm et Terraform assurent des déploiements reproductibles.
             </p>
             <p>
@@ -458,7 +458,7 @@ export function Portfolio() {
             <a href="https://github.com/JackMaarek" target="_blank" rel="noreferrer" {...tune("magnetic")}>
               Voir sur GitHub <span aria-hidden="true">↗</span>
             </a>
-            <span>CLI Go · platform-botV2</span>
+            <span>CLI Go · platform-bot</span>
           </div>
         </article>
       </section>

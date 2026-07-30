@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import {
   StringMagnetic,
@@ -420,7 +421,14 @@ export function Portfolio() {
       <div className="noise" aria-hidden="true" />
       <header className="topbar">
         <a className="monogram" href="#top" aria-label="Retour en haut">
-          JM<span>©26</span>
+          <Image
+            src="/logo-jm-header.png"
+            alt=""
+            width={48}
+            height={48}
+            priority
+            unoptimized
+          />
         </a>
         <div className="status">
           <span className="status-dot" />

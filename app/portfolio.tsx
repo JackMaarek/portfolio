@@ -132,6 +132,20 @@ function TopologyCanvas() {
       [0.68, 0.88],
       [0.9, 0.77],
     ];
+    const nodeLabels = [
+      "Client",
+      "Edge",
+      "Ingress",
+      "GitOps",
+      "API",
+      "EKS",
+      "Queue",
+      "Database",
+      "GPU",
+      "S3",
+      "Observability",
+    ];
+    const persistentLabels = new Set([5, 8, 9]);
     const links = [
       [0, 1], [1, 2], [2, 3], [0, 4], [1, 5], [2, 5], [2, 6],
       [3, 6], [4, 5], [4, 7], [5, 8], [6, 8], [6, 10], [7, 8],
@@ -218,6 +232,47 @@ function TopologyCanvas() {
             : `rgba(172,164,255,${0.18 + pulse * 0.18})`;
           context.stroke();
         }
+      });
+
+      nodes.forEach(([x, y], index) => {
+        const isHovered = index === hoveredNode;
+        const isAutoActive = index === activeFrom || index === activeTo;
+        const isPersistent = width > 520 && persistentLabels.has(index);
+        if (!isHovered && !isAutoActive && !isPersistent) return;
+
+        const nodeX = x * width;
+        const nodeY = y * height;
+        const label = nodeLabels[index].toUpperCase();
+        context.save();
+        context.font = "600 10px Arial, sans-serif";
+        const labelWidth = context.measureText(label).width + 16;
+        const labelHeight = 24;
+        let labelX = nodeX + 14;
+        let labelY = nodeY - 30;
+
+        if (labelX + labelWidth > width - 4) {
+          labelX = nodeX - labelWidth - 14;
+        }
+        if (labelY < 4) {
+          labelY = nodeY + 14;
+        }
+
+        context.globalAlpha = isHovered ? 1 : isAutoActive ? 0.92 : 0.58;
+        context.fillStyle = "rgba(11,11,13,.88)";
+        context.strokeStyle =
+          isHovered || isAutoActive
+            ? "rgba(226,255,85,.72)"
+            : "rgba(201,197,255,.35)";
+        context.lineWidth = 1;
+        context.fillRect(labelX, labelY, labelWidth, labelHeight);
+        context.strokeRect(labelX, labelY, labelWidth, labelHeight);
+        context.fillStyle =
+          isHovered || isAutoActive
+            ? "rgba(239,237,245,1)"
+            : "rgba(239,237,245,.82)";
+        context.textBaseline = "middle";
+        context.fillText(label, labelX + 8, labelY + labelHeight / 2 + 0.5);
+        context.restore();
       });
 
       animationFrame = requestAnimationFrame(draw);

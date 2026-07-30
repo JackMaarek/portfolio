@@ -3,9 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   StringMagnetic,
-  StringParallax,
   StringProgress,
-  StringSplit,
   StringTune,
 } from "@fiddle-digital/string-tune";
 
@@ -210,14 +208,66 @@ export function Portfolio() {
   const [activeExperience, setActiveExperience] = useState(0);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const stringTune = StringTune.getInstance();
+    stringTune.scrollDesktopMode = "default";
+    stringTune.scrollMobileMode = "default";
     stringTune.use(StringProgress);
-    stringTune.use(StringParallax);
     stringTune.use(StringMagnetic);
-    stringTune.use(StringSplit);
     stringTune.start(60);
-    return () => stringTune.destroy();
+
+    const revealElements = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-reveal]"),
+    );
+    const sceneElements = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-scroll-scene]"),
+    );
+
+    if (reducedMotion) {
+      revealElements.forEach((element) => element.classList.add("is-visible"));
+      return () => stringTune.destroy();
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.12 },
+    );
+    revealElements.forEach((element) => observer.observe(element));
+
+    let frame = 0;
+    const updateScenes = () => {
+      const viewportHeight = window.innerHeight;
+      sceneElements.forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        const progress = Math.min(
+          1,
+          Math.max(0, (viewportHeight - rect.top) / (viewportHeight + rect.height)),
+        );
+        element.style.setProperty("--scene-progress", progress.toFixed(4));
+      });
+      frame = 0;
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateScenes);
+    };
+    updateScenes();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+      stringTune.destroy();
+    };
   }, []);
 
   return (
@@ -252,20 +302,27 @@ export function Portfolio() {
       <section id="top" className="hero">
         <div className="hero-grid" aria-hidden="true" />
         <TopologyCanvas />
-        <div className="hero-eyebrow" {...tune("parallax", {"string-factor": "-0.12"})}>
-          <span>Platform Engineer</span>
-          <span>Paris · France</span>
+        <div className="hero-eyebrow">
+          <span>Jacques Maarek</span>
+          <span>Platform Engineer · Paris</span>
         </div>
         <div className="hero-copy">
-          <h1 {...tune("split")}>
-            Jacques
-            <br />
-            Maarek
+          <h1 data-reveal>
+            Platform Engineer spécialisé Kubernetes, GitOps et Infrastructure
+            as Code
           </h1>
-          <p>
-            Je construis les plateformes qui permettent aux équipes de livrer
-            <em> plus vite</em>, sans transiger sur la sécurité.
-          </p>
+          <div className="hero-statement" aria-label="Des plateformes cloud qui tiennent en production">
+            <span className="statement-line"><i>Des plateformes cloud</i></span>
+            <span className="statement-line"><i>qui tiennent</i></span>
+            <span className="statement-line accent-line"><i>en production.</i></span>
+          </div>
+          <div className="hero-summary" data-reveal>
+            <p>
+              Je conçois les fondations techniques qui permettent aux équipes
+              de déployer vite, de façon reproductible et sécurisée.
+            </p>
+            <span>Kubernetes · AWS · Terraform · ArgoCD</span>
+          </div>
         </div>
         <div className="hero-foot">
           <a className="round-link" href="#experience" {...tune("magnetic")}>
@@ -280,9 +337,13 @@ export function Portfolio() {
         </div>
       </section>
 
-      <section id="main-content" className="manifesto" {...tune("progress", {"string-key": "--section-progress"})}>
+      <section
+        id="main-content"
+        className="manifesto scroll-scene"
+        data-scroll-scene
+      >
         <p className="section-label">01 / À propos</p>
-        <div className="manifesto-copy">
+        <div className="manifesto-copy" data-reveal>
           <p>
             Du <span>code back-end</span> aux plateformes Kubernetes
             multi-clusters.
@@ -292,20 +353,20 @@ export function Portfolio() {
             la <span>fiabilité en production.</span>
           </p>
         </div>
-        <aside>
+        <aside data-reveal>
           Expérience acquise dans des contextes où l’indisponibilité, la fuite
           d’un secret ou une dérive de coûts ne sont pas des détails.
         </aside>
       </section>
 
       <section id="expertise" className="capabilities">
-        <div className="section-heading">
+        <div className="section-heading" data-reveal>
           <p className="section-label">02 / Expertise</p>
           <h2>Ce que je mets<br />en production.</h2>
         </div>
         <div className="capability-list">
           {capabilities.map((capability) => (
-            <article className="capability" key={capability.index}>
+            <article className="capability" key={capability.index} data-reveal>
               <span className="capability-index">{capability.index}</span>
               <div>
                 <h3>{capability.title}</h3>
@@ -320,7 +381,7 @@ export function Portfolio() {
       </section>
 
       <section id="experience" className="experience">
-        <div className="section-heading experience-heading">
+        <div className="section-heading experience-heading" data-reveal>
           <p className="section-label">03 / Parcours</p>
           <h2>Construire.<br />Sécuriser.<br />Transmettre.</h2>
           <p className="experience-intro">
@@ -328,7 +389,7 @@ export function Portfolio() {
             plateforme, dans des secteurs où la rigueur compte.
           </p>
         </div>
-        <div className="experience-panel">
+        <div className="experience-panel" data-reveal>
           <div className="experience-tabs" role="tablist" aria-label="Expériences">
             {experiences.map((item, index) => (
               <button
@@ -367,7 +428,7 @@ export function Portfolio() {
         </div>
       </section>
 
-      <section id="projets" className="projects">
+      <section id="projets" className="projects scroll-scene" data-scroll-scene>
         <div className="project-visual" {...tune("progress", {"string-key": "--project-progress"})}>
           <div className="orbit orbit-one" />
           <div className="orbit orbit-two" />
@@ -380,7 +441,7 @@ export function Portfolio() {
           <span className="orbit-label label-three">Terraform</span>
           <span className="orbit-label label-four">Policy</span>
         </div>
-        <article className="project-copy">
+        <article className="project-copy" data-reveal>
           <p className="section-label">04 / Projet personnel</p>
           <p className="project-kicker">PodYourLife présente</p>
           <h2>k8s-platform</h2>
@@ -407,18 +468,18 @@ export function Portfolio() {
         </article>
       </section>
 
-      <section className="results">
+      <section className="results scroll-scene" data-scroll-scene>
         <p className="section-label">05 / Quelques repères</p>
         <div className="result-grid">
-          <article>
+          <article data-reveal>
             <strong>−50%</strong>
             <p>de coûts d’infrastructure et Kubernetes sur une mission bancaire.</p>
           </article>
-          <article>
+          <article data-reveal>
             <strong>≈150</strong>
             <p>équipes accompagnées au quotidien sur leurs processus de delivery.</p>
           </article>
-          <article>
+          <article data-reveal>
             <strong>0</strong>
             <p>credential statique dans la chaîne CI/CD de la plateforme de référence.</p>
           </article>

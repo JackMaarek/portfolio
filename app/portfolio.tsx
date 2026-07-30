@@ -441,13 +441,13 @@ export function Portfolio() {
           <p className="project-kicker">PodYourLife présente</p>
           <h2>k8s-platform</h2>
           <p className="project-lead">
-            Une plateforme GitOps de référence pour concevoir, sécuriser et
-            opérer plusieurs environnements Kubernetes sur AWS.
+            Du service applicatif au workload ML/GPU : un socle Kubernetes et
+            GitOps pour déployer simplement sur AWS, piloté par une CLI interne.
           </p>
           <div className="project-columns">
             <p>
-              ArgoCD App-of-Apps, sync-waves, Terraform organisé par domaines
-              et génération déterministe des branches d’environnement.
+              platform-botV2 prépare et configure les environnements. ArgoCD,
+              Helm et Terraform assurent des déploiements reproductibles.
             </p>
             <p>
               Istio mTLS strict, Kyverno, External Secrets Operator, OIDC et

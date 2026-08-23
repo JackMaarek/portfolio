@@ -102,87 +102,8 @@ const capabilities = [
   },
 ];
 
-const offerFrictions = [
-  {
-    index: "01",
-    title: "Déploiements\nrisqués",
-    body: "Absence de garde-fous et de visibilité sur l’état réel de vos déploiements.",
-    icon: "warning",
-  },
-  {
-    index: "02",
-    title: "Rollbacks\nflous",
-    body: "Pas de traçabilité fiable pour revenir à un état sain en toute confiance.",
-    icon: "rollback",
-  },
-  {
-    index: "03",
-    title: "Environnements\ndivergents",
-    body: "Des environnements qui dérivent et masquent les vrais problèmes.",
-    icon: "layers",
-  },
-  {
-    index: "04",
-    title: "Alertes\ninutiles",
-    body: "Trop de bruit, pas de signal : vos équipes passent à côté de l’essentiel.",
-    icon: "alert-off",
-  },
-];
-
-const offerPillars = [
-  { title: "Lisibilité", body: "Voir où la chaîne casse", icon: "eye" },
-  { title: "Fiabilité", body: "Réduire le risque opérationnel", icon: "shield" },
-  { title: "Opérabilité", body: "Diagnostiquer plus vite", icon: "target" },
-];
-
 const tune = (value: string, attributes: Record<string, string> = {}) =>
   ({ string: value, ...attributes }) as Record<string, string>;
-
-function OfferIcon({ name }: { name: string }) {
-  const iconProps = {
-    "aria-hidden": true,
-    fill: "none",
-    viewBox: "0 0 48 48",
-    xmlns: "http://www.w3.org/2000/svg",
-  };
-
-  if (name === "warning") {
-    return <svg {...iconProps}><path d="M24 6 44 41H4L24 6Z" /><path d="M24 17v11M24 35v1" /></svg>;
-  }
-  if (name === "rollback") {
-    return <svg {...iconProps}><path d="M12 18V9m0 0h9m-9 0 5.2 5.2A21 21 0 1 1 10 30" /></svg>;
-  }
-  if (name === "layers") {
-    return <svg {...iconProps}><path d="M7 7h25v25H7zM16 16h25v25H16z" /></svg>;
-  }
-  if (name === "alert-off") {
-    return <svg {...iconProps}><path d="M12 34h24l-4-5V20a8 8 0 0 0-15-4M17 38a7 7 0 0 0 14 0M8 8l32 32" /><circle cx="36.5" cy="34.5" r="8.5" /></svg>;
-  }
-  if (name === "eye") {
-    return <svg {...iconProps}><path d="M4 24s7-13 20-13 20 13 20 13-7 13-20 13S4 24 4 24Z" /><circle cx="24" cy="24" r="7" /></svg>;
-  }
-  if (name === "shield") {
-    return <svg {...iconProps}><path d="M24 5c5 5 11 6 17 7v11c0 11-7 17-17 21C14 40 7 34 7 23V12c6-1 12-2 17-7Z" /><path d="m17 25 5 5 10-12" /></svg>;
-  }
-  return <svg {...iconProps}><circle cx="24" cy="24" r="9" /><path d="M24 4v10m0 20v10M4 24h10m20 0h10M10 10l7 7m14 14 7 7m0-28-7 7M17 31l-7 7" /></svg>;
-}
-
-function DeliveryPipeline() {
-  const steps = ["Code", "CI", "Registry", "ArgoCD", "EKS"];
-
-  return (
-    <div className="delivery-pipeline" aria-label="Chaîne de delivery : Code, CI, Registry, ArgoCD, EKS">
-      <span className="pipeline-start" aria-hidden="true" />
-      {steps.map((step, index) => (
-        <div className="pipeline-step" key={step}>
-          <span className="pipeline-node" aria-hidden="true" />
-          <span className="pipeline-label">{step}</span>
-          {index < steps.length - 1 && <span className="pipeline-arrow" aria-hidden="true" />}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function TopologyCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -523,7 +444,6 @@ export function Portfolio() {
           {menuOpen ? "Fermer" : "Menu"}
         </button>
         <nav id="main-nav" className={menuOpen ? "nav open" : "nav"}>
-          <a href="#offre" onClick={() => setMenuOpen(false)}>Offre</a>
           <a href="#expertise" onClick={() => setMenuOpen(false)}>Expertise</a>
           <a href="#experience" onClick={() => setMenuOpen(false)}>Expérience</a>
           <a href="#projets" onClick={() => setMenuOpen(false)}>Projets</a>
@@ -586,53 +506,9 @@ export function Portfolio() {
         </aside>
       </section>
 
-      <section id="offre" className="offer" aria-labelledby="offer-heading">
-        <div className="offer-problem">
-          <div className="offer-intro" data-reveal>
-            <p className="offer-label"><span>02 /</span> Ce qui vous ralentit</p>
-            <h2 id="offer-heading">
-              Le problème<br />n’est pas<br />vos outils.<br />
-              <span>C’est<br />ce qu’on ne voit plus.</span>
-            </h2>
-          </div>
-          <div className="friction-grid">
-            {offerFrictions.map((friction) => (
-              <article className="friction-card" key={friction.index} data-reveal>
-                <span className="friction-index">{friction.index}</span>
-                <OfferIcon name={friction.icon} />
-                <h3>{friction.title.split("\n").map((line) => <span key={line}>{line}</span>)}</h3>
-                <p>{friction.body}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div className="offer-promise">
-          <div className="promise-copy" data-reveal>
-            <p className="offer-label"><span>03 /</span> La promesse</p>
-            <h2>
-              En 3 à 5 jours,<br />une vision claire,<br />
-              <span>priorisée et<br />actionnable.</span>
-            </h2>
-          </div>
-          <div className="promise-content">
-            <div className="promise-pillars">
-              {offerPillars.map((pillar) => (
-                <article className="promise-pillar" key={pillar.title} data-reveal>
-                  <OfferIcon name={pillar.icon} />
-                  <h3>{pillar.title}</h3>
-                  <p>{pillar.body}</p>
-                </article>
-              ))}
-            </div>
-            <DeliveryPipeline />
-          </div>
-        </div>
-      </section>
-
       <section id="expertise" className="capabilities">
         <div className="section-heading" data-reveal>
-          <p className="section-label">04 / Expertise</p>
+          <p className="section-label">02 / Expertise</p>
           <h2>Ce que je<br />construis.</h2>
         </div>
         <div className="capability-list">
@@ -653,7 +529,7 @@ export function Portfolio() {
 
       <section id="experience" className="experience">
         <div className="section-heading experience-heading" data-reveal>
-          <p className="section-label">05 / Parcours</p>
+          <p className="section-label">03 / Parcours</p>
           <h2>Livrer.<br />Fiabiliser.<br />Passer à l’échelle.</h2>
           <p className="experience-intro">
             De 2018 à aujourd’hui, du développement back-end aux enjeux de
@@ -712,8 +588,8 @@ export function Portfolio() {
           <span className="orbit-label label-three">Terraform</span>
           <span className="orbit-label label-four">Policy</span>
         </div>
-          <article className="project-copy" data-reveal>
-          <p className="section-label">06 / Projet personnel</p>
+        <article className="project-copy" data-reveal>
+          <p className="section-label">04 / Projet personnel</p>
           <p className="project-kicker">PodYourLife présente</p>
           <h2>k8s-platform</h2>
           <p className="project-lead">
@@ -740,7 +616,7 @@ export function Portfolio() {
       </section>
 
       <section className="results scroll-scene" data-scroll-scene>
-        <p className="section-label">07 / Impact mesurable</p>
+        <p className="section-label">05 / Impact mesurable</p>
         <div className="result-grid">
           <article data-reveal>
             <strong>−50%</strong>
@@ -755,7 +631,7 @@ export function Portfolio() {
 
       <footer id="contact" className="contact">
         <div className="contact-top">
-          <p className="section-label">08 / Contact</p>
+          <p className="section-label">06 / Contact</p>
           <p>Un besoin plateforme, cloud<br />ou automatisation ?</p>
         </div>
         <a className="contact-mail" href="mailto:jacques.maarek.dev@gmail.com" {...tune("magnetic")}>

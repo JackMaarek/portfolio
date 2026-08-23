@@ -16,18 +16,6 @@ test("portfolio exposes its core positioning", async () => {
   assert.match(portfolio, /platform-bot/);
 });
 
-test("portfolio exposes the diagnostic offer", async () => {
-  const portfolio = await readFile(
-    new URL("app/portfolio.tsx", projectRoot),
-    "utf8",
-  );
-
-  assert.match(portfolio, /Ce qui vous ralentit/);
-  assert.match(portfolio, /Déploiements\\nrisqués/);
-  assert.match(portfolio, /En 3 à 5 jours/);
-  assert.match(portfolio, /Chaîne de delivery/);
-});
-
 test("document metadata describes the portfolio", async () => {
   const layout = await readFile(new URL("app/layout.tsx", projectRoot), "utf8");
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   StringMagnetic,
@@ -446,7 +447,8 @@ export function Portfolio() {
         <nav id="main-nav" className={menuOpen ? "nav open" : "nav"}>
           <a href="#expertise" onClick={() => setMenuOpen(false)}>Expertise</a>
           <a href="#experience" onClick={() => setMenuOpen(false)}>Expérience</a>
-          <a href="#projets" onClick={() => setMenuOpen(false)}>Projets</a>
+          <Link href="/offer" onClick={() => setMenuOpen(false)}>Offre</Link>
+          <a href="#projects" onClick={() => setMenuOpen(false)}>Projets</a>
           <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
         </nav>
       </header>
@@ -575,7 +577,7 @@ export function Portfolio() {
         </div>
       </section>
 
-      <section id="projets" className="projects scroll-scene" data-scroll-scene>
+      <section id="projects" className="projects scroll-scene" data-scroll-scene>
         <div className="project-visual" {...tune("progress", {"string-key": "--project-progress"})}>
           <div className="orbit orbit-one" />
           <div className="orbit orbit-two" />

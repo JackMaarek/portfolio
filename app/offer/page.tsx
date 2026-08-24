@@ -245,8 +245,8 @@ function OfferTopology() {
           </feMerge>
         </filter>
         <linearGradient id="offer-route-gradient" x1="120" x2="640" y1="80" y2="500">
-          <stop offset="0%" stopColor="rgba(226, 255, 85, .95)" />
-          <stop offset="100%" stopColor="rgba(226, 255, 85, .62)" />
+          <stop offset="0%" stopColor="rgba(255, 153, 0, .95)" />
+          <stop offset="100%" stopColor="rgba(255, 153, 0, .62)" />
         </linearGradient>
       </defs>
 

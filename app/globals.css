@@ -5,7 +5,8 @@
   --paper: #efedf5;
   --muted: #aaa6b5;
   --violet: #aba2ff;
-  --acid: #e2ff55;
+  --acid: #ff9900;
+  --acid-readable: #7a4200;
   --line: rgba(239, 237, 245, 0.18);
 }
 
@@ -635,7 +636,7 @@ button {
   height: 10px;
   border-radius: 50%;
   background: var(--acid);
-  box-shadow: 0 0 24px rgba(226,255,85,.6);
+  box-shadow: 0 0 24px rgba(255,153,0,.6);
   content: "";
 }
 
@@ -981,7 +982,7 @@ button:focus-visible {
   color: var(--paper);
   background:
     radial-gradient(circle at 78% 18%, rgba(99, 77, 218, .22), transparent 30rem),
-    radial-gradient(circle at 20% 80%, rgba(226, 255, 85, .08), transparent 22rem),
+    radial-gradient(circle at 20% 80%, rgba(255, 153, 0, .08), transparent 22rem),
     var(--ink);
 }
 
@@ -1006,6 +1007,12 @@ button:focus-visible {
   line-height: 1.4;
   text-transform: uppercase;
   letter-spacing: 0;
+}
+
+.offer-band .offer-section-label,
+.offer-faq .offer-section-label,
+.offer-contact .offer-section-label {
+  color: var(--acid-readable);
 }
 
 .offer-hero h1,
@@ -1097,8 +1104,8 @@ button:focus-visible {
 
 .offer-primary-link:hover,
 .offer-primary-link:focus-visible {
-  background: rgba(226, 255, 85, .08);
-  box-shadow: 0 0 28px rgba(226, 255, 85, .2);
+  background: rgba(255, 153, 0, .08);
+  box-shadow: 0 0 28px rgba(255, 153, 0, .2);
 }
 
 .offer-hero-foot {
@@ -1121,7 +1128,7 @@ button:focus-visible {
   height: auto;
   overflow: visible;
   opacity: 1;
-  filter: drop-shadow(0 0 28px rgba(226, 255, 85, .08));
+  filter: drop-shadow(0 0 28px rgba(255, 153, 0, .08));
 }
 
 .offer-topology-web line {
@@ -1150,8 +1157,8 @@ button:focus-visible {
 }
 
 .offer-node-halo {
-  fill: rgba(226, 255, 85, .16);
-  stroke: rgba(226, 255, 85, .68);
+  fill: rgba(255, 153, 0, .16);
+  stroke: rgba(255, 153, 0, .68);
   stroke-width: 1.4;
 }
 
@@ -1382,7 +1389,7 @@ button:focus-visible {
   right: 7%;
   left: 7%;
   height: 2px;
-  background: linear-gradient(90deg, var(--acid), rgba(226, 255, 85, .36));
+  background: linear-gradient(90deg, var(--acid), rgba(255, 153, 0, .36));
   content: "";
 }
 
@@ -1401,14 +1408,14 @@ button:focus-visible {
   border: 4px solid var(--acid);
   border-radius: 50%;
   background: var(--offer-surface);
-  box-shadow: 0 0 20px rgba(226, 255, 85, .32);
+  box-shadow: 0 0 20px rgba(255, 153, 0, .32);
   content: "";
 }
 
 .offer-timeline span {
   display: block;
   margin-bottom: 12px;
-  color: var(--acid);
+  color: var(--acid-readable);
   font-weight: 700;
 }
 
@@ -1543,7 +1550,7 @@ button:focus-visible {
   margin-right: 12px;
   border-radius: 50%;
   background: var(--acid);
-  box-shadow: 0 0 14px rgba(226, 255, 85, .72);
+  box-shadow: 0 0 14px rgba(255, 153, 0, .72);
   content: "";
 }
 
@@ -1636,7 +1643,7 @@ button:focus-visible {
 
 .offer-contact > a:hover,
 .offer-contact > a:focus-visible {
-  box-shadow: 0 0 30px rgba(226, 255, 85, .46);
+  box-shadow: 0 0 30px rgba(255, 153, 0, .46);
   transform: translateX(3px);
 }
 

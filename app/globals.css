@@ -141,7 +141,7 @@ button {
 .nav a:focus-visible,
 .footer-meta a:hover,
 .footer-meta a:focus-visible {
-  color: var(--acid);
+  color: var(--violet);
 }
 
 .menu-toggle {
@@ -289,10 +289,11 @@ button {
   border: 1px solid var(--acid);
   border-radius: 999px;
   color: var(--paper);
-  background: rgba(201, 255, 71, .08);
+  background: rgba(255, 189, 116, .08);
   font-weight: 600;
   letter-spacing: .08em;
   transition:
+    border-color 180ms ease,
     color 180ms ease,
     background 180ms ease,
     box-shadow 180ms ease,
@@ -310,18 +311,22 @@ button {
   color: #0b0b0d;
   background: var(--acid);
   font-size: 1rem;
-  transition: transform 180ms ease;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
 }
 
 .round-link:hover,
 .round-link:focus-visible {
   color: var(--paper);
-  background: rgba(201, 255, 71, .16);
-  box-shadow: 0 0 28px rgba(201, 255, 71, .22);
+  border-color: var(--violet);
+  background: rgba(171, 162, 255, .14);
+  box-shadow: 0 0 28px rgba(171, 162, 255, .22);
 }
 
 .round-link:hover .round-link-arrow,
 .round-link:focus-visible .round-link-arrow {
+  background: var(--violet);
   transform: translateY(3px);
 }
 
@@ -507,10 +512,16 @@ button {
   transition: color 180ms ease, padding 180ms ease;
 }
 
-.experience-tabs button:hover,
-.experience-tabs button:focus-visible,
 .experience-tabs button[aria-selected="true"] {
   color: var(--ink);
+  padding-left: 8px;
+}
+
+.experience-tabs button:hover,
+.experience-tabs button:focus-visible,
+.experience-tabs button[aria-selected="true"]:hover,
+.experience-tabs button[aria-selected="true"]:focus-visible {
+  color: #5147b4;
   padding-left: 8px;
 }
 
@@ -761,7 +772,15 @@ button {
   border-radius: 999px;
   color: var(--ink);
   background: var(--acid);
-  transition: transform 180ms ease;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.project-actions a:hover,
+.project-actions a:focus-visible {
+  background: var(--violet);
+  transform: translateY(-2px);
 }
 
 .project-actions > span {
@@ -887,7 +906,7 @@ button {
 
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid var(--acid);
+  outline: 2px solid var(--violet);
   outline-offset: 5px;
 }
 
@@ -958,7 +977,10 @@ button:focus-visible {
 }
 
 .offer-nav a:hover,
-.offer-nav a:focus-visible,
+.offer-nav a:focus-visible {
+  color: var(--violet);
+}
+
 .offer-nav-active {
   color: var(--acid);
 }
@@ -1012,7 +1034,7 @@ button:focus-visible {
 .offer-band .offer-section-label,
 .offer-faq .offer-section-label,
 .offer-contact .offer-section-label {
-  color: var(--acid-readable);
+  color: var(--offer-violet);
 }
 
 .offer-hero h1,
@@ -1103,17 +1125,22 @@ button:focus-visible {
 }
 
 .offer-primary-link span {
-  transition: transform 180ms ease;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
 }
 
 .offer-primary-link:hover,
 .offer-primary-link:focus-visible {
-  background: rgba(255, 189, 116, .08);
-  box-shadow: 0 0 28px rgba(255, 189, 116, .2);
+  border-color: var(--violet);
+  color: var(--violet);
+  background: rgba(171, 162, 255, .1);
+  box-shadow: 0 0 28px rgba(171, 162, 255, .2);
 }
 
 .offer-primary-link:hover span,
 .offer-primary-link:focus-visible span {
+  background: var(--violet);
   transform: translateX(3px);
 }
 
@@ -1342,8 +1369,8 @@ button:focus-visible {
 .offer-issue:hover,
 .offer-deliverable:hover,
 .offer-plan:hover {
-  border-color: rgba(116, 72, 20, .34);
-  box-shadow: 0 20px 44px rgba(17, 16, 20, .1);
+  border-color: rgba(79, 67, 184, .48);
+  box-shadow: 0 20px 44px rgba(79, 67, 184, .12);
   transform: translateY(-4px);
 }
 
@@ -1428,7 +1455,7 @@ button:focus-visible {
   left: -27px;
   width: 18px;
   height: 18px;
-  border: 3px solid var(--acid);
+  border: 3px solid var(--offer-violet);
   border-radius: 50%;
   background: var(--offer-surface-deep);
   transform: translateY(-50%);
@@ -1441,7 +1468,7 @@ button:focus-visible {
   left: -35px;
   width: 28px;
   height: 1px;
-  background: var(--offer-border);
+  background: rgba(79, 67, 184, .38);
   content: "";
 }
 
@@ -1477,8 +1504,8 @@ button:focus-visible {
 }
 
 .offer-scope-panel li:hover {
-  background: rgba(255, 189, 116, .12);
-  color: var(--acid-readable);
+  background: rgba(79, 67, 184, .1);
+  color: var(--offer-violet);
 }
 
 .offer-scope-panel aside {
@@ -1509,7 +1536,7 @@ button:focus-visible {
   right: 7%;
   left: 7%;
   height: 2px;
-  background: linear-gradient(90deg, var(--acid), rgba(255, 189, 116, .36));
+  background: linear-gradient(90deg, var(--offer-violet), rgba(79, 67, 184, .24));
   content: "";
 }
 
@@ -1525,17 +1552,17 @@ button:focus-visible {
   left: 0;
   width: 28px;
   height: 28px;
-  border: 4px solid var(--acid);
+  border: 4px solid var(--offer-violet);
   border-radius: 50%;
   background: var(--offer-surface);
-  box-shadow: 0 0 20px rgba(255, 189, 116, .32);
+  box-shadow: 0 0 20px rgba(79, 67, 184, .24);
   content: "";
 }
 
 .offer-timeline span {
   display: block;
   margin-bottom: 12px;
-  color: var(--acid-readable);
+  color: var(--offer-violet);
   font-weight: 700;
 }
 
@@ -1562,11 +1589,15 @@ button:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 28px;
+  align-items: stretch;
 }
 
 .offer-plan {
   position: relative;
+  display: flex;
+  height: 100%;
   min-height: 430px;
+  flex-direction: column;
   background: rgba(226, 223, 234, .52);
 }
 
@@ -1581,8 +1612,8 @@ button:focus-visible {
   margin-bottom: 22px;
   padding: 0 10px;
   border-radius: 3px;
-  color: var(--ink);
-  background: var(--acid);
+  color: var(--paper);
+  background: var(--offer-violet);
   font-size: .7rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1625,7 +1656,7 @@ button:focus-visible {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--acid);
+  background: var(--offer-violet);
   content: "";
 }
 
@@ -1634,7 +1665,7 @@ button:focus-visible {
   min-height: 54px;
   align-items: center;
   justify-content: center;
-  margin-top: 34px;
+  margin-top: auto;
   border: 1px solid var(--offer-violet);
   border-radius: 999px;
   color: var(--offer-violet);
@@ -1647,9 +1678,9 @@ button:focus-visible {
 
 .offer-plan a:hover,
 .offer-plan a:focus-visible {
-  color: var(--ink);
-  border-color: var(--acid);
-  background: var(--acid);
+  color: var(--paper);
+  border-color: var(--offer-violet);
+  background: var(--offer-violet);
 }
 
 .offer-continuation {
@@ -1669,8 +1700,8 @@ button:focus-visible {
   height: 8px;
   margin-right: 12px;
   border-radius: 50%;
-  background: var(--acid);
-  box-shadow: 0 0 14px rgba(255, 189, 116, .72);
+  background: var(--offer-violet);
+  box-shadow: 0 0 14px rgba(79, 67, 184, .42);
   content: "";
 }
 
@@ -1708,7 +1739,7 @@ button:focus-visible {
 
 .offer-faq summary:hover,
 .offer-faq summary:focus-visible {
-  color: var(--acid-readable);
+  color: var(--offer-violet);
 }
 
 .offer-faq summary::-webkit-details-marker {
@@ -1763,6 +1794,8 @@ button:focus-visible {
 .offer-contact > a {
   width: 72px;
   height: 72px;
+  color: var(--paper);
+  background: var(--offer-violet);
   font-size: 2rem;
   transition:
     box-shadow 180ms ease,
@@ -1771,7 +1804,7 @@ button:focus-visible {
 
 .offer-contact > a:hover,
 .offer-contact > a:focus-visible {
-  box-shadow: 0 0 30px rgba(255, 189, 116, .46);
+  box-shadow: 0 0 30px rgba(79, 67, 184, .32);
   transform: translateX(3px);
 }
 

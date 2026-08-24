@@ -224,9 +224,9 @@ function TopologyCanvas() {
         context.lineWidth = isHoveredLink ? 1.7 : 1;
         context.strokeStyle =
           isHoveredLink
-            ? "rgba(255,153,0,.9)"
+            ? "rgba(255,189,116,.9)"
             : isCompletedRoute
-              ? "rgba(255,153,0,.58)"
+              ? "rgba(255,189,116,.58)"
             : "rgba(201,197,255,.2)";
         context.stroke();
       });
@@ -241,7 +241,7 @@ function TopologyCanvas() {
           (fromY + (toY - fromY) * segmentProgress) * height,
         );
         context.lineWidth = 1.8;
-        context.strokeStyle = "rgba(255,153,0,.95)";
+        context.strokeStyle = "rgba(255,189,116,.95)";
         context.stroke();
       }
 
@@ -269,17 +269,17 @@ function TopologyCanvas() {
         context.arc(nodeX, nodeY, radius, 0, Math.PI * 2);
         context.fillStyle =
           proximity > 0 || isAutoActive || isRouteReached
-            ? "rgba(255,153,0,.98)"
+            ? "rgba(255,189,116,.98)"
             : "rgba(236,234,255,.8)";
         context.shadowBlur = isHovered ? 24 : isAutoActive ? 12 + pulse * 8 : 0;
-        context.shadowColor = "rgba(255,153,0,.75)";
+        context.shadowColor = "rgba(255,189,116,.75)";
         context.fill();
         context.shadowBlur = 0;
         if (isAutoActive || index === 2 || index === 5 || index === 8) {
           context.beginPath();
           context.arc(nodeX, nodeY, radius + 8, 0, Math.PI * 2);
           context.strokeStyle = isHovered || isAutoActive
-            ? "rgba(255,153,0,.65)"
+            ? "rgba(255,189,116,.65)"
             : `rgba(172,164,255,${0.18 + pulse * 0.18})`;
           context.stroke();
         }
@@ -316,7 +316,7 @@ function TopologyCanvas() {
         context.fillStyle = "rgba(11,11,13,.88)";
         context.strokeStyle =
           isHovered || isAutoActive
-            ? "rgba(255,153,0,.72)"
+            ? "rgba(255,189,116,.72)"
             : "rgba(201,197,255,.35)";
         context.lineWidth = 1;
         context.fillRect(labelX, labelY, labelWidth, labelHeight);

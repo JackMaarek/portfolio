@@ -987,7 +987,7 @@ button:focus-visible {
 
 .offer-hero-copy {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   min-height: calc(92svh - 178px);
   max-width: 760px;
@@ -1114,67 +1114,70 @@ button:focus-visible {
 
 .offer-topology {
   position: absolute;
-  top: 17%;
-  right: 3%;
-  width: min(54vw, 760px);
-  height: 68%;
-  opacity: .9;
+  top: 14%;
+  right: 1%;
+  z-index: 2;
+  width: min(56vw, 790px);
+  height: auto;
+  overflow: visible;
+  opacity: 1;
+  filter: drop-shadow(0 0 28px rgba(226, 255, 85, .08));
 }
 
-.offer-topology::before {
-  position: absolute;
-  inset: 7% 5% 9% 0;
-  background-image:
-    linear-gradient(34deg, transparent 0 24%, rgba(171, 162, 255, .18) 24% 24.35%, transparent 24.35% 100%),
-    linear-gradient(147deg, transparent 0 28%, rgba(171, 162, 255, .16) 28% 28.35%, transparent 28.35% 100%),
-    linear-gradient(72deg, transparent 0 48%, rgba(171, 162, 255, .16) 48% 48.35%, transparent 48.35% 100%);
-  content: "";
+.offer-topology-web line {
+  stroke: rgba(183, 176, 255, .34);
+  stroke-width: 1.35;
+  vector-effect: non-scaling-stroke;
 }
 
-.offer-route-line {
-  position: absolute;
-  top: 46%;
-  right: 9%;
-  left: 14%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--acid), rgba(226, 255, 85, .18));
-  transform: rotate(16deg);
-  transform-origin: left center;
+.offer-topology-ghosts circle {
+  fill: #b9b1ff;
+  opacity: .96;
 }
 
-.offer-node {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border: 5px solid var(--acid);
-  border-radius: 50%;
-  background: var(--ink);
-  box-shadow:
-    0 0 0 1px rgba(226, 255, 85, .62),
-    0 0 22px rgba(226, 255, 85, .42);
+.offer-topology-route {
+  fill: none;
+  stroke: url("#offer-route-gradient");
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  filter: url("#offer-topology-glow");
+  vector-effect: non-scaling-stroke;
 }
 
-.offer-node::after {
-  position: absolute;
-  top: -34px;
-  left: 20px;
-  padding: 6px 9px;
-  border: 1px solid rgba(239, 237, 245, .55);
-  color: var(--paper);
-  background: rgba(11, 11, 13, .72);
-  font-size: .62rem;
+.offer-topology-node {
+  filter: url("#offer-topology-glow");
+}
+
+.offer-node-halo {
+  fill: rgba(226, 255, 85, .16);
+  stroke: rgba(226, 255, 85, .68);
+  stroke-width: 1.4;
+}
+
+.offer-node-ring {
+  fill: var(--ink);
+  stroke: var(--acid);
+  stroke-width: 4.5;
+}
+
+.offer-node-core {
+  fill: var(--acid);
+}
+
+.offer-node-label rect {
+  fill: rgba(11, 11, 13, .72);
+  stroke: rgba(239, 237, 245, .58);
+  stroke-width: 1;
+}
+
+.offer-node-label text {
+  fill: var(--paper);
+  font-size: 11px;
   font-weight: 700;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  white-space: nowrap;
-  content: attr(data-label);
 }
-
-.node-code { top: 17%; left: 22%; }
-.node-ci { top: 34%; left: 32%; }
-.node-registry { top: 42%; left: 54%; }
-.node-argocd { top: 52%; left: 72%; }
-.node-eks { top: 72%; left: 83%; }
-.node-metrics { top: 82%; left: 60%; }
 
 .offer-band {
   position: relative;
@@ -1722,11 +1725,11 @@ button:focus-visible {
   }
 
   .offer-topology {
-    top: 26%;
-    right: -18%;
-    width: 86%;
-    height: 54%;
-    opacity: .5;
+    top: 25%;
+    right: -24%;
+    width: 96%;
+    height: auto;
+    opacity: .48;
   }
 
   .manifesto,
@@ -1887,7 +1890,7 @@ button:focus-visible {
   }
 
   .offer-hero h1 {
-    font-size: 4.15rem;
+    font-size: clamp(3rem, 13.2vw, 3.35rem);
     line-height: .95;
   }
 
@@ -1910,10 +1913,15 @@ button:focus-visible {
   }
 
   .offer-topology {
-    top: 32%;
-    right: -52%;
-    width: 128%;
-    height: 42%;
+    top: 43%;
+    right: -68%;
+    width: 150%;
+    height: auto;
+    opacity: .3;
+  }
+
+  .offer-node-label text {
+    font-size: 10px;
   }
 
   .round-link {

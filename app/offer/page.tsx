@@ -198,25 +198,89 @@ function OfferHeader() {
 
 function OfferTopology() {
   const nodes = [
-    { label: "Code", className: "node-code" },
-    { label: "CI", className: "node-ci" },
-    { label: "Registry", className: "node-registry" },
-    { label: "ArgoCD", className: "node-argocd" },
-    { label: "EKS", className: "node-eks" },
-    { label: "Metrics", className: "node-metrics" },
+    { label: "Code", x: 150, y: 78, width: 64, dx: 28, dy: -22 },
+    { label: "CI", x: 220, y: 220, width: 44, dx: 32, dy: 8 },
+    { label: "Registry", x: 410, y: 280, width: 92, dx: 30, dy: -22 },
+    { label: "ArgoCD", x: 555, y: 325, width: 78, dx: 32, dy: -18 },
+    { label: "EKS", x: 620, y: 430, width: 52, dx: 28, dy: -16 },
+    { label: "Metrics", x: 495, y: 505, width: 82, dx: 28, dy: 34 },
+  ];
+
+  const backgroundNodes = [
+    [96, 370],
+    [300, 112],
+    [570, 112],
+    [120, 500],
+    [318, 472],
+    [532, 392],
+  ];
+
+  const backgroundLinks = [
+    [150, 78, 300, 112],
+    [300, 112, 570, 112],
+    [570, 112, 620, 430],
+    [220, 220, 96, 370],
+    [220, 220, 300, 112],
+    [220, 220, 410, 280],
+    [96, 370, 318, 472],
+    [318, 472, 532, 392],
+    [410, 280, 532, 392],
+    [532, 392, 620, 430],
   ];
 
   return (
-    <div className="offer-topology" aria-hidden="true">
-      <div className="offer-route-line" />
-      {nodes.map((node) => (
-        <span
-          className={`offer-node ${node.className}`}
-          key={node.label}
-          data-label={node.label}
-        />
-      ))}
-    </div>
+    <svg
+      className="offer-topology"
+      viewBox="0 0 720 560"
+      aria-hidden="true"
+      focusable="false"
+      overflow="visible"
+    >
+      <defs>
+        <filter id="offer-topology-glow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="6" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <linearGradient id="offer-route-gradient" x1="120" x2="640" y1="80" y2="500">
+          <stop offset="0%" stopColor="rgba(226, 255, 85, .95)" />
+          <stop offset="100%" stopColor="rgba(226, 255, 85, .62)" />
+        </linearGradient>
+      </defs>
+
+      <g className="offer-topology-web">
+        {backgroundLinks.map(([x1, y1, x2, y2]) => (
+          <line key={`${x1}-${y1}-${x2}-${y2}`} x1={x1} y1={y1} x2={x2} y2={y2} />
+        ))}
+      </g>
+
+      <g className="offer-topology-ghosts">
+        {backgroundNodes.map(([x, y]) => (
+          <circle key={`${x}-${y}`} cx={x} cy={y} r="5" />
+        ))}
+      </g>
+
+      <polyline
+        className="offer-topology-route"
+        points="150,78 220,220 410,280 555,325 620,430 495,505"
+      />
+
+      <g className="offer-topology-nodes">
+        {nodes.map((node) => (
+          <g className="offer-topology-node" key={node.label} transform={`translate(${node.x} ${node.y})`}>
+            <circle className="offer-node-halo" r="18" />
+            <circle className="offer-node-ring" r="12" />
+            <circle className="offer-node-core" r="6" />
+            <g className="offer-node-label" transform={`translate(${node.dx} ${node.dy})`}>
+              <rect x="0" y="-16" width={node.width} height="28" rx="3" />
+              <text x="10" y="3">{node.label}</text>
+            </g>
+          </g>
+        ))}
+      </g>
+    </svg>
   );
 }
 

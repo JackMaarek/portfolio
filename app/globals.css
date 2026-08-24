@@ -1102,10 +1102,19 @@ button:focus-visible {
   background: var(--acid);
 }
 
+.offer-primary-link span {
+  transition: transform 180ms ease;
+}
+
 .offer-primary-link:hover,
 .offer-primary-link:focus-visible {
   background: rgba(255, 189, 116, .08);
   box-shadow: 0 0 28px rgba(255, 189, 116, .2);
+}
+
+.offer-primary-link:hover span,
+.offer-primary-link:focus-visible span {
+  transform: translateX(3px);
 }
 
 .offer-hero-foot {
@@ -1129,12 +1138,14 @@ button:focus-visible {
   overflow: visible;
   opacity: 1;
   filter: drop-shadow(0 0 28px rgba(255, 189, 116, .08));
+  animation: offer-fade-in 760ms cubic-bezier(.2,.8,.2,1) 180ms both;
 }
 
 .offer-topology-web line {
   stroke: rgba(183, 176, 255, .34);
   stroke-width: 1.35;
   vector-effect: non-scaling-stroke;
+  animation: offer-web-in 900ms ease-out 260ms both;
 }
 
 .offer-topology-ghosts circle {
@@ -1148,18 +1159,39 @@ button:focus-visible {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 3;
+  stroke-dasharray: 920;
+  stroke-dashoffset: 920;
   filter: url("#offer-topology-glow");
   vector-effect: non-scaling-stroke;
+  animation: offer-route-draw 1400ms cubic-bezier(.34,.88,.36,1) 420ms forwards;
 }
 
 .offer-topology-node {
+  opacity: 0;
   filter: url("#offer-topology-glow");
+  animation: offer-node-in 520ms ease-out both;
 }
+
+.offer-topology-node:nth-child(1) { animation-delay: 520ms; }
+.offer-topology-node:nth-child(2) { animation-delay: 660ms; }
+.offer-topology-node:nth-child(3) { animation-delay: 800ms; }
+.offer-topology-node:nth-child(4) { animation-delay: 940ms; }
+.offer-topology-node:nth-child(5) { animation-delay: 1080ms; }
+.offer-topology-node:nth-child(6) { animation-delay: 1220ms; }
+
+.offer-topology-node:nth-child(2) .offer-node-halo { animation-delay: 420ms; }
+.offer-topology-node:nth-child(3) .offer-node-halo { animation-delay: 840ms; }
+.offer-topology-node:nth-child(4) .offer-node-halo { animation-delay: 1260ms; }
+.offer-topology-node:nth-child(5) .offer-node-halo { animation-delay: 1680ms; }
+.offer-topology-node:nth-child(6) .offer-node-halo { animation-delay: 2100ms; }
 
 .offer-node-halo {
   fill: rgba(255, 189, 116, .16);
   stroke: rgba(255, 189, 116, .68);
   stroke-width: 1.4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: offer-node-breathe 3600ms ease-in-out infinite;
 }
 
 .offer-node-ring {
@@ -1184,6 +1216,74 @@ button:focus-visible {
   font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
+}
+
+.offer-hero .offer-section-label,
+.offer-hero h1,
+.offer-hero p:not(.offer-section-label, .offer-hero-foot),
+.offer-hero-tags,
+.offer-primary-link,
+.offer-hero-foot {
+  animation: offer-fade-up 680ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.offer-hero h1 { animation-delay: 80ms; }
+.offer-hero p:not(.offer-section-label, .offer-hero-foot) { animation-delay: 160ms; }
+.offer-hero-tags { animation-delay: 240ms; }
+.offer-primary-link { animation-delay: 320ms; }
+.offer-hero-foot { animation-delay: 420ms; }
+
+@keyframes offer-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes offer-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes offer-web-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes offer-route-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes offer-node-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes offer-node-breathe {
+  0%,
+  100% {
+    opacity: .72;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.14);
+  }
+}
+
+@keyframes offer-scroll-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .offer-band {
@@ -1233,6 +1333,18 @@ button:focus-visible {
   border-radius: 6px;
   background: rgba(226, 223, 234, .62);
   box-shadow: 0 14px 34px rgba(17, 16, 20, .06);
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.offer-issue:hover,
+.offer-deliverable:hover,
+.offer-plan:hover {
+  border-color: rgba(116, 72, 20, .34);
+  box-shadow: 0 20px 44px rgba(17, 16, 20, .1);
+  transform: translateY(-4px);
 }
 
 .offer-issue span,
@@ -1359,6 +1471,14 @@ button:focus-visible {
   border-bottom: 1px solid var(--offer-border);
   color: var(--offer-ink);
   font-weight: 700;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.offer-scope-panel li:hover {
+  background: rgba(255, 189, 116, .12);
+  color: var(--acid-readable);
 }
 
 .offer-scope-panel aside {
@@ -1583,6 +1703,12 @@ button:focus-visible {
   cursor: pointer;
   font-size: 1.15rem;
   list-style: none;
+  transition: color 180ms ease;
+}
+
+.offer-faq summary:hover,
+.offer-faq summary:focus-visible {
+  color: var(--acid-readable);
 }
 
 .offer-faq summary::-webkit-details-marker {
@@ -1592,10 +1718,12 @@ button:focus-visible {
 .offer-faq summary::after {
   content: "+";
   font-size: 1.6rem;
+  transition: transform 180ms ease;
 }
 
 .offer-faq details[open] summary::after {
   content: "-";
+  transform: rotate(180deg);
 }
 
 .offer-faq p {
@@ -1645,6 +1773,43 @@ button:focus-visible {
 .offer-contact > a:focus-visible {
   box-shadow: 0 0 30px rgba(255, 189, 116, .46);
   transform: translateX(3px);
+}
+
+@supports (animation-timeline: view()) {
+  .offer-band .offer-section-intro,
+  .offer-issue,
+  .offer-outcomes article,
+  .offer-flow,
+  .offer-scope-panel,
+  .offer-timeline article,
+  .offer-deliverable,
+  .offer-plan,
+  .offer-continuation,
+  .offer-faq details,
+  .offer-contact h2,
+  .offer-contact > a {
+    animation: offer-scroll-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 24%;
+  }
+
+  .offer-issue:nth-child(2),
+  .offer-deliverable:nth-child(2),
+  .offer-plan:nth-child(2) {
+    animation-range: entry 4% cover 26%;
+  }
+
+  .offer-issue:nth-child(3),
+  .offer-deliverable:nth-child(3),
+  .offer-timeline article:nth-child(3) {
+    animation-range: entry 8% cover 28%;
+  }
+
+  .offer-issue:nth-child(4),
+  .offer-deliverable:nth-child(4),
+  .offer-timeline article:nth-child(4) {
+    animation-range: entry 12% cover 30%;
+  }
 }
 
 @media (max-width: 900px) {
@@ -2119,6 +2284,7 @@ button:focus-visible {
   *::before,
   *::after {
     scroll-behavior: auto !important;
+    animation-delay: 0ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -2127,8 +2293,21 @@ button:focus-visible {
   .statement-line i,
   [data-reveal],
   .manifesto-copy,
-  .scroll-scene .section-label {
+  .scroll-scene .section-label,
+  .offer-hero .offer-section-label,
+  .offer-hero h1,
+  .offer-hero p,
+  .offer-hero-tags,
+  .offer-primary-link,
+  .offer-hero-foot,
+  .offer-topology,
+  .offer-topology-node,
+  .offer-node-halo {
     opacity: 1;
     transform: none;
+  }
+
+  .offer-topology-route {
+    stroke-dashoffset: 0;
   }
 }

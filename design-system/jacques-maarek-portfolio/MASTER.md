@@ -1,227 +1,164 @@
-# Design System Master File
+# Jacques Maarek Portfolio — Design System
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
-> If that file exists, its rules **override** this Master file.
-> If not, strictly follow the rules below.
+> Source of truth for the portfolio and the CI/CD & observability offer.
+> Page-specific rules may refine these foundations but must not redefine the brand.
 
----
+## Product direction
 
-**Project:** Jacques Maarek Portfolio
-**Generated:** 2026-07-30 17:57:08
-**Category:** Luxury/Premium Brand
-**Design Dials:** Variance 8/10 (Bold / Asymmetric) | Motion 7/10 (Standard) | Density 4/10 (Standard)
+The site positions Jacques Maarek as a senior freelance Platform Engineer: precise,
+credible, pragmatic and production-oriented. The visual language is inspired by
+infrastructure topology, operational signals and regulated environments. It must
+never read as a generic SaaS landing page or a creative-effects portfolio.
 
----
+The conversion sequence is:
 
-## Global Rules
+1. Understand the profile and business outcome.
+2. See expertise and professional proof.
+3. Read measurable impact and the k8s-platform proof of execution.
+4. Discover the short CI/CD & observability diagnostic.
+5. Start a qualified conversation.
 
-### Color Palette
+## Design principles
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#1E293B` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#334155` | `--color-secondary` |
-| Accent/CTA | `#DC2626` | `--color-accent` |
-| Background | `#F8FAFC` | `--color-background` |
-| Foreground | `#0F172A` | `--color-foreground` |
-| Muted | `#E9EDF1` | `--color-muted` |
-| Border | `#E2E8F0` | `--color-border` |
-| Destructive | `#DC2626` | `--color-destructive` |
-| Ring | `#1E293B` | `--color-ring` |
+1. **Production clarity** — explain outcomes before tools and preserve factual detail.
+2. **Controlled contrast** — dark cinematic storytelling alternates with mineral proof surfaces.
+3. **Signals, not decoration** — orange marks actions, live state and critical topology routes.
+4. **Technical legibility** — diagrams remain understandable without being required to read the copy.
+5. **Measured motion** — one dominant motion system per viewport, with a complete reduced-motion path.
+6. **Progressive conversion** — calls to action follow proof and use explicit, low-friction wording.
 
-**Color Notes:** Premium dark + action red
+## Color system
 
-### Typography
+### Dark portfolio surfaces
 
-- **Heading Font:** Inter
-- **Body Font:** Inter
-- **Mood:** dark, cinematic, technical, precision, clean, premium, developer, professional, high-end utility
-- **Google Fonts:** [Inter + Inter](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap)
+| Role | Value | Token |
+|---|---:|---|
+| Primary ink | `#0B0B0D` | `--ink` |
+| Primary text | `#EFEDF5` | `--paper` |
+| Muted text | `#AAA6B5` | `--muted` |
+| Structural lavender | `#ABA2FF` | `--violet` |
+| AWS-inspired action | `#FFBD74` | `--acid` |
+| Warm text on orange | `#744814` | `--acid-readable` |
+| Dark separators | `rgba(239, 237, 245, .18)` | `--line` |
 
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-```
+### Mineral offer surfaces
 
-### Spacing Variables
+| Role | Value | Token |
+|---|---:|---|
+| Offer ink | `#111014` | `--offer-ink` |
+| Offer muted text | `#595663` | `--offer-muted` |
+| Mineral base | `#D8D6E3` | `--offer-surface` |
+| Mineral soft | `#E2DFEA` | `--offer-surface-soft` |
+| Mineral deep | `#C9C6D8` | `--offer-surface-deep` |
+| Accessible violet | `#4F43B8` | `--offer-violet` |
+| Dark-surface lavender | `#9188E3` | `--offer-violet-soft` |
 
-*Density: 4/10 — Standard*
+Verified contrast pairs include `#AAA6B5` on `#0B0B0D` (8.27:1),
+`#FFBD74` on `#0B0B0D` (11.97:1), `#4F43B8` on `#EFEDF5` (6.22:1),
+and `#595663` on `#D8D6E3` (4.99:1).
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Tight gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
-| `--space-md` | `16px` / `1rem` | Standard padding |
-| `--space-lg` | `24px` / `1.5rem` | Section padding |
-| `--space-xl` | `32px` / `2rem` | Large gaps |
-| `--space-2xl` | `48px` / `3rem` | Section margins |
-| `--space-3xl` | `64px` / `4rem` | Hero padding |
+Orange is not a decorative third accent. Use it for availability, primary actions,
+section indexing on dark surfaces and the active infrastructure route. Lavender
+expresses structure, selected state, proof metrics and the offer’s primary hierarchy.
 
-### Shadow Depths
+## Typography
 
-| Level | Value | Usage |
-|-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+- Font stack: `Arial, Helvetica, sans-serif` for predictable metrics and zero extra transfer.
+- Body: `16px` minimum, `1.45–1.55` line height.
+- Long-form measure: `55–75ch`.
+- Display headings: tight tracking (`-0.04em` to `-0.075em`) with mobile clamps.
+- Labels: `11–12px`, uppercase, never used for essential paragraph content.
+- Avoid all-uppercase body copy and technology-heavy headlines without an outcome.
 
----
+## Layout and spacing
 
-## Component Specs
+- Minimum supported width: `320px`; production verification starts at `375px`.
+- Page gutter: `clamp(18px, 2.1vw, 30px)`.
+- Desktop grid: 12 visual columns expressed through CSS Grid, not fixed containers.
+- Section spacing: `92px` desktop, `58–70px` mobile depending on density.
+- Interactive target: `44px` preferred; never below WCAG 2.2’s `24px` minimum without spacing.
+- Cards use `6–8px` radii; pill radii are reserved for actions, tags and status.
 
-### Buttons
+Required verification widths:
 
-```css
-/* Primary Button */
-.btn-primary {
-  background: #DC2626;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
+| Width | Intent |
+|---:|---|
+| `375px` | Small mobile, stacked content and disclosure navigation |
+| `768px` | Tablet, single-column hero and selective two-column proof |
+| `1024px` | Laptop, disclosure navigation if status and links collide |
+| `1440px` | Full editorial composition and topology context |
 
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
+## Components
 
-/* Secondary Button */
-.btn-secondary {
-  background: transparent;
-  color: #1E293B;
-  border: 2px solid #1E293B;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-```
+### Header
 
-### Cards
+- One shared component across `/` and `/offer`.
+- Desktop shows logo, availability and the five primary destinations.
+- At `1120px` and below, use a disclosure menu with `aria-expanded`, Escape-to-close
+  and at least `52px` menu rows.
+- The active offer link uses `aria-current="page"` plus a visible underline.
 
-```css
-.card {
-  background: #F8FAFC;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
-  cursor: pointer;
-}
+### Calls to action
 
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-```
+- Primary: warm filled pill on dark surfaces; violet control on mineral surfaces.
+- Secondary: outlined pill with equal target height.
+- Labels state the destination or next action: “Découvrir l’offre”, “Planifier un échange”.
+- Never use an unlabeled arrow as the only conversion control.
 
-### Inputs
+### Cards and proof rows
 
-```css
-.input {
-  padding: 12px 16px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 200ms ease;
-}
+- Borders carry structure; shadows remain subtle and never replace hierarchy.
+- Hover may change background or elevation but must not shift adjacent layout.
+- Results stay factual and pair every large number with an explanatory sentence.
 
-.input:focus {
-  border-color: #1E293B;
-  outline: none;
-  box-shadow: 0 0 0 3px #1E293B20;
-}
-```
+### Experience tabs
 
-### Modals
+- Follow the WAI-ARIA tabs pattern: one tab stop, arrow-key navigation, Home/End,
+  linked `tab` and `tabpanel` IDs, and a focusable active panel.
+- Selection must never rely on color alone.
 
-```css
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
+### Infrastructure visualizations
 
-.modal {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: var(--shadow-xl);
-  max-width: 500px;
-  width: 90%;
-}
-```
-
----
-
-## Style Guidelines
-
-**Style:** Bento Grids
-
-**Keywords:** Apple-style, modular, cards, organized, clean, hierarchy, grid, rounded, soft
-
-**Best For:** Product features, dashboards, personal sites, marketing summaries, galleries
-
-**Key Effects:** Hover scale (1.02), soft shadow expansion, smooth layout shifts, content reveal
-
-### Page Pattern
-
-**Pattern Name:** Portfolio Grid
-
-- **Conversion Strategy:** Visuals first. Filter by category. Fast loading essential.
-- **CTA Placement:** Project Card Hover + Footer Contact
-- **Section Order:** 1. Hero (Name/Role), 2. Project Grid (Masonry), 3. About/Philosophy, 4. Contact
-
----
+- Decorative canvases and SVG topologies are `aria-hidden`.
+- Essential scope is repeated in semantic text or lists.
+- At mobile widths, remove labels that collide with copy and lower opacity.
+- Linear flows use semantic ordered lists and reflow vertically instead of clipping.
 
 ## Motion
 
-**Stagger List** (Standard) — Trigger: load or scroll | Duration: 300-450ms | Easing: `back.out(1.4)`
+- Entry duration: `300–680ms`; hover/focus feedback: `150–220ms`.
+- Avoid simultaneous parallax, canvas animation and choreography in one viewport.
+- Canvas animation pauses for `prefers-reduced-motion: reduce` and renders a static state.
+- StringTune does not start when reduced motion is requested.
+- Never animate layout properties or leave content hidden if motion does not run.
 
-```js
-gsap.from('.grid-item', { opacity: 0, scale: 0.92, y: 16, duration: 0.4, stagger: { each: 0.06, from: 'start', grid: 'auto' }, ease: 'back.out(1.4)' });
-```
+## Accessibility
 
-**Framework notes:** grid: 'auto' lets GSAP infer rows/columns from a CSS grid layout for a natural wave stagger
+- Target WCAG 2.2 AA.
+- Maintain `4.5:1` contrast for normal text and `3:1` for large text and UI boundaries.
+- Use a `3px` visible focus indicator with a `4px` offset on dark and light surfaces.
+- Preserve semantic headings, landmarks, lists, native `details/summary` and skip links.
+- All functionality must work with keyboard only and remain usable at 200% zoom.
+- Do not disable browser zoom or communicate state by color alone.
 
-- ✅ Combine with from: 'center' for a bento-grid layout to draw the eye inward first
-- ❌ Don't use back.out on dense data tables; the overshoot reads as sloppy on informational UI
-- ⚡ Group DOM writes; avoid interleaving layout reads (getBoundingClientRect) between staggered tweens
+## Anti-patterns
 
----
+- Generic red or blue SaaS palettes.
+- Multiple competing accent colors.
+- Tiny horizontal navigation squeezed onto mobile.
+- Topology labels placed beneath critical copy.
+- Decorative motion continuing under reduced-motion preferences.
+- Icon-only conversion links, vague “Explore” CTAs and homepage dead ends.
+- Raw technology lists without a business outcome or proof.
 
-## Anti-Patterns (Do NOT Use)
+## Pre-delivery checklist
 
-- ❌ Cheap visuals
-- ❌ Fast animations
-
-### Additional Forbidden Patterns
-
-- ❌ **Emojis as icons** — Use SVG icons (Heroicons, Lucide, Simple Icons)
-- ❌ **Missing cursor:pointer** — All clickable elements must have cursor:pointer
-- ❌ **Layout-shifting hovers** — Avoid scale transforms that shift layout
-- ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
-- ❌ **Instant state changes** — Always use transitions (150-300ms)
-- ❌ **Invisible focus states** — Focus states must be visible for a11y
-
----
-
-## Pre-Delivery Checklist
-
-Before delivering any UI code, verify:
-
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] `cursor-pointer` on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard navigation
-- [ ] `prefers-reduced-motion` respected
-- [ ] Responsive: 375px, 768px, 1024px, 1440px
-- [ ] No content hidden behind fixed navbars
-- [ ] No horizontal scroll on mobile
+- [ ] `/` and `/offer` tested at 375, 768, 1024 and 1440 px.
+- [ ] No horizontal clipping or scroll.
+- [ ] Mobile menu opens, closes, follows links and closes with Escape.
+- [ ] Experience tabs work with Tab, arrows, Home and End.
+- [ ] Focus is visible on every interactive control.
+- [ ] Reduced-motion mode renders complete static content.
+- [ ] FAQ, pricing links, anchors and mail links are reachable by keyboard.
+- [ ] No new visual dependency or unexpected layout shift.
+- [ ] Lint, build and source tests pass.

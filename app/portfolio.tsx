@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -8,6 +7,7 @@ import {
   StringProgress,
   StringTune,
 } from "@fiddle-digital/string-tune";
+import { SiteHeader } from "./site-header";
 
 const experiences = [
   {
@@ -120,6 +120,8 @@ function TopologyCanvas() {
     let height = 0;
     let pointerX = -1000;
     let pointerY = -1000;
+    let isInViewport = true;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const interactionSurface = canvas.closest<HTMLElement>(".hero");
     const nodes = [
       [0.12, 0.28],
@@ -164,20 +166,24 @@ function TopologyCanvas() {
       canvas.width = width * ratio;
       canvas.height = height * ratio;
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      if (reducedMotion) draw(6200);
     };
 
     const move = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
       pointerX = event.clientX - rect.left;
       pointerY = event.clientY - rect.top;
+      if (reducedMotion) draw(6200);
     };
 
     const leave = () => {
       pointerX = -1000;
       pointerY = -1000;
+      if (reducedMotion) draw(6200);
     };
 
     const draw = (time: number) => {
+      animationFrame = 0;
       context.clearRect(0, 0, width, height);
       const pulse = (Math.sin(time * 0.0012) + 1) / 2;
       const travelDuration = (deploymentRoute.length - 1) * segmentDuration;
@@ -251,7 +257,7 @@ function TopologyCanvas() {
         const distance = Math.hypot(nodeX - pointerX, nodeY - pointerY);
         const proximity = Math.max(0, 1 - distance / 88);
         const isHovered = index === hoveredNode;
-        const isAutoActive = index === activeFrom || index === activeTo;
+        const isAutoActive = !reducedMotion && (index === activeFrom || index === activeTo);
         const routeNodeIndex = deploymentRoute.indexOf(index);
         const isRouteReached =
           routeNodeIndex >= 0 && routeNodeIndex <= completedSegments;
@@ -287,7 +293,8 @@ function TopologyCanvas() {
 
       nodes.forEach(([x, y], index) => {
         const isHovered = index === hoveredNode;
-        const isAutoActive = index === activeFrom || index === activeTo;
+        const isAutoActive =
+          width > 520 && !reducedMotion && (index === activeFrom || index === activeTo);
         const isPersistent = width > 520 && persistentLabels.has(index);
         if (!isHovered && !isAutoActive && !isPersistent) return;
 
@@ -330,17 +337,42 @@ function TopologyCanvas() {
         context.restore();
       });
 
+      scheduleDraw();
+    };
+
+    function scheduleDraw() {
+      if (reducedMotion || !isInViewport || document.hidden || animationFrame) return;
       animationFrame = requestAnimationFrame(draw);
+    }
+
+    const pauseDraw = () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    };
+
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isInViewport = entry.isIntersecting;
+      if (isInViewport) scheduleDraw();
+      else pauseDraw();
+    });
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) pauseDraw();
+      else scheduleDraw();
     };
 
     resize();
+    visibilityObserver.observe(canvas);
     window.addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     interactionSurface?.addEventListener("pointermove", move);
     interactionSurface?.addEventListener("pointerleave", leave);
-    animationFrame = requestAnimationFrame(draw);
+    if (!reducedMotion) scheduleDraw();
     return () => {
-      cancelAnimationFrame(animationFrame);
+      pauseDraw();
+      visibilityObserver.disconnect();
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       interactionSurface?.removeEventListener("pointermove", move);
       interactionSurface?.removeEventListener("pointerleave", leave);
     };
@@ -350,18 +382,11 @@ function TopologyCanvas() {
 }
 
 export function Portfolio() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [activeExperience, setActiveExperience] = useState(0);
+  const experienceTabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const stringTune = StringTune.getInstance();
-    stringTune.scrollDesktopMode = "default";
-    stringTune.scrollMobileMode = "default";
-    stringTune.use(StringProgress);
-    stringTune.use(StringMagnetic);
-    stringTune.start(60);
-
     const revealElements = Array.from(
       document.querySelectorAll<HTMLElement>("[data-reveal]"),
     );
@@ -371,8 +396,16 @@ export function Portfolio() {
 
     if (reducedMotion) {
       revealElements.forEach((element) => element.classList.add("is-visible"));
-      return () => stringTune.destroy();
+      sceneElements.forEach((element) => element.style.setProperty("--scene-progress", ".5"));
+      return;
     }
+
+    const stringTune = StringTune.getInstance();
+    stringTune.scrollDesktopMode = "default";
+    stringTune.scrollMobileMode = "default";
+    stringTune.use(StringProgress);
+    stringTune.use(StringMagnetic);
+    stringTune.start(60);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -416,42 +449,18 @@ export function Portfolio() {
     };
   }, []);
 
+  const selectExperience = (index: number, moveFocus = false) => {
+    setActiveExperience(index);
+    if (moveFocus) {
+      window.requestAnimationFrame(() => experienceTabRefs.current[index]?.focus());
+    }
+  };
+
   return (
     <main className="site-shell">
       <a className="skip-link" href="#main-content">Aller au contenu</a>
       <div className="noise" aria-hidden="true" />
-      <header className="topbar">
-        <a className="monogram" href="#top" aria-label="Retour en haut">
-          <Image
-            src="/logo-jm-header.png"
-            alt=""
-            width={48}
-            height={48}
-            priority
-            unoptimized
-          />
-        </a>
-        <div className="status">
-          <span className="status-dot" />
-          Disponible pour missions freelance
-        </div>
-        <button
-          className="menu-toggle"
-          type="button"
-          aria-expanded={menuOpen}
-          aria-controls="main-nav"
-          onClick={() => setMenuOpen((value) => !value)}
-        >
-          {menuOpen ? "Fermer" : "Menu"}
-        </button>
-        <nav id="main-nav" className={menuOpen ? "nav open" : "nav"}>
-          <a href="#expertise" onClick={() => setMenuOpen(false)}>Expertise</a>
-          <a href="#experience" onClick={() => setMenuOpen(false)}>Expérience</a>
-          <Link href="/offer" onClick={() => setMenuOpen(false)}>Offre</Link>
-          <a href="#projects" onClick={() => setMenuOpen(false)}>Projets</a>
-          <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
-        </nav>
-      </header>
+      <SiteHeader page="portfolio" />
 
       <section id="top" className="hero">
         <div className="hero-grid" aria-hidden="true" />
@@ -479,10 +488,16 @@ export function Portfolio() {
           </div>
         </div>
         <div className="hero-foot">
-          <a className="round-link" href="#experience" {...tune("magnetic")}>
-            <span>Explorer</span>
-            <span className="round-link-arrow" aria-hidden="true">↓</span>
-          </a>
+          <div className="hero-actions">
+            <Link className="hero-offer-link" href="/offer">
+              <span>Découvrir l’offre</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+            <a className="round-link" href="#experience" {...tune("magnetic")}>
+              <span>Voir le parcours</span>
+              <span className="round-link-arrow" aria-hidden="true">↓</span>
+            </a>
+          </div>
           <p>6+ années · Banque · Santé · Cyber</p>
         </div>
       </section>
@@ -543,11 +558,33 @@ export function Portfolio() {
             {experiences.map((item, index) => (
               <button
                 key={item.company}
+                ref={(element) => { experienceTabRefs.current[index] = element; }}
+                id={`experience-tab-${index}`}
                 type="button"
                 role="tab"
                 aria-selected={activeExperience === index}
                 aria-controls={`experience-${index}`}
-                onClick={() => setActiveExperience(index)}
+                tabIndex={activeExperience === index ? 0 : -1}
+                onClick={() => selectExperience(index)}
+                onKeyDown={(event) => {
+                  const lastIndex = experiences.length - 1;
+                  let nextIndex: number | null = null;
+
+                  if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+                    nextIndex = index === lastIndex ? 0 : index + 1;
+                  } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+                    nextIndex = index === 0 ? lastIndex : index - 1;
+                  } else if (event.key === "Home") {
+                    nextIndex = 0;
+                  } else if (event.key === "End") {
+                    nextIndex = lastIndex;
+                  }
+
+                  if (nextIndex !== null) {
+                    event.preventDefault();
+                    selectExperience(nextIndex, true);
+                  }
+                }}
               >
                 <span>{item.period}</span>
                 <strong>{item.company}</strong>
@@ -561,7 +598,9 @@ export function Portfolio() {
               id={`experience-${index}`}
               className={activeExperience === index ? "experience-detail active" : "experience-detail"}
               role="tabpanel"
-              aria-hidden={activeExperience !== index}
+              aria-labelledby={`experience-tab-${index}`}
+              tabIndex={0}
+              hidden={activeExperience !== index}
             >
               <p className="detail-sector">{item.sector}</p>
               <h3>{item.role}</h3>
@@ -609,7 +648,12 @@ export function Portfolio() {
             </p>
           </div>
           <div className="project-actions">
-            <a href="https://github.com/JackMaarek" target="_blank" rel="noreferrer" {...tune("magnetic")}>
+            <a
+              href="https://github.com/PodYourLife/k8s-platform"
+              target="_blank"
+              rel="noreferrer"
+              {...tune("magnetic")}
+            >
               Voir sur GitHub <span aria-hidden="true">↗</span>
             </a>
             <span>CLI Go · platform-bot</span>
@@ -631,9 +675,34 @@ export function Portfolio() {
         </div>
       </section>
 
+      <section className="offer-bridge" aria-labelledby="offer-bridge-title">
+        <div className="offer-bridge-heading" data-reveal>
+          <p className="section-label">06 / Diagnostic CI/CD & Observabilité</p>
+          <h2 id="offer-bridge-title">
+            Une intervention courte pour rendre votre delivery
+            <span> lisible et actionnable.</span>
+          </h2>
+        </div>
+        <div className="offer-bridge-copy" data-reveal>
+          <p>
+            En 3 à 5 jours, j’identifie les risques de votre chaîne de delivery,
+            les angles morts d’observabilité et les actions à prioriser.
+          </p>
+          <ul aria-label="Périmètre du diagnostic">
+            <li>CI/CD</li>
+            <li>Kubernetes & GitOps</li>
+            <li>Observabilité</li>
+            <li>Roadmap 30/60 jours</li>
+          </ul>
+          <Link className="offer-bridge-link" href="/offer">
+            Découvrir le diagnostic <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </section>
+
       <footer id="contact" className="contact">
         <div className="contact-top">
-          <p className="section-label">06 / Contact</p>
+          <p className="section-label">07 / Contact</p>
           <p>Un besoin plateforme, cloud<br />ou automatisation ?</p>
         </div>
         <a className="contact-mail" href="mailto:jacques.maarek.dev@gmail.com" {...tune("magnetic")}>

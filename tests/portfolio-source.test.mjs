@@ -5,19 +5,39 @@ import test from "node:test";
 const projectRoot = new URL("../", import.meta.url);
 
 test("portfolio exposes its core positioning", async () => {
-  const portfolio = await readFile(
-    new URL("app/portfolio.tsx", projectRoot),
-    "utf8",
-  );
+  const [portfolio, header] = await Promise.all([
+    readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
+  ]);
 
   assert.match(portfolio, /Platform Engineer spécialisé Kubernetes/);
   assert.match(portfolio, /Le cloud, prêt pour la production/);
   assert.match(portfolio, /k8s-platform/);
   assert.match(portfolio, /platform-bot/);
+  assert.match(portfolio, /github\.com\/PodYourLife\/k8s-platform/);
+  assert.match(portfolio, /Découvrir l’offre/);
+  assert.match(portfolio, /Diagnostic CI\/CD & Observabilité/);
   assert.ok(portfolio.includes('href="/offer"'));
-  assert.ok(portfolio.includes('href="#projects"'));
-  assert.ok(!portfolio.includes('href="/offre"'));
-  assert.ok(!portfolio.includes("#projets"));
+  assert.ok(header.includes('portfolioHref: "#projects"'));
+  assert.ok(!`${portfolio}${header}`.includes('href="/offre"'));
+  assert.ok(!`${portfolio}${header}`.includes("#projets"));
+});
+
+test("shared navigation and experience tabs expose accessible interactions", async () => {
+  const [portfolio, header, styles] = await Promise.all([
+    readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/globals.css", projectRoot), "utf8"),
+  ]);
+
+  assert.match(header, /aria-expanded/);
+  assert.match(header, /aria-controls="main-nav"/);
+  assert.match(header, /event\.key !== "Escape"/);
+  assert.match(portfolio, /tabIndex=\{activeExperience === index \? 0 : -1\}/);
+  assert.match(portfolio, /event\.key === "ArrowRight"/);
+  assert.match(portfolio, /aria-labelledby=\{`experience-tab-/);
+  assert.match(styles, /@media \(max-width: 1120px\)/);
+  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
 test("document metadata describes the portfolio", async () => {
@@ -29,17 +49,20 @@ test("document metadata describes the portfolio", async () => {
 });
 
 test("offer page exposes the commercial diagnostic", async () => {
-  const offer = await readFile(
-    new URL("app/offer/page.tsx", projectRoot),
-    "utf8",
-  );
+  const [offer, header] = await Promise.all([
+    readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
+  ]);
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
   assert.ok(offer.includes("Vos déploiements"));
   assert.ok(offer.includes("À partir de 3 900 € HT"));
   assert.ok(offer.includes("Roadmap 30/60 jours"));
-  assert.ok(offer.includes('href="/offer"'));
-  assert.ok(offer.includes('href="/#projects"'));
-  assert.ok(!offer.includes('href="/offre"'));
+  assert.ok(offer.includes("Planifier un échange"));
+  assert.ok(offer.includes('<ol className="offer-flow"'));
+  assert.ok(offer.includes('<SiteHeader page="offer"'));
+  assert.ok(header.includes('offerHref: "/offer"'));
+  assert.ok(header.includes('offerHref: "/#projects"'));
+  assert.ok(!`${offer}${header}`.includes('href="/offre"'));
   assert.ok(!offer.includes("offre-content"));
 });

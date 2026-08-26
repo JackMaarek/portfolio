@@ -8,6 +8,9 @@
   --acid: #ffbd74;
   --acid-readable: #744814;
   --line: rgba(239, 237, 245, 0.18);
+  --focus-ring: #c9c2ff;
+  --page-gutter: clamp(18px, 2.1vw, 30px);
+  --touch-target: 44px;
 }
 
 * {
@@ -25,6 +28,8 @@ body {
   color: var(--paper);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -146,7 +151,10 @@ button {
 
 .menu-toggle {
   display: none;
+  min-width: 64px;
+  min-height: var(--touch-target);
   border: 0;
+  cursor: pointer;
   background: transparent;
 }
 
@@ -278,14 +286,49 @@ button {
   align-items: flex-end;
 }
 
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-offer-link {
+  display: inline-flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 0 22px;
+  border: 1px solid var(--acid);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--acid);
+  font-weight: 700;
+  letter-spacing: .02em;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.hero-offer-link:hover,
+.hero-offer-link:focus-visible {
+  border-color: var(--violet);
+  background: var(--violet);
+  box-shadow: 0 0 28px rgba(171, 162, 255, .2);
+  transform: translateY(-2px);
+}
+
 .round-link {
   position: relative;
   display: inline-flex;
-  width: 176px;
+  width: auto;
+  min-width: 188px;
   min-height: 54px;
   align-items: center;
   justify-content: center;
-  padding: 0 52px;
+  padding: 0 58px 0 24px;
   border: 1px solid var(--acid);
   border-radius: 999px;
   color: var(--paper);
@@ -550,6 +593,10 @@ button {
 
 .experience-detail.active {
   display: block;
+}
+
+.experience-detail[hidden] {
+  display: none;
 }
 
 @keyframes detail-in {
@@ -823,6 +870,83 @@ button {
   line-height: 1.5;
 }
 
+.offer-bridge {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr);
+  gap: clamp(48px, 8vw, 120px);
+  padding: 92px var(--page-gutter);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 78% 18%, rgba(171, 162, 255, .14), transparent 26rem),
+    #100f14;
+}
+
+.offer-bridge-heading h2 {
+  max-width: 920px;
+  margin: 46px 0 0;
+  font-size: clamp(3.2rem, 6.4vw, 7.2rem);
+  font-weight: 500;
+  line-height: .92;
+  letter-spacing: -.065em;
+}
+
+.offer-bridge-heading h2 span {
+  color: var(--violet);
+}
+
+.offer-bridge-copy {
+  align-self: end;
+}
+
+.offer-bridge-copy > p {
+  margin: 0;
+  color: var(--paper);
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  line-height: 1.45;
+}
+
+.offer-bridge-copy ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 28px 0 34px;
+  padding: 0;
+  list-style: none;
+}
+
+.offer-bridge-copy li {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: .72rem;
+}
+
+.offer-bridge-link {
+  display: inline-flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 0 22px;
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--acid);
+  font-weight: 700;
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.offer-bridge-link:hover,
+.offer-bridge-link:focus-visible {
+  background: var(--violet);
+  box-shadow: 0 0 28px rgba(171, 162, 255, .2);
+  transform: translateY(-2px);
+}
+
 .contact {
   position: relative;
   padding: 76px 30px 30px;
@@ -905,12 +1029,22 @@ button {
 }
 
 a:focus-visible,
-button:focus-visible {
-  outline: 2px solid var(--violet);
-  outline-offset: 5px;
+button:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 4px;
 }
 
-.contact a:focus-visible {
+.capabilities :focus-visible,
+.experience :focus-visible,
+.offer-band :focus-visible,
+.offer-faq :focus-visible,
+.offer-contact :focus-visible {
+  outline-color: var(--offer-violet, #5147b4);
+}
+
+.contact :focus-visible {
   outline-color: var(--ink);
 }
 
@@ -1105,7 +1239,8 @@ button:focus-visible {
   padding: 0 8px 0 28px;
   border: 1px solid var(--acid);
   border-radius: 999px;
-  color: var(--acid);
+  color: var(--ink);
+  background: var(--acid);
   font-weight: 700;
   transition:
     background 180ms ease,
@@ -1113,8 +1248,7 @@ button:focus-visible {
     transform 180ms ease;
 }
 
-.offer-primary-link span,
-.offer-contact > a {
+.offer-primary-link span {
   display: grid;
   width: 42px;
   height: 42px;
@@ -1133,15 +1267,47 @@ button:focus-visible {
 .offer-primary-link:hover,
 .offer-primary-link:focus-visible {
   border-color: var(--violet);
-  color: var(--violet);
-  background: rgba(171, 162, 255, .1);
+  color: var(--ink);
+  background: var(--violet);
   box-shadow: 0 0 28px rgba(171, 162, 255, .2);
+  transform: translateY(-2px);
 }
 
 .offer-primary-link:hover span,
 .offer-primary-link:focus-visible span {
   background: var(--violet);
   transform: translateX(3px);
+}
+
+.offer-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.offer-secondary-link {
+  display: inline-flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 46px;
+  padding: 0 24px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--paper);
+  font-weight: 700;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.offer-secondary-link:hover,
+.offer-secondary-link:focus-visible {
+  border-color: var(--violet);
+  color: var(--paper);
+  background: rgba(171, 162, 255, .12);
 }
 
 .offer-hero-foot {
@@ -1249,7 +1415,7 @@ button:focus-visible {
 .offer-hero h1,
 .offer-hero p:not(.offer-section-label, .offer-hero-foot),
 .offer-hero-tags,
-.offer-primary-link,
+.offer-hero-actions,
 .offer-hero-foot {
   animation: offer-fade-up 680ms cubic-bezier(.2,.8,.2,1) both;
 }
@@ -1257,7 +1423,7 @@ button:focus-visible {
 .offer-hero h1 { animation-delay: 80ms; }
 .offer-hero p:not(.offer-section-label, .offer-hero-foot) { animation-delay: 160ms; }
 .offer-hero-tags { animation-delay: 240ms; }
-.offer-primary-link { animation-delay: 320ms; }
+.offer-hero-actions { animation-delay: 300ms; }
 .offer-hero-foot { animation-delay: 420ms; }
 
 @keyframes offer-fade-in {
@@ -1434,10 +1600,12 @@ button:focus-visible {
   align-items: center;
   gap: 34px;
   margin-top: 34px;
+  padding: 0;
   overflow-x: auto;
+  list-style: none;
 }
 
-.offer-flow span {
+.offer-flow li {
   position: relative;
   flex: 0 0 auto;
   padding: 8px 12px;
@@ -1449,7 +1617,7 @@ button:focus-visible {
   text-transform: uppercase;
 }
 
-.offer-flow span::before {
+.offer-flow li::before {
   position: absolute;
   top: 50%;
   left: -27px;
@@ -1462,7 +1630,7 @@ button:focus-visible {
   content: "";
 }
 
-.offer-flow span + span::after {
+.offer-flow li + li::after {
   position: absolute;
   top: 50%;
   left: -35px;
@@ -1791,19 +1959,40 @@ button:focus-visible {
   color: var(--offer-violet);
 }
 
-.offer-contact > a {
-  width: 72px;
-  height: 72px;
-  color: var(--paper);
-  background: var(--offer-violet);
-  font-size: 2rem;
+.offer-contact-link {
+  display: inline-flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 8px 8px 8px 24px;
+  border: 1px solid rgba(79, 67, 184, .72);
+  border-radius: 999px;
+  color: var(--offer-violet);
+  font-weight: 700;
   transition:
+    color 180ms ease,
+    background 180ms ease,
     box-shadow 180ms ease,
     transform 180ms ease;
 }
 
-.offer-contact > a:hover,
-.offer-contact > a:focus-visible {
+.offer-contact-link i {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--paper);
+  background: var(--offer-violet);
+  font-size: 1.25rem;
+  font-style: normal;
+}
+
+.offer-contact-link:hover,
+.offer-contact-link:focus-visible {
+  color: var(--paper);
+  background: var(--offer-violet);
   box-shadow: 0 0 30px rgba(79, 67, 184, .32);
   transform: translateX(3px);
 }
@@ -1820,7 +2009,7 @@ button:focus-visible {
   .offer-continuation,
   .offer-faq details,
   .offer-contact h2,
-  .offer-contact > a {
+  .offer-contact-link {
     animation: offer-scroll-reveal linear both;
     animation-timeline: view();
     animation-range: entry 0% cover 24%;
@@ -1845,45 +2034,36 @@ button:focus-visible {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1120px) {
   .topbar {
     grid-template-columns: 1fr auto;
   }
 
   .offer-topbar {
-    grid-template-columns: auto 1fr;
-    gap: 18px;
+    grid-template-columns: 1fr auto;
   }
 
   .status {
     display: none;
   }
 
-  .offer-nav {
-    justify-content: flex-end;
-    gap: 14px;
-    overflow-x: auto;
-    font-size: .76rem;
-  }
-
   .menu-toggle {
     display: block;
-    min-width: 58px;
-    min-height: 44px;
-    cursor: pointer;
   }
 
   .nav {
     position: absolute;
     top: 84px;
     right: 18px;
+    z-index: 12;
     display: none;
-    width: min(300px, calc(100vw - 36px));
+    width: min(340px, calc(100vw - 36px));
     flex-direction: column;
     gap: 0;
     padding: 12px;
     border: 1px solid var(--line);
-    background: rgba(11,11,13,.96);
+    background: rgba(11,11,13,.98);
+    box-shadow: 0 24px 64px rgba(0,0,0,.34);
     backdrop-filter: blur(18px);
   }
 
@@ -1892,9 +2072,27 @@ button:focus-visible {
   }
 
   .nav a {
+    display: flex;
+    min-height: 52px;
+    align-items: center;
     padding: 16px;
     border-bottom: 1px solid var(--line);
   }
+
+  .offer-nav {
+    justify-content: flex-start;
+    overflow: visible;
+    font-size: .9rem;
+  }
+
+  .offer-nav-active::after {
+    right: 16px;
+    bottom: 7px;
+    left: 16px;
+  }
+}
+
+@media (max-width: 900px) {
 
   .topology {
     top: 19%;
@@ -2026,6 +2224,15 @@ button:focus-visible {
   .result-grid p {
     margin-top: 70px;
   }
+
+  .offer-bridge {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .offer-bridge-copy {
+    max-width: 640px;
+  }
 }
 
 @media (max-width: 620px) {
@@ -2047,17 +2254,6 @@ button:focus-visible {
   .offer-contact {
     padding-right: 18px;
     padding-left: 18px;
-  }
-
-  .offer-topbar {
-    align-items: start;
-    min-height: 96px;
-    padding-top: 18px;
-  }
-
-  .offer-nav {
-    justify-content: flex-start;
-    padding-bottom: 8px;
   }
 
   .hero {
@@ -2085,6 +2281,22 @@ button:focus-visible {
     gap: 30px;
   }
 
+  .hero-foot {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .hero-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .hero-offer-link,
+  .round-link {
+    width: 100%;
+  }
+
   .hero-statement {
     font-size: clamp(3.25rem, 16.2vw, 5.2rem);
     line-height: .86;
@@ -2092,6 +2304,14 @@ button:focus-visible {
 
   .hero-summary p {
     font-size: 1.12rem;
+  }
+
+  .topology {
+    top: 21%;
+    right: -30%;
+    width: 88%;
+    height: 34%;
+    opacity: .3;
   }
 
   .offer-hero h1 {
@@ -2114,23 +2334,35 @@ button:focus-visible {
   }
 
   .offer-primary-link {
+    width: 100%;
     margin-top: 34px;
   }
 
-  .offer-topology {
-    top: 43%;
-    right: -68%;
-    width: 150%;
-    height: auto;
-    opacity: .3;
+  .offer-hero-actions {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
   }
 
-  .offer-node-label text {
-    font-size: 10px;
+  .offer-secondary-link {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .offer-topology {
+    top: auto;
+    right: -28%;
+    bottom: 22px;
+    width: 108%;
+    height: auto;
+    opacity: .18;
+  }
+
+  .offer-node-label {
+    display: none;
   }
 
   .round-link {
-    width: 168px;
     min-height: 52px;
   }
 
@@ -2142,8 +2374,8 @@ button:focus-visible {
   .offer-band,
   .offer-faq,
   .offer-contact {
-    padding-top: 72px;
-    padding-bottom: 72px;
+    padding-top: 58px;
+    padding-bottom: 58px;
   }
 
   .offer-section-label {
@@ -2181,8 +2413,28 @@ button:focus-visible {
   }
 
   .offer-flow {
-    gap: 30px;
-    padding-bottom: 8px;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 18px;
+    padding: 0 0 0 32px;
+    overflow: visible;
+  }
+
+  .offer-flow li {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .offer-flow li::before {
+    left: -30px;
+  }
+
+  .offer-flow li + li::after {
+    top: -19px;
+    left: -22px;
+    width: 1px;
+    height: 18px;
   }
 
   .offer-scope-panel li {
@@ -2217,9 +2469,20 @@ button:focus-visible {
     font-size: 1rem;
   }
 
-  .offer-contact > a {
-    width: 58px;
-    height: 58px;
+  .offer-contact-link {
+    width: 100%;
+  }
+
+  .offer-bridge {
+    gap: 38px;
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+
+  .offer-bridge-heading h2 {
+    margin-top: 34px;
+    font-size: 2.85rem;
+    line-height: .98;
   }
 
   .manifesto-copy p {
@@ -2331,7 +2594,7 @@ button:focus-visible {
   .offer-hero h1,
   .offer-hero p,
   .offer-hero-tags,
-  .offer-primary-link,
+  .offer-hero-actions,
   .offer-hero-foot,
   .offer-topology,
   .offer-topology-node,
@@ -2342,5 +2605,15 @@ button:focus-visible {
 
   .offer-topology-route {
     stroke-dashoffset: 0;
+  }
+
+  .hero-offer-link:hover,
+  .offer-bridge-link:hover,
+  .offer-issue:hover,
+  .offer-deliverable:hover,
+  .offer-plan:hover,
+  .offer-contact-link:hover,
+  .project-actions a:hover {
+    transform: none;
   }
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
+import { SiteHeader } from "../site-header";
 
 const contactHref =
   "mailto:jacques.maarek.dev@gmail.com?subject=Diagnostic%20CI%2FCD%20%26%20Observabilit%C3%A9";
@@ -166,36 +165,6 @@ export const metadata: Metadata = {
     "Diagnostic court pour identifier ce qui fragilise vos déploiements, vos environnements et votre observabilité.",
 };
 
-function OfferHeader() {
-  return (
-    <header className="offer-topbar">
-      <Link className="monogram" href="/" aria-label="Retour à la landing page">
-        <Image
-          src="/logo-jm-header.png"
-          alt=""
-          width={48}
-          height={48}
-          priority
-          unoptimized
-        />
-      </Link>
-      <div className="status">
-        <span className="status-dot" />
-        Disponible pour missions freelance
-      </div>
-      <nav className="offer-nav" aria-label="Navigation offre">
-        <Link href="/#expertise">Expertise</Link>
-        <Link href="/#experience">Expérience</Link>
-        <Link className="offer-nav-active" href="/offer" aria-current="page">
-          Offre
-        </Link>
-        <Link href="/#projects">Projets</Link>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
-  );
-}
-
 function OfferTopology() {
   const nodes = [
     { label: "Code", x: 150, y: 78, width: 64, dx: 28, dy: -22 },
@@ -291,7 +260,7 @@ export default function OfferPage() {
         Aller au contenu
       </a>
       <div className="noise" aria-hidden="true" />
-      <OfferHeader />
+      <SiteHeader page="offer" />
 
       <section className="offer-hero" id="top">
         <div className="hero-grid" aria-hidden="true" />
@@ -314,10 +283,15 @@ export default function OfferPage() {
             <li>Métriques</li>
             <li>Alerting</li>
           </ul>
-          <a className="offer-primary-link" href="#formats">
-            Découvrir le diagnostic
-            <span aria-hidden="true">→</span>
-          </a>
+          <div className="offer-hero-actions">
+            <a className="offer-primary-link" href={contactHref}>
+              Planifier un échange
+              <span aria-hidden="true">→</span>
+            </a>
+            <a className="offer-secondary-link" href="#offer-content">
+              Voir le diagnostic
+            </a>
+          </div>
         </div>
         <p className="offer-hero-foot">
           Intervention courte · plan d’action concret
@@ -359,11 +333,11 @@ export default function OfferPage() {
             </article>
           ))}
         </div>
-        <div className="offer-flow" aria-label="Flux analysé">
+        <ol className="offer-flow" aria-label="Flux analysé">
           {["Code", "CI", "Registry", "ArgoCD", "EKS"].map((item) => (
-            <span key={item}>{item}</span>
+            <li key={item}>{item}</li>
           ))}
-        </div>
+        </ol>
       </section>
 
       <section className="offer-band offer-scope">
@@ -388,7 +362,7 @@ export default function OfferPage() {
         </div>
       </section>
 
-      <section className="offer-band offer-process">
+      <section id="diagnostic" className="offer-band offer-process">
         <div className="offer-section-intro">
           <p className="offer-section-label">05 / Le diagnostic</p>
           <h2>
@@ -479,8 +453,9 @@ export default function OfferPage() {
           </h2>
           <p>Un échange de 30 minutes pour qualifier le périmètre.</p>
         </div>
-        <a href={contactHref} aria-label="Contacter Jacques Maarek">
-          →
+        <a className="offer-contact-link" href={contactHref}>
+          <span>Échanger sur votre contexte</span>
+          <i aria-hidden="true">→</i>
         </a>
       </footer>
     </main>

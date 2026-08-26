@@ -59,7 +59,13 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(offer.includes("À partir de 3 900 € HT"));
   assert.ok(offer.includes("Roadmap 30/60 jours"));
   assert.ok(offer.includes("Planifier un échange"));
-  assert.ok(offer.includes('<ol className="offer-flow"'));
+  assert.ok(offer.includes("Pas un rapport de plus"));
+  assert.ok(offer.includes("Savoir où agir d’abord"));
+  assert.ok(offer.includes("Préparer le prochain déploiement"));
+  assert.ok(offer.includes("Piloter la remédiation"));
+  assert.ok(offer.includes('className="offer-recommendation-flow"'));
+  assert.ok(offer.includes("Construction d’une recommandation"));
+  assert.ok(!offer.includes("03 / La promesse"));
   assert.ok(offer.includes('<SiteHeader page="offer"'));
   assert.ok(header.includes('offerHref: "/offer"'));
   assert.ok(header.includes('offerHref: "/#projects"'));

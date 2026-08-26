@@ -111,6 +111,13 @@ Required verification widths:
 - Hover may change background or elevation but must not shift adjacent layout.
 - Results stay factual and pair every large number with an explanatory sentence.
 
+### Offer decision block
+
+- State the decisions enabled by the diagnostic, not generic qualities such as clarity or reliability.
+- Separate immediate, next-release and 30/60-day outcomes so buyers can project the operational value.
+- Make recommendation traceability explicit: observation → risk → impact → action → priority.
+- Keep this block distinct from scope, process and deliverables; it explains usefulness, not inventory.
+
 ### Experience tabs
 
 - Follow the WAI-ARIA tabs pattern: one tab stop, arrow-key navigation, Home/End,

@@ -27,19 +27,30 @@ const painPoints = [
   },
 ];
 
-const outcomes = [
+const decisionOutcomes = [
   {
-    title: "Lisibilité",
-    body: "Voir où la chaîne casse.",
+    horizon: "À la restitution",
+    title: "Savoir où agir d’abord",
+    body: "Les risques sont classés par impact, probabilité et effort de correction — pas par préférence d’outil.",
   },
   {
-    title: "Fiabilité",
-    body: "Réduire le risque opérationnel.",
+    horizon: "Prochaine mise en production",
+    title: "Préparer le prochain déploiement",
+    body: "Les garde-fous à vérifier, le chemin de rollback et les signaux à surveiller sont explicités.",
   },
   {
-    title: "Opérabilité",
-    body: "Diagnostiquer plus vite.",
+    horizon: "30 / 60 jours",
+    title: "Piloter la remédiation",
+    body: "Les actions sont séquencées avec leurs dépendances et un critère de réussite vérifiable.",
   },
+];
+
+const recommendationSteps = [
+  "Observation",
+  "Risque",
+  "Impact",
+  "Action",
+  "Priorité",
 ];
 
 const scopeItems = [
@@ -319,25 +330,43 @@ export default function OfferPage() {
 
       <section className="offer-band offer-promise">
         <div className="offer-section-intro">
-          <p className="offer-section-label">03 / La promesse</p>
+          <p className="offer-section-label">03 / Le résultat attendu</p>
           <h2>
-            En 3 à 5 jours,
-            <span> une vision claire, priorisée et actionnable.</span>
+            Pas un rapport de plus.
+            <span> Trois décisions utilisables dès la restitution.</span>
           </h2>
         </div>
-        <div className="offer-outcomes">
-          {outcomes.map((outcome) => (
-            <article key={outcome.title}>
-              <h3>{outcome.title}</h3>
-              <p>{outcome.body}</p>
-            </article>
-          ))}
+        <div className="offer-decision-panel">
+          <div className="offer-decisions">
+            {decisionOutcomes.map((outcome) => (
+              <article key={outcome.title}>
+                <p className="offer-decision-horizon">{outcome.horizon}</p>
+                <h3>{outcome.title}</h3>
+                <p>{outcome.body}</p>
+              </article>
+            ))}
+          </div>
+          <div className="offer-recommendation-model">
+            <p className="offer-recommendation-label">
+              Une recommandation traçable
+            </p>
+            <ol
+              className="offer-recommendation-flow"
+              aria-label="Construction d’une recommandation"
+            >
+              {recommendationSteps.map((item, index) => (
+                <li key={item}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{item}</strong>
+                </li>
+              ))}
+            </ol>
+            <p className="offer-recommendation-note">
+              Chaque action proposée doit pouvoir être reliée à un fait observé,
+              à son impact et à une priorité explicite.
+            </p>
+          </div>
         </div>
-        <ol className="offer-flow" aria-label="Flux analysé">
-          {["Code", "CI", "Registry", "ArgoCD", "EKS"].map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ol>
       </section>
 
       <section className="offer-band offer-scope">

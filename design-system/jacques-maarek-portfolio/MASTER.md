@@ -69,6 +69,8 @@ expresses structure, selected state, proof metrics and the offer’s primary hie
 - Display headings: tight tracking (`-0.04em` to `-0.075em`) with mobile clamps.
 - Labels: `11–12px`, uppercase, never used for essential paragraph content.
 - Avoid all-uppercase body copy and technology-heavy headlines without an outcome.
+- Offer-section headlines use complete expert propositions that name the object, analysis or decision; avoid three-word slogan sequences and social-post cadence.
+- Long offer headlines use a smaller editorial scale than the hero so expertise is read before visual impact.
 
 ## Layout and spacing
 
@@ -128,8 +130,15 @@ Required verification widths:
 
 - Decorative canvases and SVG topologies are `aria-hidden`.
 - Essential scope is repeated in semantic text or lists.
-- At mobile widths, remove labels that collide with copy and lower opacity.
+- Canvas labels remain stable and limited to the primary infrastructure path; animation must not cycle unrelated labels through the copy area.
+- At mobile widths, hide offer topologies that cross actions and reduce homepage topology opacity below competing-text level.
 - Linear flows use semantic ordered lists and reflow vertically instead of clipping.
+
+### Final conversion surfaces
+
+- Primary contact actions on mineral surfaces use a filled accessible-violet treatment, not a low-contrast outline that resembles a disabled state.
+- Short conversion phrases containing a hyphen remain on one line at supported mobile widths.
+- Hover feedback may change color or elevation but must not move a whole content row.
 
 ## Motion
 

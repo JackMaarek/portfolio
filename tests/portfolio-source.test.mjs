@@ -38,6 +38,10 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(portfolio, /aria-labelledby=\{`experience-tab-/);
   assert.match(styles, /@media \(max-width: 1120px\)/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(portfolio, /persistentLabels = new Set\(\[2, 3, 5\]\)/);
+  assert.match(styles, /\.manifesto-copy p \+ p\s*\{\s*color: var\(--paper\)/);
+  assert.match(styles, /\.contact-mail\s*\{[\s\S]*?white-space: nowrap/);
+  assert.match(styles, /\.offer-contact-link\s*\{[\s\S]*?background: var\(--offer-violet\)/);
 });
 
 test("document metadata describes the portfolio", async () => {
@@ -59,13 +63,17 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(offer.includes("À partir de 3 900 € HT"));
   assert.ok(offer.includes("Roadmap 30/60 jours"));
   assert.ok(offer.includes("Planifier un échange"));
-  assert.ok(offer.includes("Pas un rapport de plus"));
+  assert.ok(offer.includes("Des constats traçables pour arbitrer les risques"));
+  assert.ok(offer.includes("Une analyse progressive de la chaîne de delivery"));
+  assert.ok(offer.includes("Cartographie des risques"));
   assert.ok(offer.includes("Savoir où agir d’abord"));
   assert.ok(offer.includes("Préparer le prochain déploiement"));
   assert.ok(offer.includes("Piloter la remédiation"));
   assert.ok(offer.includes('className="offer-recommendation-flow"'));
   assert.ok(offer.includes("Construction d’une recommandation"));
   assert.ok(!offer.includes("03 / La promesse"));
+  assert.ok(!offer.includes("Comprendre."));
+  assert.ok(!offer.includes("Priorisé. Actionnable."));
   assert.ok(offer.includes('<SiteHeader page="offer"'));
   assert.ok(header.includes('offerHref: "/offer"'));
   assert.ok(header.includes('offerHref: "/#projects"'));

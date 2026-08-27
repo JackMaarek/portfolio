@@ -313,8 +313,8 @@ export default function OfferPage() {
         <div className="offer-section-intro">
           <p className="offer-section-label">02 / Ce qui vous ralentit</p>
           <h2>
-            Le problème n’est pas vos outils.
-            <span> C’est ce qu’on ne voit plus.</span>
+            Les zones aveugles de la chaîne de delivery
+            <span> concentrent l’essentiel du risque opérationnel.</span>
           </h2>
         </div>
         <div className="offer-issue-grid">
@@ -332,8 +332,8 @@ export default function OfferPage() {
         <div className="offer-section-intro">
           <p className="offer-section-label">03 / Le résultat attendu</p>
           <h2>
-            Pas un rapport de plus.
-            <span> Trois décisions utilisables dès la restitution.</span>
+            Des constats traçables pour arbitrer les risques
+            <span> et séquencer la remédiation.</span>
           </h2>
         </div>
         <div className="offer-decision-panel">
@@ -395,8 +395,8 @@ export default function OfferPage() {
         <div className="offer-section-intro">
           <p className="offer-section-label">05 / Le diagnostic</p>
           <h2>
-            Comprendre.
-            <span> Prioriser. Agir.</span>
+            Une analyse progressive de la chaîne de delivery,
+            <span> du cadrage à la restitution.</span>
           </h2>
         </div>
         <div className="offer-timeline">
@@ -414,8 +414,8 @@ export default function OfferPage() {
         <div className="offer-section-intro">
           <p className="offer-section-label">06 / Ce que vous obtenez</p>
           <h2>
-            Clair.
-            <span> Priorisé. Actionnable.</span>
+            Cartographie des risques
+            <span> et plan de remédiation exploitable.</span>
           </h2>
         </div>
         <div className="offer-deliverable-grid">
@@ -433,8 +433,8 @@ export default function OfferPage() {
         <div className="offer-section-intro">
           <p className="offer-section-label">07 / Formats</p>
           <h2>
-            Choisir le bon niveau
-            <span> de profondeur.</span>
+            Deux niveaux d’analyse adaptés
+            <span> à la maturité de votre chaîne de delivery.</span>
           </h2>
         </div>
         <div className="offer-plan-grid">

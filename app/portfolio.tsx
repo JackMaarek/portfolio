@@ -149,7 +149,7 @@ function TopologyCanvas() {
       "S3",
       "Metrics",
     ];
-    const persistentLabels = new Set([5, 8, 9]);
+    const persistentLabels = new Set([2, 3, 5]);
     const links = [
       [0, 1], [1, 2], [2, 3], [0, 4], [1, 5], [2, 5], [2, 6],
       [3, 6], [4, 5], [4, 7], [5, 8], [6, 8], [6, 10], [7, 8],
@@ -293,10 +293,9 @@ function TopologyCanvas() {
 
       nodes.forEach(([x, y], index) => {
         const isHovered = index === hoveredNode;
-        const isAutoActive =
-          width > 520 && !reducedMotion && (index === activeFrom || index === activeTo);
-        const isPersistent = width > 520 && persistentLabels.has(index);
-        if (!isHovered && !isAutoActive && !isPersistent) return;
+        const isPersistent =
+          window.innerWidth > 1024 && persistentLabels.has(index);
+        if (!isHovered && !isPersistent) return;
 
         const nodeX = x * width;
         const nodeY = y * height;
@@ -319,17 +318,17 @@ function TopologyCanvas() {
           labelY = nodeY + 14;
         }
 
-        context.globalAlpha = isHovered ? 1 : isAutoActive ? 0.92 : 0.58;
+        context.globalAlpha = isHovered ? 1 : 0.68;
         context.fillStyle = "rgba(11,11,13,.88)";
         context.strokeStyle =
-          isHovered || isAutoActive
+          isHovered
             ? "rgba(255,189,116,.72)"
             : "rgba(201,197,255,.35)";
         context.lineWidth = 1;
         context.fillRect(labelX, labelY, labelWidth, labelHeight);
         context.strokeRect(labelX, labelY, labelWidth, labelHeight);
         context.fillStyle =
-          isHovered || isAutoActive
+          isHovered
             ? "rgba(239,237,245,1)"
             : "rgba(239,237,245,.82)";
         context.textBaseline = "middle";
@@ -547,7 +546,10 @@ export function Portfolio() {
       <section id="experience" className="experience">
         <div className="section-heading experience-heading" data-reveal>
           <p className="section-label">03 / Parcours</p>
-          <h2>Livrer.<br />Fiabiliser.<br />Passer à l’échelle.</h2>
+          <h2>
+            Du back-end aux plateformes<br />
+            cloud industrialisées.
+          </h2>
           <p className="experience-intro">
             De 2018 à aujourd’hui, du développement back-end aux enjeux de
             plateforme, dans des secteurs où la rigueur compte.

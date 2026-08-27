@@ -413,11 +413,11 @@ button {
 }
 
 .manifesto-copy p + p {
-  color: #777480;
+  color: var(--paper);
 }
 
 .manifesto-copy span {
-  color: var(--paper);
+  color: var(--violet);
 }
 
 .manifesto aside {
@@ -463,12 +463,10 @@ button {
   gap: 42px;
   padding: 34px 0 38px;
   border-bottom: 1px solid rgba(11,11,13,.22);
-  transition: padding 220ms ease, background 220ms ease;
+  transition: background 180ms ease;
 }
 
 .capability:hover {
-  padding-right: 18px;
-  padding-left: 18px;
   background: #e4e0ec;
 }
 
@@ -519,6 +517,11 @@ button {
 .experience-heading {
   grid-template-columns: 1fr 2fr 1.2fr;
   align-items: end;
+}
+
+.experience-heading h2 {
+  font-size: clamp(3.2rem, 4.5vw, 5.4rem);
+  line-height: .94;
 }
 
 .experience-intro {
@@ -977,6 +980,7 @@ button {
   font-size: clamp(5.4rem, 15vw, 16rem);
   line-height: .72;
   letter-spacing: -.1em;
+  white-space: nowrap;
 }
 
 .contact-mail span {
@@ -1175,10 +1179,19 @@ summary:focus-visible,
 .offer-section-intro h2,
 .offer-contact h2 {
   margin: 0;
-  font-size: 7.5rem;
   font-weight: 500;
   line-height: .92;
   letter-spacing: 0;
+}
+
+.offer-hero h1 {
+  font-size: clamp(5.8rem, 8.2vw, 7.5rem);
+}
+
+.offer-section-intro h2 {
+  font-size: clamp(3.25rem, 4.8vw, 5rem);
+  line-height: .98;
+  letter-spacing: -.045em;
 }
 
 .offer-hero h1 span,
@@ -1501,7 +1514,6 @@ summary:focus-visible,
 }
 
 .offer-section-intro h2 {
-  font-size: 4.8rem;
   color: var(--offer-ink);
 }
 
@@ -1847,7 +1859,7 @@ summary:focus-visible,
 .offer-plan ul {
   display: grid;
   gap: 12px;
-  margin-top: 24px;
+  margin: 24px 0 32px;
 }
 
 .offer-plan li {
@@ -2008,7 +2020,8 @@ summary:focus-visible,
   padding: 8px 8px 8px 24px;
   border: 1px solid rgba(79, 67, 184, .72);
   border-radius: 999px;
-  color: var(--offer-violet);
+  color: var(--paper);
+  background: var(--offer-violet);
   font-weight: 700;
   transition:
     color 180ms ease,
@@ -2024,9 +2037,12 @@ summary:focus-visible,
   place-items: center;
   border-radius: 50%;
   color: var(--paper);
-  background: var(--offer-violet);
+  background: rgba(239, 237, 245, .16);
   font-size: 1.25rem;
   font-style: normal;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
 }
 
 .offer-contact-link:hover,
@@ -2034,6 +2050,11 @@ summary:focus-visible,
   color: var(--paper);
   background: var(--offer-violet);
   box-shadow: 0 0 30px rgba(79, 67, 184, .32);
+}
+
+.offer-contact-link:hover i,
+.offer-contact-link:focus-visible i {
+  background: rgba(239, 237, 245, .24);
   transform: translateX(3px);
 }
 
@@ -2191,7 +2212,7 @@ summary:focus-visible,
 
   .offer-section-intro h2,
   .offer-contact h2 {
-    font-size: 3.8rem;
+    font-size: 3.35rem;
   }
 
   .offer-scope-panel,
@@ -2346,7 +2367,7 @@ summary:focus-visible,
     right: -30%;
     width: 88%;
     height: 34%;
-    opacity: .3;
+    opacity: .16;
   }
 
   .offer-hero h1 {
@@ -2385,12 +2406,7 @@ summary:focus-visible,
   }
 
   .offer-topology {
-    top: auto;
-    right: -28%;
-    bottom: 22px;
-    width: 108%;
-    height: auto;
-    opacity: .18;
+    display: none;
   }
 
   .offer-node-label {
@@ -2589,13 +2605,17 @@ summary:focus-visible,
   }
 
   .contact-top {
-    gap: 45px;
+    gap: 28px;
     flex-direction: column;
   }
 
+  .contact {
+    padding-top: 58px;
+  }
+
   .contact-mail {
-    min-height: 300px;
-    font-size: 22vw;
+    min-height: 230px;
+    font-size: clamp(3.6rem, 18.5vw, 4.6rem);
   }
 
   .footer-meta {

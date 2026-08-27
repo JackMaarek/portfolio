@@ -129,7 +129,7 @@ const plans = [
   {
     title: "Diagnostic court",
     duration: "3 jours",
-    price: "À partir de 2 500 € HT",
+    price: "À partir de 1 560 € HT",
     cta: "Échanger sur le périmètre",
     points: [
       "CI/CD et environnements",
@@ -140,7 +140,7 @@ const plans = [
   {
     title: "Diagnostic complet",
     duration: "5 jours",
-    price: "À partir de 3 900 € HT",
+    price: "À partir de 2 600 € HT",
     cta: "Planifier un diagnostic",
     recommended: true,
     points: [

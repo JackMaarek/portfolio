@@ -60,7 +60,8 @@ test("offer page exposes the commercial diagnostic", async () => {
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
   assert.ok(offer.includes("Vos déploiements"));
-  assert.ok(offer.includes("À partir de 3 900 € HT"));
+  assert.ok(offer.includes("À partir de 1 560 € HT"));
+  assert.ok(offer.includes("À partir de 2 600 € HT"));
   assert.ok(offer.includes("Roadmap 30/60 jours"));
   assert.ok(offer.includes("Planifier un échange"));
   assert.ok(offer.includes("Des constats traçables pour arbitrer les risques"));

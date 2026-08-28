@@ -18,6 +18,7 @@ const navigation = [
 
 export function SiteHeader({ page }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const isOffer = page === "offer";
 
@@ -30,12 +31,31 @@ export function SiteHeader({ page }: SiteHeaderProps) {
       menuButtonRef.current?.focus();
     };
 
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!(event.target instanceof Node)) return;
+      if (!headerRef.current?.contains(event.target)) setMenuOpen(false);
+    };
+
+    const desktopQuery = window.matchMedia("(min-width: 1121px)");
+    const closeOnDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setMenuOpen(false);
+    };
+
     window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    desktopQuery.addEventListener("change", closeOnDesktop);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      desktopQuery.removeEventListener("change", closeOnDesktop);
+    };
   }, [menuOpen]);
 
   return (
-    <header className={isOffer ? "topbar offer-topbar" : "topbar"}>
+    <header
+      ref={headerRef}
+      className={isOffer ? "topbar offer-topbar" : "topbar"}
+    >
       <Link
         className="monogram"
         href={isOffer ? "/" : "#top"}

@@ -456,12 +456,13 @@ export function Portfolio() {
   };
 
   return (
-    <main className="site-shell">
-      <a className="skip-link" href="#main-content">Aller au contenu</a>
+    <div className="site-shell">
+      <a className="skip-link" href="#portfolio-main">Aller au contenu</a>
       <div className="noise" aria-hidden="true" />
       <SiteHeader page="portfolio" />
 
-      <section id="top" className="hero">
+      <main id="portfolio-main" className="page-main" tabIndex={-1}>
+        <section id="top" className="hero">
         <div className="hero-grid" aria-hidden="true" />
         <TopologyCanvas />
         <div className="hero-eyebrow">
@@ -499,7 +500,7 @@ export function Portfolio() {
           </div>
           <p>6+ années · Banque · Santé · Cyber</p>
         </div>
-      </section>
+        </section>
 
       <section
         id="main-content"
@@ -556,7 +557,12 @@ export function Portfolio() {
           </p>
         </div>
         <div className="experience-panel" data-reveal>
-          <div className="experience-tabs" role="tablist" aria-label="Expériences">
+          <div
+            className="experience-tabs"
+            role="tablist"
+            aria-label="Expériences"
+            aria-orientation="vertical"
+          >
             {experiences.map((item, index) => (
               <button
                 key={item.company}
@@ -619,7 +625,11 @@ export function Portfolio() {
       </section>
 
       <section id="projects" className="projects scroll-scene" data-scroll-scene>
-        <div className="project-visual" {...tune("progress", {"string-key": "--project-progress"})}>
+        <div
+          className="project-visual"
+          aria-hidden="true"
+          {...tune("progress", {"string-key": "--project-progress"})}
+        >
           <div className="orbit orbit-one" />
           <div className="orbit orbit-two" />
           <div className="core">
@@ -654,6 +664,7 @@ export function Portfolio() {
               href="https://github.com/PodYourLife/k8s-platform"
               target="_blank"
               rel="noreferrer"
+              aria-label="Voir k8s-platform sur GitHub (nouvel onglet)"
               {...tune("magnetic")}
             >
               Voir sur GitHub <span aria-hidden="true">↗</span>
@@ -701,6 +712,7 @@ export function Portfolio() {
           </Link>
         </div>
       </section>
+      </main>
 
       <footer id="contact" className="contact">
         <div className="contact-top">
@@ -712,11 +724,18 @@ export function Portfolio() {
         </a>
         <div className="footer-meta">
           <span>Jacques Maarek · Platform Engineer</span>
-          <a href="https://github.com/JackMaarek" target="_blank" rel="noreferrer">GitHub ↗</a>
+          <a
+            href="https://github.com/JackMaarek"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub de Jacques Maarek (nouvel onglet)"
+          >
+            GitHub ↗
+          </a>
           <a href="#top">Retour en haut ↑</a>
           <span>Paris · 2026</span>
         </div>
       </footer>
-    </main>
+    </div>
   );
 }

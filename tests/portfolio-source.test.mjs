@@ -33,23 +33,44 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(header, /aria-expanded/);
   assert.match(header, /aria-controls="main-nav"/);
   assert.match(header, /event\.key !== "Escape"/);
+  assert.match(header, /closeOnOutsidePointer/);
+  assert.match(header, /min-width: 1121px/);
   assert.match(portfolio, /tabIndex=\{activeExperience === index \? 0 : -1\}/);
   assert.match(portfolio, /event\.key === "ArrowRight"/);
+  assert.match(portfolio, /aria-orientation="vertical"/);
   assert.match(portfolio, /aria-labelledby=\{`experience-tab-/);
+  assert.match(portfolio, /className="project-visual"[\s\S]*?aria-hidden="true"/);
   assert.match(styles, /@media \(max-width: 1120px\)/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(styles, /--offer-violet: #4c40af/);
+  assert.match(styles, /\.nav a,[\s\S]*?min-height: var\(--touch-target\)/);
   assert.match(portfolio, /persistentLabels = new Set\(\[2, 3, 5\]\)/);
   assert.match(styles, /\.manifesto-copy p \+ p\s*\{\s*color: var\(--paper\)/);
   assert.match(styles, /\.contact-mail\s*\{[\s\S]*?white-space: nowrap/);
   assert.match(styles, /\.offer-contact-link\s*\{[\s\S]*?background: var\(--offer-violet\)/);
+
+  const scrollAnimationRules = styles.slice(
+    styles.indexOf("@supports (animation-timeline: view())"),
+    styles.indexOf("@media (max-width: 1120px)"),
+  );
+  assert.ok(!scrollAnimationRules.includes(".offer-contact-link"));
 });
 
 test("document metadata describes the portfolio", async () => {
-  const layout = await readFile(new URL("app/layout.tsx", projectRoot), "utf8");
+  const [layout, sharedMetadata, offer] = await Promise.all([
+    readFile(new URL("app/layout.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/site-metadata.ts", projectRoot), "utf8"),
+    readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
+  ]);
 
-  assert.match(layout, /Jacques Maarek — Platform Engineer/);
+  assert.match(sharedMetadata, /Jacques Maarek — Platform Engineer/);
+  assert.match(sharedMetadata, /x-forwarded-host/);
   assert.match(layout, /Infrastructure as Code/);
+  assert.match(layout, /alternates: \{ canonical:/);
   assert.match(layout, /<html lang="fr">/);
+  assert.match(offer, /openGraph:/);
+  assert.match(offer, /twitter:/);
+  assert.match(offer, /canonical: `\$\{origin\}\/offer`/);
 });
 
 test("offer page exposes the commercial diagnostic", async () => {
@@ -76,6 +97,8 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(!offer.includes("Comprendre."));
   assert.ok(!offer.includes("Priorisé. Actionnable."));
   assert.ok(offer.includes('<SiteHeader page="offer"'));
+  assert.ok(offer.includes('<main id="offer-main"'));
+  assert.ok(offer.includes('href="#offer-main"'));
   assert.ok(header.includes('offerHref: "/offer"'));
   assert.ok(header.includes('offerHref: "/#projects"'));
   assert.ok(!`${offer}${header}`.includes('href="/offre"'));

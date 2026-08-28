@@ -50,11 +50,11 @@ The conversion sequence is:
 | Mineral base | `#D8D6E3` | `--offer-surface` |
 | Mineral soft | `#E2DFEA` | `--offer-surface-soft` |
 | Mineral deep | `#C9C6D8` | `--offer-surface-deep` |
-| Accessible violet | `#4F43B8` | `--offer-violet` |
+| Accessible violet | `#4C40AF` | `--offer-violet` |
 | Dark-surface lavender | `#9188E3` | `--offer-violet-soft` |
 
 Verified contrast pairs include `#AAA6B5` on `#0B0B0D` (8.27:1),
-`#FFBD74` on `#0B0B0D` (11.97:1), `#4F43B8` on `#EFEDF5` (6.22:1),
+`#FFBD74` on `#0B0B0D` (11.97:1), `#4C40AF` on `#C9C6D8` (4.72:1),
 and `#595663` on `#D8D6E3` (4.99:1).
 
 Orange is not a decorative third accent. Use it for availability, primary actions,
@@ -110,7 +110,8 @@ Required verification widths:
 ### Cards and proof rows
 
 - Borders carry structure; shadows remain subtle and never replace hierarchy.
-- Hover may change background or elevation but must not shift adjacent layout.
+- Non-interactive cards remain visually stable on hover so they never imply clickability.
+- Interactive surfaces may change background or elevation but must not shift adjacent layout.
 - Results stay factual and pair every large number with an explanatory sentence.
 
 ### Offer decision block
@@ -144,6 +145,7 @@ Required verification widths:
 
 - Entry duration: `300–680ms`; hover/focus feedback: `150–220ms`.
 - Avoid simultaneous parallax, canvas animation and choreography in one viewport.
+- Animate section-level groups rather than every child card; keep each viewport to one or two motion cues.
 - Canvas animation pauses for `prefers-reduced-motion: reduce` and renders a static state.
 - StringTune does not start when reduced motion is requested.
 - Never animate layout properties or leave content hidden if motion does not run.

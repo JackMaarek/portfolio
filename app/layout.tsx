@@ -1,26 +1,19 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import "./globals.css";
+import { getSiteOrigin, siteName } from "./site-metadata";
 
-const title = "Jacques Maarek — Platform Engineer";
+const title = siteName;
 const description =
   "Platform Engineer spécialisé Kubernetes, GitOps, Infrastructure as Code et plateformes AWS sécurisées.";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const host =
-    requestHeaders.get("x-forwarded-host") ??
-    requestHeaders.get("host") ??
-    "localhost:3000";
-  const protocol =
-    requestHeaders.get("x-forwarded-proto") ??
-    (host.startsWith("localhost") ? "http" : "https");
-  const origin = `${protocol}://${host}`;
+  const origin = await getSiteOrigin();
   const image = `${origin}/og.png`;
 
   return {
     title,
     description,
+    alternates: { canonical: `${origin}/` },
     icons: {
       icon: [
         { url: "/favicon.ico", sizes: "any" },
@@ -35,8 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       type: "website",
+      url: `${origin}/`,
       locale: "fr_FR",
-      siteName: "Jacques Maarek — Platform Engineer",
+      siteName,
       images: [{ url: image, width: 1200, height: 630, alt: title }],
     },
     twitter: {

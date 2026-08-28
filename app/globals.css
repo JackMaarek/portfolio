@@ -5,6 +5,7 @@
   --paper: #efedf5;
   --muted: #aaa6b5;
   --violet: #aba2ff;
+  --violet-readable: #5147b4;
   --acid: #ffbd74;
   --acid-readable: #744814;
   --line: rgba(239, 237, 245, 0.18);
@@ -33,8 +34,10 @@ body {
 }
 
 button,
-a {
+a,
+summary {
   color: inherit;
+  touch-action: manipulation;
 }
 
 a {
@@ -64,6 +67,10 @@ button {
 
 .skip-link:focus {
   transform: translateY(0);
+}
+
+.page-main:focus {
+  outline: none;
 }
 
 .site-shell {
@@ -139,7 +146,16 @@ button {
 
 .nav a,
 .footer-meta a {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
   transition: color 180ms ease;
+}
+
+.nav a {
+  min-width: var(--touch-target);
+  justify-content: center;
+  padding-inline: 8px;
 }
 
 .nav a:hover,
@@ -450,7 +466,7 @@ button {
 
 .capabilities .section-label,
 .experience .section-label {
-  color: #5147b4;
+  color: var(--violet-readable);
 }
 
 .capability-list {
@@ -463,11 +479,6 @@ button {
   gap: 42px;
   padding: 34px 0 38px;
   border-bottom: 1px solid rgba(11,11,13,.22);
-  transition: background 180ms ease;
-}
-
-.capability:hover {
-  background: #e4e0ec;
 }
 
 .capability-index {
@@ -567,12 +578,12 @@ button {
 .experience-tabs button:focus-visible,
 .experience-tabs button[aria-selected="true"]:hover,
 .experience-tabs button[aria-selected="true"]:focus-visible {
-  color: #5147b4;
+  color: var(--violet-readable);
   padding-left: 8px;
 }
 
 .experience-tabs button[aria-selected="true"] i {
-  color: #5147b4;
+  color: var(--violet-readable);
   transform: rotate(45deg);
 }
 
@@ -609,7 +620,7 @@ button {
 
 .detail-sector {
   margin: 0 0 20px;
-  color: #5147b4;
+  color: var(--violet-readable);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.13em;
@@ -652,7 +663,7 @@ button {
   position: absolute;
   left: 0;
   content: "→";
-  color: #5147b4;
+  color: var(--violet-readable);
 }
 
 .projects {
@@ -864,6 +875,7 @@ button {
   font-weight: 500;
   line-height: .85;
   letter-spacing: -.09em;
+  font-variant-numeric: tabular-nums;
 }
 
 .result-grid p {
@@ -1058,7 +1070,8 @@ summary:focus-visible,
   --offer-surface: #d8d6e3;
   --offer-surface-soft: #e2dfea;
   --offer-surface-deep: #c9c6d8;
-  --offer-violet: #4f43b8;
+  --offer-violet: #4c40af;
+  --offer-violet-rgb: 76, 64, 175;
   --offer-violet-soft: #9188e3;
   --offer-border: rgba(17, 16, 20, .26);
   position: relative;
@@ -1344,6 +1357,7 @@ summary:focus-visible,
   overflow: visible;
   opacity: 1;
   filter: drop-shadow(0 0 28px rgba(255, 189, 116, .08));
+  pointer-events: none;
   animation: offer-fade-in 760ms cubic-bezier(.2,.8,.2,1) 180ms both;
 }
 
@@ -1538,18 +1552,6 @@ summary:focus-visible,
   border-radius: 6px;
   background: rgba(226, 223, 234, .62);
   box-shadow: 0 14px 34px rgba(17, 16, 20, .06);
-  transition:
-    border-color 220ms ease,
-    box-shadow 220ms ease,
-    transform 220ms ease;
-}
-
-.offer-issue:hover,
-.offer-deliverable:hover,
-.offer-plan:hover {
-  border-color: rgba(79, 67, 184, .48);
-  box-shadow: 0 20px 44px rgba(79, 67, 184, .12);
-  transform: translateY(-4px);
 }
 
 .offer-issue span,
@@ -1718,14 +1720,6 @@ summary:focus-visible,
   border-bottom: 1px solid var(--offer-border);
   color: var(--offer-ink);
   font-weight: 700;
-  transition:
-    background 180ms ease,
-    color 180ms ease;
-}
-
-.offer-scope-panel li:hover {
-  background: rgba(79, 67, 184, .1);
-  color: var(--offer-violet);
 }
 
 .offer-scope-panel aside {
@@ -1756,7 +1750,7 @@ summary:focus-visible,
   right: 7%;
   left: 7%;
   height: 2px;
-  background: linear-gradient(90deg, var(--offer-violet), rgba(79, 67, 184, .24));
+  background: linear-gradient(90deg, var(--offer-violet), rgba(var(--offer-violet-rgb), .24));
   content: "";
 }
 
@@ -1775,7 +1769,7 @@ summary:focus-visible,
   border: 4px solid var(--offer-violet);
   border-radius: 50%;
   background: var(--offer-surface);
-  box-shadow: 0 0 20px rgba(79, 67, 184, .24);
+  box-shadow: 0 0 20px rgba(var(--offer-violet-rgb), .24);
   content: "";
 }
 
@@ -1822,11 +1816,12 @@ summary:focus-visible,
 }
 
 .offer-plan.recommended {
-  border-color: rgba(79, 67, 184, .86);
+  border-color: rgba(var(--offer-violet-rgb), .86);
 }
 
 .offer-badge {
   display: inline-flex;
+  align-self: flex-start;
   min-height: 28px;
   align-items: center;
   margin-bottom: 22px;
@@ -1848,6 +1843,7 @@ summary:focus-visible,
   font-size: 4.2rem;
   font-weight: 500;
   line-height: .95;
+  font-variant-numeric: tabular-nums;
 }
 
 .offer-plan > p {
@@ -1921,7 +1917,7 @@ summary:focus-visible,
   margin-right: 12px;
   border-radius: 50%;
   background: var(--offer-violet);
-  box-shadow: 0 0 14px rgba(79, 67, 184, .42);
+  box-shadow: 0 0 14px rgba(var(--offer-violet-rgb), .42);
   content: "";
 }
 
@@ -2018,7 +2014,7 @@ summary:focus-visible,
   justify-content: space-between;
   gap: 30px;
   padding: 8px 8px 8px 24px;
-  border: 1px solid rgba(79, 67, 184, .72);
+  border: 1px solid rgba(var(--offer-violet-rgb), .72);
   border-radius: 999px;
   color: var(--paper);
   background: var(--offer-violet);
@@ -2049,7 +2045,7 @@ summary:focus-visible,
 .offer-contact-link:focus-visible {
   color: var(--paper);
   background: var(--offer-violet);
-  box-shadow: 0 0 30px rgba(79, 67, 184, .32);
+  box-shadow: 0 0 30px rgba(var(--offer-violet-rgb), .32);
 }
 
 .offer-contact-link:hover i,
@@ -2060,38 +2056,18 @@ summary:focus-visible,
 
 @supports (animation-timeline: view()) {
   .offer-band .offer-section-intro,
-  .offer-issue,
-  .offer-decisions article,
-  .offer-recommendation-model,
+  .offer-issue-grid,
+  .offer-decision-panel,
   .offer-scope-panel,
-  .offer-timeline article,
-  .offer-deliverable,
-  .offer-plan,
+  .offer-timeline,
+  .offer-deliverable-grid,
+  .offer-plan-grid,
   .offer-continuation,
   .offer-faq details,
-  .offer-contact h2,
-  .offer-contact-link {
+  .offer-contact > div {
     animation: offer-scroll-reveal linear both;
     animation-timeline: view();
     animation-range: entry 0% cover 24%;
-  }
-
-  .offer-issue:nth-child(2),
-  .offer-deliverable:nth-child(2),
-  .offer-plan:nth-child(2) {
-    animation-range: entry 4% cover 26%;
-  }
-
-  .offer-issue:nth-child(3),
-  .offer-deliverable:nth-child(3),
-  .offer-timeline article:nth-child(3) {
-    animation-range: entry 8% cover 28%;
-  }
-
-  .offer-issue:nth-child(4),
-  .offer-deliverable:nth-child(4),
-  .offer-timeline article:nth-child(4) {
-    animation-range: entry 12% cover 30%;
   }
 }
 
@@ -2151,6 +2127,10 @@ summary:focus-visible,
     bottom: 7px;
     left: 16px;
   }
+
+  .label-two {
+    transform: translate(-250px, 110px);
+  }
 }
 
 @media (max-width: 900px) {
@@ -2189,11 +2169,7 @@ summary:focus-visible,
   }
 
   .offer-topology {
-    top: 25%;
-    right: -24%;
-    width: 96%;
-    height: auto;
-    opacity: .48;
+    display: none;
   }
 
   .manifesto,
@@ -2248,16 +2224,16 @@ summary:focus-visible,
 
   .experience-tabs {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 
   .experience-tabs button {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 1fr auto;
     padding: 16px 10px;
   }
 
   .experience-tabs button span {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .projects {
@@ -2546,11 +2522,6 @@ summary:focus-visible,
     gap: 16px;
   }
 
-  .capability:hover {
-    padding-right: 0;
-    padding-left: 0;
-  }
-
   .experience {
     padding-top: 76px;
     padding-bottom: 82px;
@@ -2583,7 +2554,7 @@ summary:focus-visible,
   }
 
   .label-one { transform: translate(110px, -220px); }
-  .label-two { transform: translate(-210px, 110px); }
+  .label-two { transform: translate(-170px, 110px); }
   .label-three { transform: translate(80px, 190px); }
   .label-four { transform: translate(-180px, -170px); }
 
@@ -2638,6 +2609,21 @@ summary:focus-visible,
     transition-duration: 0.01ms !important;
   }
 
+  .offer-band .offer-section-intro,
+  .offer-issue-grid,
+  .offer-decision-panel,
+  .offer-scope-panel,
+  .offer-timeline,
+  .offer-deliverable-grid,
+  .offer-plan-grid,
+  .offer-continuation,
+  .offer-faq details,
+  .offer-contact > div {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
   .statement-line i,
   [data-reveal],
   .manifesto-copy,
@@ -2653,6 +2639,7 @@ summary:focus-visible,
   .offer-node-halo {
     opacity: 1;
     transform: none;
+    animation: none;
   }
 
   .offer-topology-route {
@@ -2661,11 +2648,14 @@ summary:focus-visible,
 
   .hero-offer-link:hover,
   .offer-bridge-link:hover,
-  .offer-issue:hover,
-  .offer-deliverable:hover,
-  .offer-plan:hover,
   .offer-contact-link:hover,
   .project-actions a:hover {
+    transform: none;
+  }
+
+  .round-link:hover .round-link-arrow,
+  .offer-primary-link:hover span,
+  .offer-contact-link:hover i {
     transform: none;
   }
 }

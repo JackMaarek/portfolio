@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "../site-header";
+import { getSiteOrigin, siteName } from "../site-metadata";
 
 const contactHref =
   "mailto:jacques.maarek.dev@gmail.com?subject=Diagnostic%20CI%2FCD%20%26%20Observabilit%C3%A9";
@@ -170,11 +171,35 @@ const faqs = [
   },
 ];
 
-export const metadata: Metadata = {
-  title: "Offre Diagnostic CI/CD & Observabilité — Jacques Maarek",
-  description:
-    "Diagnostic court pour identifier ce qui fragilise vos déploiements, vos environnements et votre observabilité.",
-};
+const offerTitle = "Offre Diagnostic CI/CD & Observabilité — Jacques Maarek";
+const offerDescription =
+  "Diagnostic court pour identifier ce qui fragilise vos déploiements, vos environnements et votre observabilité.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const origin = await getSiteOrigin();
+  const image = `${origin}/og.png`;
+
+  return {
+    title: offerTitle,
+    description: offerDescription,
+    alternates: { canonical: `${origin}/offer` },
+    openGraph: {
+      title: offerTitle,
+      description: offerDescription,
+      type: "website",
+      url: `${origin}/offer`,
+      locale: "fr_FR",
+      siteName,
+      images: [{ url: image, width: 1200, height: 630, alt: offerTitle }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: offerTitle,
+      description: offerDescription,
+      images: [image],
+    },
+  };
+}
 
 function OfferTopology() {
   const nodes = [
@@ -266,14 +291,15 @@ function OfferTopology() {
 
 export default function OfferPage() {
   return (
-    <main className="offer-shell">
-      <a className="skip-link" href="#offer-content">
+    <div className="offer-shell">
+      <a className="skip-link" href="#offer-main">
         Aller au contenu
       </a>
       <div className="noise" aria-hidden="true" />
       <SiteHeader page="offer" />
 
-      <section className="offer-hero" id="top">
+      <main id="offer-main" className="page-main" tabIndex={-1}>
+        <section className="offer-hero" id="top">
         <div className="hero-grid" aria-hidden="true" />
         <OfferTopology />
         <div className="offer-hero-copy">
@@ -307,7 +333,7 @@ export default function OfferPage() {
         <p className="offer-hero-foot">
           Intervention courte · plan d’action concret
         </p>
-      </section>
+        </section>
 
       <section id="offer-content" className="offer-band offer-problem">
         <div className="offer-section-intro">
@@ -472,6 +498,7 @@ export default function OfferPage() {
           </details>
         ))}
       </section>
+      </main>
 
       <footer id="contact" className="offer-contact">
         <div>
@@ -487,6 +514,6 @@ export default function OfferPage() {
           <i aria-hidden="true">→</i>
         </a>
       </footer>
-    </main>
+    </div>
   );
 }

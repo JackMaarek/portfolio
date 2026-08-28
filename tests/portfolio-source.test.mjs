@@ -129,3 +129,27 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(!`${offer}${header}`.includes('href="/offre"'));
   assert.ok(!offer.includes("offre-content"));
 });
+
+test("effect lab exposes an isolated accessible system trace", async () => {
+  const [page, experience, styles] = await Promise.all([
+    readFile(new URL("app/effect-lab/page.tsx", projectRoot), "utf8"),
+    readFile(
+      new URL("app/effect-lab/effect-lab-experience.tsx", projectRoot),
+      "utf8",
+    ),
+    readFile(
+      new URL("app/effect-lab/effect-lab.module.css", projectRoot),
+      "utf8",
+    ),
+  ]);
+
+  assert.match(page, /index: false/);
+  assert.match(page, /follow: false/);
+  assert.match(experience, /requestAnimationFrame/);
+  assert.match(experience, /getPointAtLength/);
+  assert.match(experience, /prefers-reduced-motion: reduce/);
+  assert.match(experience, /aria-label="Parcours de delivery du code aux métriques"/);
+  assert.match(experience, /data-trace-step/);
+  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(styles, /\.traceStage\s*\{[\s\S]*?position: sticky/);
+});

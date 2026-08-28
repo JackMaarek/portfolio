@@ -519,6 +519,81 @@ button {
   font-size: 0.72rem;
 }
 
+.tech-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.tech-stack-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #5e5965;
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .13em;
+}
+
+.tech-stack-label::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--violet-readable);
+  box-shadow: 0 0 0 4px rgba(81, 71, 180, .09);
+  content: "";
+  transition: box-shadow 200ms ease-out;
+}
+
+.tech-list li {
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  background: rgba(239, 237, 245, .28);
+  transition:
+    border-color 200ms ease-out,
+    background-color 200ms ease-out;
+}
+
+.tech-list li::after {
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    105deg,
+    transparent 24%,
+    rgba(81, 71, 180, .18) 50%,
+    transparent 76%
+  );
+  content: "";
+  pointer-events: none;
+  transform: translateX(-125%);
+}
+
+@keyframes tech-stack-signal {
+  to { transform: translateX(125%); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tech-stack:hover .tech-stack-label::before {
+    box-shadow: 0 0 0 5px rgba(81, 71, 180, .14), 0 0 14px rgba(81, 71, 180, .28);
+  }
+
+  .tech-stack:hover .tech-list li {
+    border-color: rgba(81, 71, 180, .5);
+    background: #e7e4ef;
+  }
+
+  .tech-stack:hover .tech-list li::after {
+    animation: tech-stack-signal 320ms ease-out both;
+  }
+
+  .tech-stack:hover .tech-list li:nth-child(2)::after { animation-delay: 35ms; }
+  .tech-stack:hover .tech-list li:nth-child(3)::after { animation-delay: 70ms; }
+  .tech-stack:hover .tech-list li:nth-child(4)::after { animation-delay: 105ms; }
+  .tech-stack:hover .tech-list li:nth-child(5)::after { animation-delay: 140ms; }
+  .tech-stack:hover .tech-list li:nth-child(6)::after { animation-delay: 175ms; }
+}
+
 .experience {
   padding: 92px 30px 100px;
   background: var(--paper);
@@ -2644,6 +2719,11 @@ summary:focus-visible,
 
   .offer-topology-route {
     stroke-dashoffset: 0;
+  }
+
+  .tech-stack:hover .tech-list li::after {
+    animation: none;
+    transform: none;
   }
 
   .hero-offer-link:hover,

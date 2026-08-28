@@ -616,9 +616,17 @@ export function Portfolio() {
               <ul className="detail-points">
                 {item.points.map((point) => <li key={point}>{point}</li>)}
               </ul>
-              <ul className="tech-list" aria-label="Technologies">
-                {item.tech.map((tech) => <li key={tech}>{tech}</li>)}
-              </ul>
+              <div className="tech-stack">
+                <p className="tech-stack-label" id={`experience-tech-${index}`}>
+                  Stack mobilisée
+                </p>
+                <ul
+                  className="tech-list"
+                  aria-labelledby={`experience-tech-${index}`}
+                >
+                  {item.tech.map((tech) => <li key={tech}>{tech}</li>)}
+                </ul>
+              </div>
             </article>
           ))}
         </div>

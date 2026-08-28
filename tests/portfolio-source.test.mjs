@@ -39,11 +39,15 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(portfolio, /event\.key === "ArrowRight"/);
   assert.match(portfolio, /aria-orientation="vertical"/);
   assert.match(portfolio, /aria-labelledby=\{`experience-tab-/);
+  assert.match(portfolio, /Stack mobilisée/);
+  assert.match(portfolio, /aria-labelledby=\{`experience-tech-/);
   assert.match(portfolio, /className="project-visual"[\s\S]*?aria-hidden="true"/);
   assert.match(styles, /@media \(max-width: 1120px\)/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(styles, /--offer-violet: #4c40af/);
   assert.match(styles, /\.nav a,[\s\S]*?min-height: var\(--touch-target\)/);
+  assert.match(styles, /@media \(hover: hover\) and \(pointer: fine\)/);
+  assert.match(styles, /@keyframes tech-stack-signal/);
   assert.match(portfolio, /persistentLabels = new Set\(\[2, 3, 5\]\)/);
   assert.match(styles, /\.manifesto-copy p \+ p\s*\{\s*color: var\(--paper\)/);
   assert.match(styles, /\.contact-mail\s*\{[\s\S]*?white-space: nowrap/);
@@ -53,7 +57,14 @@ test("shared navigation and experience tabs expose accessible interactions", asy
     styles.indexOf("@supports (animation-timeline: view())"),
     styles.indexOf("@media (max-width: 1120px)"),
   );
+  const reducedMotionRules = styles.slice(
+    styles.indexOf("@media (prefers-reduced-motion: reduce)"),
+  );
   assert.ok(!scrollAnimationRules.includes(".offer-contact-link"));
+  assert.match(
+    reducedMotionRules,
+    /\.tech-stack:hover \.tech-list li::after[\s\S]*?animation: none/,
+  );
 });
 
 test("document metadata describes the portfolio", async () => {

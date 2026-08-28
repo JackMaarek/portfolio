@@ -106,12 +106,15 @@ Required verification widths:
 - Primary: warm filled pill on dark surfaces; violet control on mineral surfaces.
 - Secondary: outlined pill with equal target height.
 - Labels state the destination or next action: “Découvrir l’offre”, “Planifier un échange”.
+- Primary and secondary links provide distinct hover, keyboard-focus and press feedback.
 - Never use an unlabeled arrow as the only conversion control.
 
 ### Cards and proof rows
 
 - Borders carry structure; shadows remain subtle and never replace hierarchy.
-- Non-interactive cards remain visually stable on hover so they never imply clickability.
+- Offer proof cards may use an ambient violet border, tint or shadow on hover while
+  preserving the default cursor and omitting arrows or link-like labels.
+- Only surfaces containing a real action may translate subtly on hover.
 - Interactive surfaces may change background or elevation but must not shift adjacent layout.
 - Results stay factual and pair every large number with an explanatory sentence.
 

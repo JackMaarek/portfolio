@@ -56,6 +56,12 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(styles, /\.manifesto-copy p \+ p\s*\{\s*color: var\(--paper\)/);
   assert.match(styles, /\.contact-mail\s*\{[\s\S]*?white-space: nowrap/);
   assert.match(styles, /\.offer-contact-link\s*\{[\s\S]*?background: var\(--offer-violet\)/);
+  assert.match(styles, /\.offer-issue:hover,[\s\S]*?\.offer-decisions article:hover/);
+  assert.match(styles, /\.offer-scope-panel li:hover/);
+  assert.match(styles, /\.offer-timeline article:hover::before/);
+  assert.match(styles, /\.offer-faq details:hover/);
+  assert.match(styles, /\.offer-faq details\[open\] p[\s\S]*?offer-faq-content-in/);
+  assert.match(styles, /\.offer-primary-link:active,[\s\S]*?transform: scale\(\.985\)/);
 
   const reducedMotionRules = styles.slice(
     styles.indexOf("@media (prefers-reduced-motion: reduce)"),
@@ -66,6 +72,7 @@ test("shared navigation and experience tabs expose accessible interactions", asy
     reducedMotionRules,
     /\.technology-tag::before[\s\S]*?transition: none/,
   );
+  assert.match(reducedMotionRules, /\.offer-plan:hover,[\s\S]*?transform: none/);
 });
 
 test("document metadata describes the portfolio", async () => {

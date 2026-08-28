@@ -1394,7 +1394,9 @@ summary:focus-visible,
   transition:
     border-color 180ms ease,
     color 180ms ease,
-    background 180ms ease;
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
 .offer-secondary-link:hover,
@@ -1402,6 +1404,13 @@ summary:focus-visible,
   border-color: var(--violet);
   color: var(--paper);
   background: rgba(171, 162, 255, .12);
+}
+
+.offer-primary-link:active,
+.offer-secondary-link:active,
+.offer-plan a:active,
+.offer-contact-link:active {
+  transform: scale(.985);
 }
 
 .offer-hero-foot {
@@ -1603,12 +1612,18 @@ summary:focus-visible,
 .offer-issue,
 .offer-deliverable,
 .offer-plan {
+  position: relative;
   min-height: 210px;
   padding: 28px;
   border: 1px solid var(--offer-border);
   border-radius: 6px;
   background: rgba(226, 223, 234, .62);
   box-shadow: 0 14px 34px rgba(17, 16, 20, .06);
+  transition:
+    border-color 200ms ease-out,
+    background-color 200ms ease-out,
+    box-shadow 200ms ease-out,
+    transform 200ms cubic-bezier(.2,.8,.2,1);
 }
 
 .offer-issue span,
@@ -1670,6 +1685,10 @@ summary:focus-visible,
   border: 1px solid var(--offer-border);
   border-radius: 6px;
   background: rgba(226, 223, 234, .42);
+  transition:
+    border-color 200ms ease-out,
+    background-color 200ms ease-out,
+    box-shadow 200ms ease-out;
 }
 
 .offer-decisions .offer-decision-horizon {
@@ -1712,6 +1731,10 @@ summary:focus-visible,
   border: 1px solid var(--offer-border);
   border-radius: 4px;
   background: rgba(226, 223, 234, .48);
+  transition:
+    border-color 180ms ease-out,
+    background-color 180ms ease-out,
+    box-shadow 180ms ease-out;
 }
 
 .offer-recommendation-flow li:not(:last-child)::after {
@@ -1777,6 +1800,10 @@ summary:focus-visible,
   border-bottom: 1px solid var(--offer-border);
   color: var(--offer-ink);
   font-weight: 700;
+  transition:
+    color 180ms ease-out,
+    background-color 180ms ease-out,
+    box-shadow 180ms ease-out;
 }
 
 .offer-scope-panel aside {
@@ -1828,6 +1855,14 @@ summary:focus-visible,
   background: var(--offer-surface);
   box-shadow: 0 0 20px rgba(var(--offer-violet-rgb), .24);
   content: "";
+  transition:
+    background-color 180ms ease-out,
+    box-shadow 180ms ease-out,
+    transform 180ms ease-out;
+}
+
+.offer-timeline article h3 {
+  transition: color 180ms ease-out;
 }
 
 .offer-timeline span {
@@ -1946,7 +1981,9 @@ summary:focus-visible,
   transition:
     color 180ms ease,
     background 180ms ease,
-    border-color 180ms ease;
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
 .offer-plan a:hover,
@@ -1954,6 +1991,8 @@ summary:focus-visible,
   color: var(--paper);
   border-color: var(--offer-violet);
   background: var(--offer-violet);
+  box-shadow: 0 10px 24px rgba(var(--offer-violet-rgb), .2);
+  transform: translateY(-1px);
 }
 
 .offer-continuation {
@@ -1965,6 +2004,10 @@ summary:focus-visible,
   font-size: .82rem;
   font-weight: 700;
   text-transform: uppercase;
+  transition:
+    border-color 180ms ease-out,
+    background-color 180ms ease-out,
+    box-shadow 180ms ease-out;
 }
 
 .offer-continuation::before {
@@ -1976,6 +2019,9 @@ summary:focus-visible,
   background: var(--offer-violet);
   box-shadow: 0 0 14px rgba(var(--offer-violet-rgb), .42);
   content: "";
+  transition:
+    box-shadow 180ms ease-out,
+    transform 180ms ease-out;
 }
 
 .offer-faq {
@@ -1992,6 +2038,9 @@ summary:focus-visible,
 
 .offer-faq details {
   border-top: 1px solid var(--offer-border);
+  transition:
+    background-color 180ms ease-out,
+    border-color 180ms ease-out;
 }
 
 .offer-faq details:last-child {
@@ -2028,6 +2077,21 @@ summary:focus-visible,
 .offer-faq details[open] summary::after {
   content: "-";
   transform: rotate(180deg);
+}
+
+.offer-faq details[open] p {
+  animation: offer-faq-content-in 240ms ease-out both;
+}
+
+@keyframes offer-faq-content-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .offer-faq p {
@@ -2102,13 +2166,80 @@ summary:focus-visible,
 .offer-contact-link:focus-visible {
   color: var(--paper);
   background: var(--offer-violet);
-  box-shadow: 0 0 30px rgba(var(--offer-violet-rgb), .32);
+  box-shadow: 0 12px 30px rgba(var(--offer-violet-rgb), .28);
+  transform: translateY(-2px);
 }
 
 .offer-contact-link:hover i,
 .offer-contact-link:focus-visible i {
   background: rgba(239, 237, 245, .24);
   transform: translateX(3px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .offer-issue:hover,
+  .offer-deliverable:hover,
+  .offer-decisions article:hover {
+    border-color: rgba(var(--offer-violet-rgb), .54);
+    background-color: rgba(239, 237, 245, .7);
+    box-shadow: 0 18px 42px rgba(var(--offer-violet-rgb), .13);
+  }
+
+  .offer-plan:hover {
+    border-color: rgba(var(--offer-violet-rgb), .72);
+    background-color: rgba(239, 237, 245, .68);
+    box-shadow: 0 22px 48px rgba(var(--offer-violet-rgb), .15);
+    transform: translate3d(0, -4px, 0);
+  }
+
+  .offer-plan.recommended:hover {
+    border-color: var(--offer-violet);
+  }
+
+  .offer-recommendation-flow li:hover {
+    border-color: rgba(var(--offer-violet-rgb), .58);
+    background-color: rgba(239, 237, 245, .72);
+    box-shadow: 0 10px 22px rgba(var(--offer-violet-rgb), .11);
+  }
+
+  .offer-scope-panel li:hover {
+    color: var(--offer-violet);
+    background-color: rgba(var(--offer-violet-rgb), .09);
+    box-shadow: inset 3px 0 0 var(--offer-violet);
+  }
+
+  .offer-timeline article:hover::before {
+    background-color: var(--offer-violet);
+    box-shadow:
+      0 0 0 6px rgba(var(--offer-violet-rgb), .1),
+      0 0 26px rgba(var(--offer-violet-rgb), .42);
+    transform: scale(1.12);
+  }
+
+  .offer-timeline article:hover h3 {
+    color: var(--offer-violet);
+  }
+
+  .offer-continuation:hover {
+    border-color: rgba(var(--offer-violet-rgb), .56);
+    background-color: rgba(var(--offer-violet-rgb), .07);
+    box-shadow: 0 12px 28px rgba(var(--offer-violet-rgb), .1);
+  }
+
+  .offer-continuation:hover::before {
+    box-shadow: 0 0 20px rgba(var(--offer-violet-rgb), .68);
+    transform: scale(1.15);
+  }
+
+  .offer-faq details:hover {
+    border-color: rgba(var(--offer-violet-rgb), .56);
+    background-color: rgba(var(--offer-violet-rgb), .06);
+  }
+
+  .offer-secondary-link:hover,
+  .offer-secondary-link:focus-visible {
+    box-shadow: 0 10px 24px rgba(171, 162, 255, .12);
+  }
 }
 
 .offer-motion-ready [data-offer-reveal] {
@@ -2122,6 +2253,23 @@ summary:focus-visible,
 
 .offer-motion-ready [data-offer-reveal="content"] {
   transition-delay: 90ms;
+}
+
+.offer-motion-ready .offer-continuation[data-offer-reveal] {
+  transition:
+    opacity 520ms cubic-bezier(.2,.8,.2,1) 90ms,
+    transform 520ms cubic-bezier(.2,.8,.2,1) 90ms,
+    border-color 180ms ease-out,
+    background-color 180ms ease-out,
+    box-shadow 180ms ease-out;
+}
+
+.offer-motion-ready .offer-faq details[data-offer-reveal] {
+  transition:
+    opacity 520ms cubic-bezier(.2,.8,.2,1) 90ms,
+    transform 520ms cubic-bezier(.2,.8,.2,1) 90ms,
+    background-color 180ms ease-out,
+    border-color 180ms ease-out;
 }
 
 .offer-motion-ready [data-offer-reveal].is-visible {
@@ -2706,14 +2854,27 @@ summary:focus-visible,
 
   .hero-offer-link:hover,
   .offer-bridge-link:hover,
+  .offer-primary-link:hover,
+  .offer-primary-link:active,
+  .offer-secondary-link:active,
+  .offer-plan:hover,
+  .offer-plan a:hover,
+  .offer-plan a:active,
   .offer-contact-link:hover,
+  .offer-contact-link:active,
   .project-actions a:hover {
     transform: none;
   }
 
   .round-link:hover .round-link-arrow,
   .offer-primary-link:hover span,
+  .offer-timeline article:hover::before,
+  .offer-continuation:hover::before,
   .offer-contact-link:hover i {
     transform: none;
+  }
+
+  .offer-faq details[open] p {
+    animation: none;
   }
 }

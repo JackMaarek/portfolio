@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OfferMotion } from "../offer-motion";
 import { SiteHeader } from "../site-header";
 import { getSiteOrigin, siteName } from "../site-metadata";
 
@@ -292,6 +293,7 @@ function OfferTopology() {
 export default function OfferPage() {
   return (
     <div className="offer-shell">
+      <OfferMotion />
       <a className="skip-link" href="#offer-main">
         Aller au contenu
       </a>
@@ -336,14 +338,14 @@ export default function OfferPage() {
         </section>
 
       <section id="offer-content" className="offer-band offer-problem">
-        <div className="offer-section-intro">
+        <div className="offer-section-intro" data-offer-reveal="intro">
           <p className="offer-section-label">02 / Ce qui vous ralentit</p>
           <h2>
             Les zones aveugles de la chaîne de delivery
             <span> concentrent l’essentiel du risque opérationnel.</span>
           </h2>
         </div>
-        <div className="offer-issue-grid">
+        <div className="offer-issue-grid" data-offer-reveal="content">
           {painPoints.map((point) => (
             <article className="offer-issue" key={point.index}>
               <span>{point.index}</span>
@@ -355,14 +357,14 @@ export default function OfferPage() {
       </section>
 
       <section className="offer-band offer-promise">
-        <div className="offer-section-intro">
+        <div className="offer-section-intro" data-offer-reveal="intro">
           <p className="offer-section-label">03 / Le résultat attendu</p>
           <h2>
             Des constats traçables pour arbitrer les risques
             <span> et séquencer la remédiation.</span>
           </h2>
         </div>
-        <div className="offer-decision-panel">
+        <div className="offer-decision-panel" data-offer-reveal="content">
           <div className="offer-decisions">
             {decisionOutcomes.map((outcome) => (
               <article key={outcome.title}>
@@ -396,14 +398,14 @@ export default function OfferPage() {
       </section>
 
       <section className="offer-band offer-scope">
-        <div className="offer-section-intro">
+        <div className="offer-section-intro" data-offer-reveal="intro">
           <p className="offer-section-label">04 / Périmètre</p>
           <h2>
             Un diagnostic volontairement cadré.
             <span> Pas un audit cloud généraliste.</span>
           </h2>
         </div>
-        <div className="offer-scope-panel">
+        <div className="offer-scope-panel" data-offer-reveal="content">
           <ul aria-label="Sujets inclus">
             {scopeItems.map((item) => (
               <li key={item}>{item}</li>
@@ -418,14 +420,14 @@ export default function OfferPage() {
       </section>
 
       <section id="diagnostic" className="offer-band offer-process">
-        <div className="offer-section-intro">
+        <div className="offer-section-intro" data-offer-reveal="intro">
           <p className="offer-section-label">05 / Le diagnostic</p>
           <h2>
             Une analyse progressive de la chaîne de delivery,
             <span> du cadrage à la restitution.</span>
           </h2>
         </div>
-        <div className="offer-timeline">
+        <div className="offer-timeline" data-offer-reveal="content">
           {processSteps.map((step) => (
             <article key={step.day}>
               <span>{step.day}</span>
@@ -437,14 +439,14 @@ export default function OfferPage() {
       </section>
 
       <section className="offer-band offer-deliverables">
-        <div className="offer-section-intro">
+        <div className="offer-section-intro" data-offer-reveal="intro">
           <p className="offer-section-label">06 / Ce que vous obtenez</p>
           <h2>
             Cartographie des risques
             <span> et plan de remédiation exploitable.</span>
           </h2>
         </div>
-        <div className="offer-deliverable-grid">
+        <div className="offer-deliverable-grid" data-offer-reveal="content">
           {deliverables.map((item) => (
             <article className="offer-deliverable" key={item.index}>
               <span>{item.index}</span>
@@ -456,14 +458,14 @@ export default function OfferPage() {
       </section>
 
       <section id="formats" className="offer-band offer-formats">
-        <div className="offer-section-intro">
+        <div className="offer-section-intro" data-offer-reveal="intro">
           <p className="offer-section-label">07 / Formats</p>
           <h2>
             Deux niveaux d’analyse adaptés
             <span> à la maturité de votre chaîne de delivery.</span>
           </h2>
         </div>
-        <div className="offer-plan-grid">
+        <div className="offer-plan-grid" data-offer-reveal="content">
           {plans.map((plan) => (
             <article
               className={
@@ -484,15 +486,17 @@ export default function OfferPage() {
             </article>
           ))}
         </div>
-        <p className="offer-continuation">
+        <p className="offer-continuation" data-offer-reveal="content">
           Ensuite / sprint de remédiation · 10 à 20 jours · périmètre sur mesure
         </p>
       </section>
 
       <section className="offer-faq">
-        <p className="offer-section-label">08 / Questions fréquentes</p>
+        <p className="offer-section-label" data-offer-reveal="intro">
+          08 / Questions fréquentes
+        </p>
         {faqs.map((item) => (
-          <details key={item.question}>
+          <details data-offer-reveal="content" key={item.question}>
             <summary>{item.question}</summary>
             <p>{item.answer}</p>
           </details>
@@ -501,7 +505,7 @@ export default function OfferPage() {
       </main>
 
       <footer id="contact" className="offer-contact">
-        <div>
+        <div data-offer-reveal="intro">
           <p className="offer-section-label">09 / Contact</p>
           <h2>
             Parlons de votre

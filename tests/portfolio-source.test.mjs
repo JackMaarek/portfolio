@@ -57,14 +57,11 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(styles, /\.contact-mail\s*\{[\s\S]*?white-space: nowrap/);
   assert.match(styles, /\.offer-contact-link\s*\{[\s\S]*?background: var\(--offer-violet\)/);
 
-  const scrollAnimationRules = styles.slice(
-    styles.indexOf("@supports (animation-timeline: view())"),
-    styles.indexOf("@media (max-width: 1120px)"),
-  );
   const reducedMotionRules = styles.slice(
     styles.indexOf("@media (prefers-reduced-motion: reduce)"),
   );
-  assert.ok(!scrollAnimationRules.includes(".offer-contact-link"));
+  assert.match(styles, /\.offer-motion-ready \[data-offer-reveal\]/);
+  assert.ok(!styles.includes("animation-timeline: view()"));
   assert.match(
     reducedMotionRules,
     /\.technology-tag::before[\s\S]*?transition: none/,
@@ -89,9 +86,10 @@ test("document metadata describes the portfolio", async () => {
 });
 
 test("offer page exposes the commercial diagnostic", async () => {
-  const [offer, header] = await Promise.all([
+  const [offer, header, motion] = await Promise.all([
     readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer-motion.tsx", projectRoot), "utf8"),
   ]);
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
@@ -112,6 +110,11 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(!offer.includes("Comprendre."));
   assert.ok(!offer.includes("Priorisé. Actionnable."));
   assert.ok(offer.includes('<SiteHeader page="offer"'));
+  assert.ok(offer.includes("<OfferMotion />"));
+  assert.ok(offer.includes('data-offer-reveal="intro"'));
+  assert.ok(offer.includes('data-offer-reveal="content"'));
+  assert.ok(motion.includes("IntersectionObserver"));
+  assert.ok(motion.includes("prefers-reduced-motion: reduce"));
   assert.ok(offer.includes('<main id="offer-main"'));
   assert.ok(offer.includes('href="#offer-main"'));
   assert.ok(header.includes('offerHref: "/offer"'));

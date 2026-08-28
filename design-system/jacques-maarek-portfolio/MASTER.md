@@ -37,6 +37,7 @@ The conversion sequence is:
 | Primary text | `#EFEDF5` | `--paper` |
 | Muted text | `#AAA6B5` | `--muted` |
 | Structural lavender | `#ABA2FF` | `--violet` |
+| Accessible violet | `#5147B4` | `--violet-readable` |
 | AWS-inspired action | `#FFBD74` | `--acid` |
 | Warm text on orange | `#744814` | `--acid-readable` |
 | Dark separators | `rgba(239, 237, 245, .18)` | `--line` |
@@ -126,10 +127,9 @@ Required verification widths:
 - Follow the WAI-ARIA tabs pattern: one tab stop, arrow-key navigation, Home/End,
   linked `tab` and `tabpanel` IDs, and a focusable active panel.
 - Selection must never rely on color alone.
-- Capability and experience technology chips share one component. Until a related article
-  exists, each chip uses a `help` cursor and an explicit “Article à venir” tooltip: no dead
-  link, arrow or layout movement. When content exists, convert it into a labelled link with
-  keyboard focus while preserving the same visual identity.
+- Capability and experience technology chips share one passive component. Their hover uses
+  the accessible structural violet, a default cursor and no tooltip, arrow or layout movement.
+  Convert a chip into a labelled keyboard-focusable link only when a real destination exists.
 
 ### Infrastructure visualizations
 

@@ -6,6 +6,7 @@
   --muted: #aaa6b5;
   --violet: #aba2ff;
   --violet-readable: #5147b4;
+  --violet-readable-rgb: 81, 71, 180;
   --acid: #ffbd74;
   --acid-readable: #744814;
   --line: rgba(239, 237, 245, 0.18);
@@ -518,7 +519,7 @@ button {
   border-radius: 999px;
   color: var(--ink);
   font-size: 0.72rem;
-  cursor: help;
+  cursor: default;
   background: transparent;
   transition:
     color 180ms ease-out,
@@ -536,38 +537,13 @@ button {
   inset: -1px;
   z-index: 0;
   border-radius: inherit;
-  background: var(--ink);
+  background: var(--violet-readable);
   content: "";
   opacity: 0;
   transform: scale(.86);
   transition:
     opacity 180ms ease-out,
     transform 220ms cubic-bezier(.2,.8,.2,1);
-}
-
-.technology-tag::after {
-  position: absolute;
-  bottom: calc(100% + 9px);
-  left: 50%;
-  z-index: 4;
-  width: max-content;
-  padding: 6px 8px;
-  border: 1px solid rgba(239, 237, 245, .18);
-  border-radius: 4px;
-  color: var(--paper);
-  background: var(--ink);
-  box-shadow: 0 8px 20px rgba(11, 11, 13, .18);
-  content: attr(data-status);
-  font-size: .64rem;
-  line-height: 1;
-  letter-spacing: .04em;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, 5px);
-  transition:
-    opacity 150ms ease-out,
-    transform 180ms ease-out;
 }
 
 .tech-stack {
@@ -597,9 +573,11 @@ button {
 
 @media (hover: hover) and (pointer: fine) {
   .technology-tag:hover {
-    border-color: var(--ink);
+    border-color: var(--violet-readable);
     color: var(--paper);
-    box-shadow: 0 8px 20px rgba(11, 11, 13, .14);
+    box-shadow:
+      0 0 0 3px rgba(var(--violet-readable-rgb), .11),
+      0 9px 22px rgba(var(--violet-readable-rgb), .2);
   }
 
   .technology-tag:hover::before {
@@ -607,10 +585,6 @@ button {
     transform: scale(1);
   }
 
-  .technology-tag:hover::after {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
 }
 
 .experience {
@@ -2740,17 +2714,12 @@ summary:focus-visible,
     stroke-dashoffset: 0;
   }
 
-  .technology-tag::before,
-  .technology-tag::after {
+  .technology-tag::before {
     transition: none;
   }
 
   .technology-tag:hover::before {
     transform: none;
-  }
-
-  .technology-tag:hover::after {
-    transform: translate(-50%, 0);
   }
 
   .hero-offer-link:hover,

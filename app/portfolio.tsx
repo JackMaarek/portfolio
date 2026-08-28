@@ -120,7 +120,7 @@ function TechnologyTags({ items, label, labelledBy }: TechnologyTagsProps) {
       aria-labelledby={labelledBy}
     >
       {items.map((item) => (
-        <li className="technology-tag" data-status="Article à venir" key={item}>
+        <li className="technology-tag" key={item}>
           <span>{item}</span>
         </li>
       ))}

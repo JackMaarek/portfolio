@@ -40,7 +40,7 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(portfolio, /aria-orientation="vertical"/);
   assert.match(portfolio, /aria-labelledby=\{`experience-tab-/);
   assert.match(portfolio, /function TechnologyTags/);
-  assert.match(portfolio, /data-status="Article à venir"/);
+  assert.ok(!portfolio.includes("data-status="));
   assert.match(portfolio, /Stack mobilisée/);
   assert.match(portfolio, /labelledBy=\{`experience-tech-/);
   assert.match(portfolio, /className="project-visual"[\s\S]*?aria-hidden="true"/);
@@ -49,8 +49,9 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(styles, /--offer-violet: #4c40af/);
   assert.match(styles, /\.nav a,[\s\S]*?min-height: var\(--touch-target\)/);
   assert.match(styles, /@media \(hover: hover\) and \(pointer: fine\)/);
-  assert.match(styles, /\.technology-tag:hover::after/);
-  assert.match(styles, /cursor: help/);
+  assert.match(styles, /\.technology-tag:hover::before/);
+  assert.match(styles, /background: var\(--violet-readable\)/);
+  assert.match(styles, /cursor: default/);
   assert.match(portfolio, /persistentLabels = new Set\(\[2, 3, 5\]\)/);
   assert.match(styles, /\.manifesto-copy p \+ p\s*\{\s*color: var\(--paper\)/);
   assert.match(styles, /\.contact-mail\s*\{[\s\S]*?white-space: nowrap/);
@@ -66,7 +67,7 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.ok(!scrollAnimationRules.includes(".offer-contact-link"));
   assert.match(
     reducedMotionRules,
-    /\.technology-tag::before,[\s\S]*?\.technology-tag::after[\s\S]*?transition: none/,
+    /\.technology-tag::before[\s\S]*?transition: none/,
   );
 });
 

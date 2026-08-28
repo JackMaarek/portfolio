@@ -126,9 +126,10 @@ Required verification widths:
 - Follow the WAI-ARIA tabs pattern: one tab stop, arrow-key navigation, Home/End,
   linked `tab` and `tabpanel` IDs, and a focusable active panel.
 - Selection must never rely on color alone.
-- Technology chips remain passive taxonomy until a related article exists. They may react
-  as one grouped signal, but keep the default cursor and never use individual lift, arrows
-  or button-like movement. When content exists, convert the chip into a real labelled link.
+- Capability and experience technology chips share one component. Until a related article
+  exists, each chip uses a `help` cursor and an explicit “Article à venir” tooltip: no dead
+  link, arrow or layout movement. When content exists, convert it into a labelled link with
+  keyboard focus while preserving the same visual identity.
 
 ### Infrastructure visualizations
 

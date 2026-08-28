@@ -106,6 +106,28 @@ const capabilities = [
 const tune = (value: string, attributes: Record<string, string> = {}) =>
   ({ string: value, ...attributes }) as Record<string, string>;
 
+type TechnologyTagsProps = {
+  items: string[];
+  label?: string;
+  labelledBy?: string;
+};
+
+function TechnologyTags({ items, label, labelledBy }: TechnologyTagsProps) {
+  return (
+    <ul
+      className="technology-tags"
+      aria-label={label}
+      aria-labelledby={labelledBy}
+    >
+      {items.map((item) => (
+        <li className="technology-tag" data-status="Article à venir" key={item}>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function TopologyCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -536,9 +558,10 @@ export function Portfolio() {
                 <h3>{capability.title}</h3>
                 <p>{capability.body}</p>
               </div>
-              <ul aria-label={`Technologies : ${capability.title}`}>
-                {capability.tags.map((tag) => <li key={tag}>{tag}</li>)}
-              </ul>
+              <TechnologyTags
+                items={capability.tags}
+                label={`Technologies : ${capability.title}`}
+              />
             </article>
           ))}
         </div>
@@ -620,12 +643,10 @@ export function Portfolio() {
                 <p className="tech-stack-label" id={`experience-tech-${index}`}>
                   Stack mobilisée
                 </p>
-                <ul
-                  className="tech-list"
-                  aria-labelledby={`experience-tech-${index}`}
-                >
-                  {item.tech.map((tech) => <li key={tech}>{tech}</li>)}
-                </ul>
+                <TechnologyTags
+                  items={item.tech}
+                  labelledBy={`experience-tech-${index}`}
+                />
               </div>
             </article>
           ))}

@@ -500,8 +500,7 @@ button {
   line-height: 1.55;
 }
 
-.capability ul,
-.tech-list {
+.technology-tags {
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
@@ -511,12 +510,64 @@ button {
   list-style: none;
 }
 
-.capability li,
-.tech-list li {
+.technology-tag {
+  position: relative;
+  isolation: isolate;
   padding: 8px 12px;
   border: 1px solid rgba(11,11,13,.28);
   border-radius: 999px;
+  color: var(--ink);
   font-size: 0.72rem;
+  cursor: help;
+  background: transparent;
+  transition:
+    color 180ms ease-out,
+    border-color 180ms ease-out,
+    box-shadow 180ms ease-out;
+}
+
+.technology-tag > span {
+  position: relative;
+  z-index: 1;
+}
+
+.technology-tag::before {
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--ink);
+  content: "";
+  opacity: 0;
+  transform: scale(.86);
+  transition:
+    opacity 180ms ease-out,
+    transform 220ms cubic-bezier(.2,.8,.2,1);
+}
+
+.technology-tag::after {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  z-index: 4;
+  width: max-content;
+  padding: 6px 8px;
+  border: 1px solid rgba(239, 237, 245, .18);
+  border-radius: 4px;
+  color: var(--paper);
+  background: var(--ink);
+  box-shadow: 0 8px 20px rgba(11, 11, 13, .18);
+  content: attr(data-status);
+  font-size: .64rem;
+  line-height: 1;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 5px);
+  transition:
+    opacity 150ms ease-out,
+    transform 180ms ease-out;
 }
 
 .tech-stack {
@@ -542,56 +593,24 @@ button {
   background: var(--violet-readable);
   box-shadow: 0 0 0 4px rgba(81, 71, 180, .09);
   content: "";
-  transition: box-shadow 200ms ease-out;
-}
-
-.tech-list li {
-  position: relative;
-  overflow: hidden;
-  cursor: default;
-  background: rgba(239, 237, 245, .28);
-  transition:
-    border-color 200ms ease-out,
-    background-color 200ms ease-out;
-}
-
-.tech-list li::after {
-  position: absolute;
-  inset: -1px;
-  background: linear-gradient(
-    105deg,
-    transparent 24%,
-    rgba(81, 71, 180, .18) 50%,
-    transparent 76%
-  );
-  content: "";
-  pointer-events: none;
-  transform: translateX(-125%);
-}
-
-@keyframes tech-stack-signal {
-  to { transform: translateX(125%); }
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .tech-stack:hover .tech-stack-label::before {
-    box-shadow: 0 0 0 5px rgba(81, 71, 180, .14), 0 0 14px rgba(81, 71, 180, .28);
+  .technology-tag:hover {
+    border-color: var(--ink);
+    color: var(--paper);
+    box-shadow: 0 8px 20px rgba(11, 11, 13, .14);
   }
 
-  .tech-stack:hover .tech-list li {
-    border-color: rgba(81, 71, 180, .5);
-    background: #e7e4ef;
+  .technology-tag:hover::before {
+    opacity: 1;
+    transform: scale(1);
   }
 
-  .tech-stack:hover .tech-list li::after {
-    animation: tech-stack-signal 320ms ease-out both;
+  .technology-tag:hover::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
-
-  .tech-stack:hover .tech-list li:nth-child(2)::after { animation-delay: 35ms; }
-  .tech-stack:hover .tech-list li:nth-child(3)::after { animation-delay: 70ms; }
-  .tech-stack:hover .tech-list li:nth-child(4)::after { animation-delay: 105ms; }
-  .tech-stack:hover .tech-list li:nth-child(5)::after { animation-delay: 140ms; }
-  .tech-stack:hover .tech-list li:nth-child(6)::after { animation-delay: 175ms; }
 }
 
 .experience {
@@ -2721,9 +2740,17 @@ summary:focus-visible,
     stroke-dashoffset: 0;
   }
 
-  .tech-stack:hover .tech-list li::after {
-    animation: none;
+  .technology-tag::before,
+  .technology-tag::after {
+    transition: none;
+  }
+
+  .technology-tag:hover::before {
     transform: none;
+  }
+
+  .technology-tag:hover::after {
+    transform: translate(-50%, 0);
   }
 
   .hero-offer-link:hover,

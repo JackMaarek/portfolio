@@ -178,6 +178,11 @@ test("live system preview reuses real offer content", async () => {
   for (const issue of ["Déploiements risqués", "Rollbacks flous", "Environnements divergents", "Alertes inutiles"]) {
     assert.ok(data.includes(`"${issue}"`), issue);
   }
+  const paths = await readFile(new URL("app/offer/live-system/live-system-paths.ts", projectRoot), "utf8");
+  assert.match(paths, /export const candidateLinks/);
+  assert.match(paths, /export const deadEnds/);
+  assert.match(paths, /export const feedbackLoop/);
+  assert.match(caption, /Constats/);
   assert.match(caption, /placement="offer-trace"/);
   assert.match(scene, /aria-hidden="true"/);
   assert.match(phaseHook, /prefers-reduced-motion: reduce/);

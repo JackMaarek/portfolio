@@ -1,0 +1,128 @@
+/* Dark pinned stage, in the visual language of the offer hero. */
+.liveSystem {
+  position: relative;
+  color: var(--paper);
+  background:
+    radial-gradient(circle at 80% 10%, rgba(145, 136, 227, .22), transparent 26rem),
+    var(--ink);
+}
+
+.intro {
+  padding: 58px 18px 8px;
+}
+
+.label {
+  margin: 0 0 20px;
+  color: var(--acid);
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.intro h2 {
+  max-width: 820px;
+  margin: 0;
+  font-size: 2.85rem;
+  font-weight: 500;
+  line-height: .98;
+  letter-spacing: -.045em;
+}
+
+.intro h2 span {
+  display: block;
+  color: var(--violet);
+}
+
+/* Without JavaScript the stage simply flows; once live it pins. */
+.stage {
+  display: grid;
+  gap: 24px;
+  padding: 24px 18px 58px;
+}
+
+.track[data-live="true"] {
+  height: 620svh;
+}
+
+.track[data-live="true"] .stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  grid-template-rows: 58svh minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) 18px calc(env(safe-area-inset-bottom, 0px) + 14px);
+  overflow: hidden;
+}
+
+.sceneFrame {
+  min-height: 0;
+}
+
+.progress {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 700;
+  list-style: none;
+}
+
+.progress li::before {
+  display: block;
+  height: 3px;
+  margin-bottom: 6px;
+  border-radius: 2px;
+  background: rgba(239, 237, 245, .16);
+  content: "";
+  transition: background-color 400ms ease;
+}
+
+.progress li[data-reached="true"] {
+  color: var(--violet);
+}
+
+.progress li[data-reached="true"]::before {
+  background: var(--violet);
+}
+
+@media (min-width: 981px) {
+  .intro {
+    padding: 94px 30px 12px;
+  }
+
+  .intro h2 {
+    font-size: clamp(3.25rem, 4.8vw, 5rem);
+  }
+
+  .stage {
+    padding-inline: 30px;
+  }
+
+  .track[data-live="true"] .stage {
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    column-gap: 64px;
+    align-items: center;
+    padding: 6svh 30px 4svh;
+  }
+
+  .track[data-live="true"] .sceneFrame {
+    height: 86svh;
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track[data-live="true"] {
+    height: auto;
+  }
+
+  .track[data-live="true"] .stage {
+    position: static;
+    height: auto;
+    grid-template-rows: 60svh auto auto;
+  }
+}

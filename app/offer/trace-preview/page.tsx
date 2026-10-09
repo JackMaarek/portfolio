@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "../../site-header";
-import { DeliveryTrace } from "../delivery-trace/delivery-trace";
+import { LiveSystem } from "../live-system/live-system";
 import styles from "./trace-preview.module.css";
 
-// Test route: the delivery trace in the offer context before it replaces
+// Test route: the live system scene in the offer context before it replaces
 // section 05 of the offer page.
 export const metadata: Metadata = {
   title: "Le diagnostic — Jacques Maarek",
@@ -20,7 +20,7 @@ export default function TracePreviewPage() {
         <SiteHeader page="offer" />
       </div>
       <main>
-        <DeliveryTrace />
+        <LiveSystem />
       </main>
     </div>
   );

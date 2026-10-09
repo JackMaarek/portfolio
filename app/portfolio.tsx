@@ -7,6 +7,7 @@ import {
   StringProgress,
   StringTune,
 } from "@fiddle-digital/string-tune";
+import { BookingLink } from "./booking-link";
 import { SiteHeader } from "./site-header";
 
 const experiences = [
@@ -748,9 +749,14 @@ export function Portfolio() {
           <p className="section-label">07 / Contact</p>
           <p>Un besoin plateforme, cloud<br />ou automatisation ?</p>
         </div>
-        <a className="contact-mail" href="mailto:jacques.maarek.dev@gmail.com" {...tune("magnetic")}>
+        <BookingLink
+          className="contact-mail"
+          placement="home-contact"
+          label="Parlons-en"
+          {...tune("magnetic")}
+        >
           Parlons-en<span aria-hidden="true">↗</span>
-        </a>
+        </BookingLink>
         <div className="footer-meta">
           <span>Jacques Maarek · Platform Engineer</span>
           <a

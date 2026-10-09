@@ -26,7 +26,7 @@ export function LiveSystem() {
       <div className={styles.track} ref={sectionRef}>
         <div className={styles.stage}>
           <div className={styles.sceneFrame}>
-            <LiveSystemScene phase={phase} current={phases[phase]} />
+            <LiveSystemScene phase={phase} />
           </div>
           <div className={styles.copy}>
             <LiveSystemCaption phases={phases} activePhase={phase} />

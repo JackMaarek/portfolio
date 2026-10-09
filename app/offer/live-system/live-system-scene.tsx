@@ -1,32 +1,24 @@
-import {
-  litAt,
-  meshLinks,
-  meshPoints,
-  nodeIssues,
-  routePath,
-  scene,
-  systemNodes,
-  type Phase,
-} from "./live-system-data";
+import { litAt, nodeIssues, routePath, scene, systemNodes } from "./live-system-data";
+import { dayTags, feedbackLoop } from "./live-system-paths";
+import { SceneHypotheses } from "./scene-hypotheses";
 import styles from "./live-system-scene.module.css";
 
 type LiveSystemSceneProps = {
   phase: number;
-  current: Phase;
 };
 
-// The offer hero topology, switched off at first and relit day by day.
-export function LiveSystemScene({ phase, current }: LiveSystemSceneProps) {
-  const isLit = (label: string) => phase >= litAt(label);
-  const inFocus = (label: string) =>
-    current.focus.length === 0 || current.focus.includes(label);
+// Phase 0 shows an unknown system full of candidate paths; each day then
+// traces one section of the real route until the hero topology is restored.
+export function LiveSystemScene({ phase }: LiveSystemSceneProps) {
+  const isTraced = (label: string) => phase >= litAt(label);
   const isRestored = phase === 5;
+  const currentTag = dayTags.find((tag) => tag.day === `J${phase}`);
 
   return (
     <svg
       className={styles.scene}
       viewBox={`0 0 ${scene.width} ${scene.height}`}
-      data-mapped={phase >= 1}
+      data-labelled={phase >= 1}
       aria-hidden="true"
       focusable="false"
       overflow="visible"
@@ -41,60 +33,67 @@ export function LiveSystemScene({ phase, current }: LiveSystemSceneProps) {
         </filter>
       </defs>
 
-      <g className={styles.mesh}>
-        {meshLinks.map(({ from, to }) => (
-          <line
-            key={`${from.x}-${from.y}-${to.x}-${to.y}`}
-            x1={from.x}
-            y1={from.y}
-            x2={to.x}
-            y2={to.y}
-          />
-        ))}
-        {meshPoints.map(({ x, y }) => (
-          <circle key={`${x}-${y}`} cx={x} cy={y} r="4" />
-        ))}
-      </g>
+      <SceneHypotheses phase={phase} />
 
       {systemNodes.slice(1).map((node, index) => {
         const previous = systemNodes[index];
+        const traced = isTraced(previous.label) && isTraced(node.label);
         return (
-          <line
-            key={`${previous.label}-${node.label}`}
-            className={styles.segment}
-            x1={previous.x}
-            y1={previous.y}
-            x2={node.x}
-            y2={node.y}
-            data-lit={isLit(previous.label) && isLit(node.label)}
-            data-focus={inFocus(previous.label) || inFocus(node.label)}
-          />
+          <g key={`${previous.label}-${node.label}`}>
+            <line className={styles.candidate} x1={previous.x} y1={previous.y} x2={node.x} y2={node.y} />
+            <line
+              className={styles.traced}
+              data-traced={traced}
+              x1={previous.x}
+              y1={previous.y}
+              x2={node.x}
+              y2={node.y}
+              pathLength={1}
+            />
+          </g>
         );
       })}
+
+      <path className={styles.loop} data-traced={phase >= 4} d={feedbackLoop} pathLength={1} />
 
       {systemNodes.map((node) => (
         <g
           key={node.label}
           className={styles.node}
-          data-lit={isLit(node.label)}
-          data-focus={inFocus(node.label)}
+          data-traced={isTraced(node.label)}
           transform={`translate(${node.x} ${node.y})`}
         >
           <circle className={styles.halo} r="18" />
-          <circle className={styles.ring} r="12" />
+          <circle className={styles.ring} r="12" data-collide="node" />
           <circle className={styles.core} r="6" />
           <g className={styles.label} transform={`translate(${node.dx} ${node.dy})`}>
-            <rect x="0" y="-16" width={node.width} height="28" rx="3" />
+            <rect x="0" y="-16" width={node.width} height="28" rx="3" data-collide="label" />
             <text x="10" y="3">{node.label}</text>
           </g>
-          {node.label in nodeIssues && !isLit(node.label) && (
-            <g className={styles.badge} transform="translate(13 -13)">
-              <circle r="8" />
+          {node.label in nodeIssues && (
+            <g
+              className={styles.badge}
+              data-state={isTraced(node.label) ? "finding" : "open"}
+              transform="translate(13 -13)"
+            >
+              <circle r="8" data-collide="badge" />
               <text y="4">!</text>
             </g>
           )}
         </g>
       ))}
+
+      {currentTag && (
+        <text
+          key={currentTag.day}
+          className={styles.dayTag}
+          x={currentTag.x}
+          y={currentTag.y}
+          data-collide="day"
+        >
+          {currentTag.text}
+        </text>
+      )}
 
       {isRestored && (
         <g className={styles.packet}>

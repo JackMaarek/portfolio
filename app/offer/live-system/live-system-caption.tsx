@@ -34,11 +34,14 @@ export function LiveSystemCaption({ phases, activePhase }: LiveSystemCaptionProp
             )}
 
             {phase.issues.length > 0 && (
-              <ul className={styles.tags} data-tone={isIncident ? "open" : "resolved"}>
-                {phase.issues.map((issue) => (
-                  <li key={issue}>{issue}</li>
-                ))}
-              </ul>
+              <>
+                {!isIncident && <p className={styles.tagsLabel}>Constats</p>}
+                <ul className={styles.tags} data-tone={isIncident ? "open" : "finding"}>
+                  {phase.issues.map((issue) => (
+                    <li key={issue}>{issue}</li>
+                  ))}
+                </ul>
+              </>
             )}
 
             {phase.outputs.length > 0 && (

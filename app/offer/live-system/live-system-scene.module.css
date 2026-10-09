@@ -1,60 +1,70 @@
 /* Same drawing grammar as the offer hero topology (.offer-topology-*). */
 .scene {
   --scene-ease: 700ms cubic-bezier(.2, .8, .2, 1);
+  --trace-ease: 1100ms cubic-bezier(.34, .88, .36, 1);
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.mesh line {
+/* Unknown system: every link is an equally plausible grey path. */
+.candidate,
+.deadEnd {
+  stroke: rgba(239, 237, 245, .28);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 6;
+  transition: stroke var(--scene-ease), stroke-dasharray var(--scene-ease), opacity var(--scene-ease);
+}
+
+/* Settled: the eliminated hypothesis becomes the hero background mesh. */
+.candidate[data-settled="true"] {
   stroke: rgba(183, 176, 255, .34);
-  stroke-width: 1.35;
-  opacity: .3;
-  transition: opacity 900ms ease-out;
+  stroke-dasharray: none;
 }
 
-.mesh circle {
+.deadEnd[data-removed="true"] {
+  opacity: 0;
+}
+
+.meshPoint {
+  fill: rgba(239, 237, 245, .3);
+  transition: fill var(--scene-ease);
+}
+
+.meshPoint[data-settled="true"] {
   fill: #b9b1ff;
-  opacity: .28;
-  transition: opacity 700ms ease-out;
 }
 
-.scene[data-mapped="true"] .mesh line {
-  opacity: 1;
+.wanderer {
+  fill: rgba(239, 237, 245, .85);
 }
 
-.scene[data-mapped="true"] .mesh circle {
-  opacity: .96;
-}
-
-.segment {
-  stroke: rgba(239, 237, 245, .24);
-  stroke-width: 2;
-  stroke-dasharray: 3 7;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  transition: stroke var(--scene-ease), opacity var(--scene-ease);
-}
-
-.segment[data-lit="true"] {
+/* Real route, drawn section by section as each day traces it. */
+.traced {
   stroke: rgba(255, 189, 116, .95);
   stroke-width: 3;
-  stroke-dasharray: none;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
   filter: url("#live-system-glow");
+  transition: stroke-dashoffset var(--trace-ease);
 }
 
-.node,
-.segment {
-  opacity: .32;
+.traced[data-traced="true"] {
+  stroke-dashoffset: 0;
 }
 
-.node[data-focus="true"],
-.segment[data-focus="true"] {
-  opacity: 1;
+.loop {
+  fill: none;
+  stroke: rgba(255, 189, 116, .5);
+  stroke-width: 1.4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1600ms ease-in-out;
 }
 
-.node {
-  transition: opacity var(--scene-ease);
+.loop[data-traced="true"] {
+  stroke-dashoffset: 0;
 }
 
 .halo {
@@ -67,7 +77,7 @@
   fill: var(--ink);
   stroke: rgba(239, 237, 245, .32);
   stroke-width: 3;
-  transition: stroke var(--scene-ease);
+  transition: stroke var(--scene-ease), stroke-width var(--scene-ease);
 }
 
 .core {
@@ -75,24 +85,28 @@
   transition: fill var(--scene-ease);
 }
 
-.node[data-lit="true"] {
+.node[data-traced="true"] {
   filter: url("#live-system-glow");
 }
 
-.node[data-lit="true"] .halo {
+.node[data-traced="true"] .halo {
   fill: rgba(255, 189, 116, .16);
   stroke: rgba(255, 189, 116, .68);
   stroke-width: 1.4;
   animation: node-breathe 3600ms ease-in-out infinite;
 }
 
-.node[data-lit="true"] .ring {
-  stroke: var(--acid);
-  stroke-width: 4.5;
+.node[data-traced="true"] .ring { stroke: var(--acid); stroke-width: 4.5; }
+.node[data-traced="true"] .core { fill: var(--acid); }
+
+/* Node names only appear once J1 has mapped the chain. */
+.label {
+  opacity: 0;
+  transition: opacity var(--scene-ease);
 }
 
-.node[data-lit="true"] .core {
-  fill: var(--acid);
+.scene[data-labelled="true"] .label {
+  opacity: 1;
 }
 
 .label rect {
@@ -110,19 +124,14 @@
   transition: fill var(--scene-ease);
 }
 
-.node[data-lit="true"] .label rect {
-  stroke: rgba(239, 237, 245, .58);
-}
+.node[data-traced="true"] .label rect { stroke: rgba(239, 237, 245, .58); }
+.node[data-traced="true"] .label text { fill: var(--paper); }
 
-.node[data-lit="true"] .label text {
-  fill: var(--paper);
-}
-
+/* Open risk pulses; once traced it stays as a steady finding. */
 .badge circle {
-  fill: var(--paper);
   transform-box: fill-box;
   transform-origin: center;
-  animation: badge-pulse 1.6s ease-in-out infinite;
+  transition: fill var(--scene-ease);
 }
 
 .badge text {
@@ -130,6 +139,27 @@
   font-size: 11px;
   font-weight: 800;
   text-anchor: middle;
+}
+
+.badge[data-state="open"] circle {
+  fill: var(--paper);
+  animation: badge-pulse 1.6s ease-in-out infinite;
+}
+
+.badge[data-state="finding"] circle {
+  fill: var(--acid);
+}
+
+.dayTag {
+  fill: var(--acid);
+  stroke: var(--ink);
+  stroke-width: 5px;
+  paint-order: stroke;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  animation: tag-in 600ms ease-out both;
 }
 
 .packet circle {
@@ -147,18 +177,18 @@
   50% { transform: scale(1.18); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .mesh line,
-  .segment,
-  .node {
-    transition: none;
-  }
+@keyframes tag-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-  .halo,
-  .badge circle {
+@media (prefers-reduced-motion: reduce) {
+  .scene * {
+    transition: none !important;
     animation: none !important;
   }
 
+  .wanderer,
   .packet {
     display: none;
   }

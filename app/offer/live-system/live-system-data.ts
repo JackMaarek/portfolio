@@ -31,7 +31,7 @@ export const meshLinks = heroTopology.backgroundLinks.map(([x1, y1, x2, y2]) => 
   to: project(x2, y2),
 }));
 
-// Nodes each diagnostic day brings back to life.
+// Route section each diagnostic day traces, as the nodes it reaches.
 const dayFocus: Record<string, string[]> = {
   J1: [],
   J2: ["Code", "CI", "Registry"],
@@ -40,7 +40,7 @@ const dayFocus: Record<string, string[]> = {
   J5: [],
 };
 
-// Offer pain point surfacing on each node until its day is diagnosed.
+// Offer pain point surfacing on each node; it becomes a finding once traced.
 export const nodeIssues: Record<string, string> = {
   CI: "Déploiements risqués",
   Registry: "Rollbacks flous",
@@ -90,7 +90,7 @@ export const phases = [
 
 export type Phase = (typeof phases)[number];
 
-// Phase from which a node is lit: the first day whose focus includes it.
+// Phase from which a node is traced: the first day whose section includes it.
 export const litAt = (label: string) => phases.findIndex((phase) => phase.focus.includes(label));
 
 export const routePath = systemNodes

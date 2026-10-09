@@ -59,6 +59,19 @@
   line-height: 1.42;
 }
 
+.tagsLabel {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.tagsLabel + .tags {
+  margin-top: 6px;
+}
+
 /* Same rhythm as the hero scope tags: uppercase, separated by dots. */
 .tags,
 .outputs {
@@ -93,11 +106,11 @@
   box-shadow: 0 0 0 3px rgba(239, 237, 245, .16);
 }
 
-.tags[data-tone="resolved"] li {
+.tags[data-tone="finding"] li {
   color: var(--paper);
 }
 
-.tags[data-tone="resolved"] li::before {
+.tags[data-tone="finding"] li::before {
   background: var(--acid);
   box-shadow: 0 0 10px rgba(255, 189, 116, .6);
 }

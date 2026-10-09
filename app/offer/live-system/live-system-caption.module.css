@@ -1,129 +1,138 @@
-/* Phase captions: stacked by default, cross-faded once the scene is live. */
+/* Phase captions in the offer hero typography; cross-faded once live. */
 .captions {
   position: relative;
   display: grid;
-  gap: 40px;
+  gap: 48px;
+  height: 100%;
 }
 
 .caption {
-  --caption-ease: 420ms cubic-bezier(.2, .8, .2, 1);
-  color: var(--paper);
+  --caption-ease: 480ms cubic-bezier(.2, .8, .2, 1);
 }
 
 :global([data-live="true"]) .caption {
   position: absolute;
-  inset: 0 0 auto;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   visibility: hidden;
   opacity: 0;
-  transform: translateY(14px);
-  transition: opacity var(--caption-ease), transform var(--caption-ease), visibility 0s linear 420ms;
+  transform: translateY(16px);
+  transition: opacity var(--caption-ease), transform var(--caption-ease), visibility 0s linear 480ms;
 }
 
 :global([data-live="true"]) .caption[data-active="true"] {
   visibility: visible;
   opacity: 1;
   transform: none;
-  transition: opacity var(--caption-ease) 120ms, transform var(--caption-ease) 120ms, visibility 0s;
+  transition: opacity var(--caption-ease) 140ms, transform var(--caption-ease) 140ms, visibility 0s;
 }
 
 .kicker {
-  margin: 0 0 10px;
-  color: var(--violet);
-  font-size: .78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.caption[data-tone="alert"] .kicker {
+  margin: 0 0 14px;
   color: var(--acid);
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-transform: uppercase;
 }
 
 .caption h3 {
   margin: 0;
-  font-size: clamp(1.5rem, 6.4vw, 2.4rem);
+  color: var(--paper);
+  font-size: clamp(2rem, 8.4vw, 4rem);
   font-weight: 500;
-  line-height: 1.02;
-  letter-spacing: -.03em;
+  line-height: .95;
+  letter-spacing: -.045em;
+}
+
+.caption h3 span {
+  color: var(--offer-violet-soft);
 }
 
 .body {
-  margin: 10px 0 0;
-  color: var(--muted);
-  line-height: 1.45;
+  max-width: 520px;
+  margin: 16px 0 0;
+  color: #d9d6e6;
+  font-size: 1.05rem;
+  line-height: 1.42;
 }
 
-.issues {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.issues li {
-  padding: 5px 11px;
-  border: 1px solid rgba(171, 162, 255, .55);
-  border-radius: 999px;
-  color: var(--violet);
-  font-size: .82rem;
-  font-weight: 700;
-}
-
-.caption[data-tone="alert"] .issues li {
-  border-color: rgba(255, 189, 116, .6);
-  color: var(--acid);
-}
-
+/* Same rhythm as the hero scope tags: uppercase, separated by dots. */
+.tags,
 .outputs {
-  margin-top: 14px;
-}
-
-.outputsLabel {
-  margin: 0 0 6px;
-  color: var(--violet);
-  font-size: .72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.outputs ul {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 14px;
-  margin: 0;
+  gap: 4px 10px;
+  margin: 18px 0 0;
   padding: 0;
   color: var(--muted);
+  font-size: .74rem;
+  text-transform: uppercase;
   list-style: none;
+}
+
+.tags li,
+.outputs li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+}
+
+.tags li::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  content: "";
+}
+
+.tags[data-tone="open"] li::before {
+  background: var(--paper);
+  box-shadow: 0 0 0 3px rgba(239, 237, 245, .16);
+}
+
+.tags[data-tone="resolved"] li {
+  color: var(--paper);
+}
+
+.tags[data-tone="resolved"] li::before {
+  background: var(--acid);
+  box-shadow: 0 0 10px rgba(255, 189, 116, .6);
 }
 
 .outputs strong {
   color: var(--paper);
-}
-
-.cta {
-  display: inline-flex;
-  min-height: 52px;
-  align-items: center;
-  gap: 16px;
-  margin-top: 18px;
-  padding: 0 22px;
-  border-radius: 999px;
-  color: var(--ink);
-  background: var(--acid);
   font-weight: 700;
-  transition: background 180ms ease, transform 180ms ease;
 }
 
-.cta:hover,
-.cta:focus-visible {
-  background: var(--violet);
-  transform: translateY(-1px);
+.outputs li + li::before {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--acid);
+  content: "";
+}
+
+.captions .cta {
+  margin-top: 24px;
+}
+
+@media (min-width: 981px) {
+  .caption h3 {
+    font-size: clamp(3rem, 4.6vw, 4.6rem);
+  }
+
+  .body {
+    font-size: 1.2rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   :global([data-live="true"]) .caption {
     position: static;
+    display: block;
     visibility: visible;
     opacity: 1;
     transform: none;

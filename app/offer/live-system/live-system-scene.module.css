@@ -1,30 +1,23 @@
-/* Live delivery system: acid marks open risk, violet marks a diagnosed path. */
+/* Same drawing grammar as the offer hero topology (.offer-topology-*). */
 .scene {
-  --scene-ease: 900ms cubic-bezier(.65, 0, .25, 1);
+  --scene-ease: 700ms cubic-bezier(.2, .8, .2, 1);
   display: block;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-}
-
-.camera {
-  transform-origin: 0 0;
-  transition: transform var(--scene-ease);
-  will-change: transform;
 }
 
 .mesh line {
-  stroke: rgba(183, 176, 255, .3);
-  stroke-width: 1;
+  stroke: rgba(183, 176, 255, .34);
+  stroke-width: 1.35;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  transition: stroke-dashoffset 1200ms ease-out;
+  transition: stroke-dashoffset 1400ms cubic-bezier(.34, .88, .36, 1);
 }
 
 .mesh circle {
-  fill: rgba(185, 177, 255, .5);
-  opacity: 0;
-  transition: opacity 600ms ease-out 500ms;
+  fill: #b9b1ff;
+  opacity: .28;
+  transition: opacity 700ms ease-out;
 }
 
 .scene[data-mapped="true"] .mesh line {
@@ -32,117 +25,143 @@
 }
 
 .scene[data-mapped="true"] .mesh circle {
-  opacity: 1;
+  opacity: .96;
 }
 
-.route {
-  fill: none;
-  stroke: var(--acid);
-  stroke-width: 2.5;
-  stroke-dasharray: 10 8;
+.segment {
+  stroke: rgba(239, 237, 245, .24);
+  stroke-width: 2;
+  stroke-dasharray: 3 7;
   stroke-linecap: round;
-  opacity: .8;
-  animation: route-flicker 1.6s steps(2, end) infinite;
-  transition: stroke var(--scene-ease), stroke-dasharray var(--scene-ease);
+  vector-effect: non-scaling-stroke;
+  transition: stroke var(--scene-ease), opacity var(--scene-ease);
 }
 
-.route[data-state="ok"] {
-  stroke: var(--violet);
+.segment[data-lit="true"] {
+  stroke: rgba(255, 189, 116, .95);
+  stroke-width: 3;
   stroke-dasharray: none;
+  filter: url("#live-system-glow");
+}
+
+.node,
+.segment {
+  opacity: .32;
+}
+
+.node[data-focus="true"],
+.segment[data-focus="true"] {
   opacity: 1;
-  animation: none;
+}
+
+.node {
+  transition: opacity var(--scene-ease);
 }
 
 .halo {
+  fill: none;
   transform-box: fill-box;
   transform-origin: center;
-  transition: fill 500ms ease, stroke 500ms ease;
 }
 
 .ring {
   fill: var(--ink);
-  stroke-width: 3.5;
-  transition: stroke 500ms ease;
+  stroke: rgba(239, 237, 245, .32);
+  stroke-width: 3;
+  transition: stroke var(--scene-ease);
 }
 
 .core {
-  transition: fill 500ms ease;
+  fill: rgba(239, 237, 245, .32);
+  transition: fill var(--scene-ease);
 }
 
-.node[data-state="alert"] .halo {
-  fill: rgba(255, 189, 116, .14);
-  stroke: rgba(255, 189, 116, .7);
-  stroke-width: 1.2;
-  animation: alert-pulse 1.4s ease-in-out infinite;
+.node[data-lit="true"] {
+  filter: url("#live-system-glow");
 }
 
-.node[data-state="alert"] .ring { stroke: var(--acid); }
-.node[data-state="alert"] .core { fill: var(--acid); }
-.node[data-state="ok"] .halo { fill: rgba(171, 162, 255, .12); stroke: none; }
-.node[data-state="ok"] .ring { stroke: var(--violet); }
-.node[data-state="ok"] .core { fill: var(--violet); }
+.node[data-lit="true"] .halo {
+  fill: rgba(255, 189, 116, .16);
+  stroke: rgba(255, 189, 116, .68);
+  stroke-width: 1.4;
+  animation: node-breathe 3600ms ease-in-out infinite;
+}
 
-.nodeLabel {
-  fill: var(--paper);
-  font-size: 12px;
+.node[data-lit="true"] .ring {
+  stroke: var(--acid);
+  stroke-width: 4.5;
+}
+
+.node[data-lit="true"] .core {
+  fill: var(--acid);
+}
+
+.label rect {
+  fill: rgba(11, 11, 13, .72);
+  stroke: rgba(239, 237, 245, .32);
+  stroke-width: 1;
+}
+
+.label text {
+  fill: var(--muted);
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: .1em;
+  letter-spacing: .12em;
   text-transform: uppercase;
+  transition: fill var(--scene-ease);
 }
 
-.alert {
-  transition: opacity 500ms ease;
+.node[data-lit="true"] .label rect {
+  stroke: rgba(239, 237, 245, .58);
 }
 
-.alert rect {
-  fill: rgba(11, 11, 13, .86);
-  stroke-width: 1.2;
-  transition: stroke 500ms ease;
-}
-
-.alert text {
-  font-size: 11.5px;
-  font-weight: 700;
-  transition: fill 500ms ease;
-}
-
-.alert[data-state="open"] rect { stroke: var(--acid); }
-.alert[data-state="open"] text { fill: var(--acid); }
-.alert[data-state="resolved"] rect { stroke: rgba(171, 162, 255, .7); }
-.alert[data-state="resolved"] text { fill: var(--violet); }
-
-.packet {
-  color: var(--acid);
-}
-
-.packet circle:last-of-type {
+.node[data-lit="true"] .label text {
   fill: var(--paper);
 }
 
-.packet[data-variant="steady"] {
-  color: var(--violet);
+.badge circle {
+  fill: var(--paper);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: badge-pulse 1.6s ease-in-out infinite;
 }
 
-@keyframes alert-pulse {
-  0%, 100% { opacity: .55; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.22); }
+.badge text {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+  text-anchor: middle;
 }
 
-@keyframes route-flicker {
-  0% { opacity: .85; }
-  100% { opacity: .5; }
+.packet circle {
+  fill: rgba(239, 237, 245, .5);
+}
+
+.packet[data-restored="true"] circle {
+  fill: var(--paper);
+  filter: url("#live-system-glow");
+}
+
+@keyframes node-breathe {
+  0%, 100% { opacity: .72; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.14); }
+}
+
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .camera,
   .mesh line,
-  .route {
+  .segment,
+  .node {
     transition: none;
   }
 
-  .route,
-  .node[data-state="alert"] .halo {
-    animation: none;
+  .halo,
+  .badge circle {
+    animation: none !important;
   }
 
   .packet {

@@ -1,12 +1,10 @@
-import type { CSSProperties } from "react";
 import {
-  healthyAt,
+  litAt,
   meshLinks,
   meshPoints,
+  nodeIssues,
   routePath,
-  routeSegments,
   scene,
-  systemAlerts,
   systemNodes,
   type Phase,
 } from "./live-system-data";
@@ -14,16 +12,15 @@ import styles from "./live-system-scene.module.css";
 
 type LiveSystemSceneProps = {
   phase: number;
-  camera: Phase["camera"];
+  current: Phase;
 };
 
-export function LiveSystemScene({ phase, camera }: LiveSystemSceneProps) {
-  const isHealthy = phase === 5;
-  const cameraStyle = {
-    transform: `translate(${scene.width / 2 - camera.scale * camera.x}px, ${
-      scene.height / 2 - camera.scale * camera.y
-    }px) scale(${camera.scale})`,
-  } as CSSProperties;
+// The offer hero topology, switched off at first and relit day by day.
+export function LiveSystemScene({ phase, current }: LiveSystemSceneProps) {
+  const isLit = (label: string) => phase >= litAt(label);
+  const inFocus = (label: string) =>
+    current.focus.length === 0 || current.focus.includes(label);
+  const isRestored = phase === 5;
 
   return (
     <svg
@@ -32,82 +29,89 @@ export function LiveSystemScene({ phase, camera }: LiveSystemSceneProps) {
       data-mapped={phase >= 1}
       aria-hidden="true"
       focusable="false"
+      overflow="visible"
     >
       <defs>
-        <radialGradient id="live-packet-glow">
-          <stop offset="0%" stopColor="currentColor" stopOpacity=".7" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-        </radialGradient>
+        <filter id="live-system-glow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
 
-      <g className={styles.camera} style={cameraStyle}>
-        <g className={styles.mesh}>
-          {meshLinks.map(([x1, y1, x2, y2]) => (
-            <line key={`${x1}-${y1}-${x2}-${y2}`} x1={x1} y1={y1} x2={x2} y2={y2} pathLength={1} />
-          ))}
-          {meshPoints.map(([x, y]) => (
-            <circle key={`${x}-${y}`} cx={x} cy={y} r="3" />
-          ))}
-        </g>
-
-        {routeSegments.map((segment) => (
-          <path
-            key={segment.key}
-            className={styles.route}
-            d={`${segment.start} ${segment.curve}`}
-            data-state={phase >= segment.healthyAt ? "ok" : "alert"}
+      <g className={styles.mesh}>
+        {meshLinks.map(({ from, to }) => (
+          <line
+            key={`${from.x}-${from.y}-${to.x}-${to.y}`}
+            x1={from.x}
+            y1={from.y}
+            x2={to.x}
+            y2={to.y}
+            pathLength={1}
           />
         ))}
-
-        {systemNodes.map((node) => (
-          <g
-            key={node.id}
-            className={styles.node}
-            data-state={phase >= healthyAt(node.id) ? "ok" : "alert"}
-            transform={`translate(${node.x} ${node.y})`}
-          >
-            <circle className={styles.halo} r="22" />
-            <circle className={styles.ring} r="12" />
-            <circle className={styles.core} r="4.5" />
-            <text className={styles.nodeLabel} x="24" y="-20">
-              {node.label}
-            </text>
-          </g>
+        {meshPoints.map(({ x, y }) => (
+          <circle key={`${x}-${y}`} cx={x} cy={y} r="4" />
         ))}
+      </g>
 
-        {systemAlerts.map((alert) => {
-          const node = systemNodes.find((candidate) => candidate.id === alert.node)!;
-          return (
-            <g
-              key={alert.issue}
-              className={styles.alert}
-              data-state={phase >= alert.resolvedAt ? "resolved" : "open"}
-              transform={`translate(${node.x + alert.dx} ${node.y + alert.dy})`}
-            >
-              <rect height="24" rx="12" width={alert.issue.length * 6.6 + 34} />
-              <text x="12" y="16">
-                {phase >= alert.resolvedAt ? "✓" : "!"} {alert.issue}
-              </text>
+      {systemNodes.slice(1).map((node, index) => {
+        const previous = systemNodes[index];
+        return (
+          <line
+            key={`${previous.label}-${node.label}`}
+            className={styles.segment}
+            x1={previous.x}
+            y1={previous.y}
+            x2={node.x}
+            y2={node.y}
+            data-lit={isLit(previous.label) && isLit(node.label)}
+            data-focus={inFocus(previous.label) || inFocus(node.label)}
+          />
+        );
+      })}
+
+      {systemNodes.map((node) => (
+        <g
+          key={node.label}
+          className={styles.node}
+          data-lit={isLit(node.label)}
+          data-focus={inFocus(node.label)}
+          transform={`translate(${node.x} ${node.y})`}
+        >
+          <circle className={styles.halo} r="18" />
+          <circle className={styles.ring} r="12" />
+          <circle className={styles.core} r="6" />
+          <g className={styles.label} transform={`translate(${node.dx} ${node.dy})`}>
+            <rect x="0" y="-16" width={node.width} height="28" rx="3" />
+            <text x="10" y="3">{node.label}</text>
+          </g>
+          {node.label in nodeIssues && !isLit(node.label) && (
+            <g className={styles.badge} transform="translate(13 -13)">
+              <circle r="8" />
+              <text y="4">!</text>
             </g>
-          );
-        })}
-
-        <g className={styles.packet} data-variant={isHealthy ? "steady" : "stalled"}>
-          <circle r="16" fill="url(#live-packet-glow)" />
-          <circle r="5" />
-          {isHealthy ? (
-            <animateMotion dur="3.2s" repeatCount="indefinite" path={routePath} />
-          ) : (
-            <animateMotion
-              dur="5s"
-              repeatCount="indefinite"
-              path={routePath}
-              calcMode="linear"
-              keyPoints="0;.22;.22;.48;.44;.48;.72;.72;0"
-              keyTimes="0;.18;.34;.5;.56;.62;.8;.94;1"
-            />
           )}
         </g>
+      ))}
+
+      <g className={styles.packet} data-restored={isRestored}>
+        <circle r="4.5" />
+        {isRestored ? (
+          <animateMotion key="steady" dur="3.6s" repeatCount="indefinite" path={routePath} />
+        ) : (
+          <animateMotion
+            key="stalled"
+            dur="6s"
+            repeatCount="indefinite"
+            path={routePath}
+            calcMode="linear"
+            keyPoints="0;.2;.2;.42;.42;0"
+            keyTimes="0;.2;.45;.62;.9;1"
+          />
+        )}
       </g>
     </svg>
   );

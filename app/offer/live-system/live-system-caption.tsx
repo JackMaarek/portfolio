@@ -19,39 +19,42 @@ export function LiveSystemCaption({ phases, activePhase }: LiveSystemCaptionProp
             key={phase.key}
             className={styles.caption}
             data-active={index === activePhase}
-            data-tone={isIncident ? "alert" : "diagnosed"}
           >
             <p className={styles.kicker}>{phase.kicker}</p>
-            <h3>{phase.title}</h3>
-            <p className={styles.body}>{phase.body}</p>
+            {isIncident ? (
+              <h3>
+                {phase.title}
+                <span>{` ${phase.body}`}</span>
+              </h3>
+            ) : (
+              <>
+                <h3>{phase.title}</h3>
+                <p className={styles.body}>{phase.body}</p>
+              </>
+            )}
 
             {phase.issues.length > 0 && (
-              <ul className={styles.issues}>
+              <ul className={styles.tags} data-tone={isIncident ? "open" : "resolved"}>
                 {phase.issues.map((issue) => (
-                  <li key={issue}>
-                    <span aria-hidden="true">{isIncident ? "!" : "✓"}</span> {issue}
-                  </li>
+                  <li key={issue}>{issue}</li>
                 ))}
               </ul>
             )}
 
             {phase.outputs.length > 0 && (
-              <div className={styles.outputs}>
-                <p className={styles.outputsLabel}>Ce que vous obtenez</p>
-                <ul>
-                  {phase.outputs.map((output) => (
-                    <li key={output.title}>
-                      <strong>{output.title}</strong>
-                      {phase.outputs.length === 1 && <> {output.body}</>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className={styles.outputs} aria-label="Ce que vous obtenez">
+                {phase.outputs.map((output) => (
+                  <li key={output.title}>
+                    <strong>{output.title}</strong>
+                    {phase.outputs.length === 1 && <span>{` ${output.body}`}</span>}
+                  </li>
+                ))}
+              </ul>
             )}
 
             {index === lastPhase && (
               <BookingLink
-                className={styles.cta}
+                className={`offer-primary-link ${styles.cta}`}
                 placement="offer-trace"
                 label="Planifier un diagnostic"
               >

@@ -3,7 +3,13 @@ import { BookingLink } from "../booking-link";
 import { OfferMotion } from "../offer-motion";
 import { SiteHeader } from "../site-header";
 import { getSiteOrigin, siteName } from "../site-metadata";
-import { deliverables, painPoints, processSteps } from "./offer-content";
+import {
+  deliverables,
+  diagnosticHeading,
+  painPoints,
+  problemHeading,
+  processSteps,
+} from "./offer-content";
 
 const decisionOutcomes = [
   {
@@ -260,10 +266,10 @@ export default function OfferPage() {
 
       <section id="offer-content" className="offer-band offer-problem">
         <div className="offer-section-intro" data-offer-reveal="intro">
-          <p className="offer-section-label">02 / Ce qui vous ralentit</p>
+          <p className="offer-section-label">{problemHeading.label}</p>
           <h2>
-            Les zones aveugles de la chaîne de delivery
-            <span> concentrent l’essentiel du risque opérationnel.</span>
+            {problemHeading.title}
+            <span>{` ${problemHeading.accent}`}</span>
           </h2>
         </div>
         <div className="offer-issue-grid" data-offer-reveal="content">
@@ -342,10 +348,10 @@ export default function OfferPage() {
 
       <section id="diagnostic" className="offer-band offer-process">
         <div className="offer-section-intro" data-offer-reveal="intro">
-          <p className="offer-section-label">05 / Le diagnostic</p>
+          <p className="offer-section-label">{diagnosticHeading.label}</p>
           <h2>
-            Une analyse progressive de la chaîne de delivery,
-            <span> du cadrage à la restitution.</span>
+            {diagnosticHeading.title}
+            <span>{` ${diagnosticHeading.accent}`}</span>
           </h2>
         </div>
         <div className="offer-timeline" data-offer-reveal="content">

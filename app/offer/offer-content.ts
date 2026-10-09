@@ -1,4 +1,16 @@
-// Offer copy shared by the offer page and the delivery trace.
+// Offer copy shared by the offer page and the live system scene.
+export const problemHeading = {
+  label: "02 / Ce qui vous ralentit",
+  title: "Les zones aveugles de la chaîne de delivery",
+  accent: "concentrent l’essentiel du risque opérationnel.",
+};
+
+export const diagnosticHeading = {
+  label: "05 / Le diagnostic",
+  title: "Une analyse progressive de la chaîne de delivery,",
+  accent: "du cadrage à la restitution.",
+};
+
 export const painPoints = [
   {
     index: "01",

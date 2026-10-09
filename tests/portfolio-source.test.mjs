@@ -156,26 +156,29 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(!offer.includes("offre-content"));
 });
 
-test("delivery trace preview reuses real offer content", async () => {
-  const [preview, trace, steps, rail, progress, content] = await Promise.all([
+test("live system preview reuses real offer content", async () => {
+  const [preview, data, caption, scene, phaseHook, content] = await Promise.all([
     readFile(new URL("app/offer/trace-preview/page.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/delivery-trace/delivery-trace.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/delivery-trace/trace-steps.ts", projectRoot), "utf8"),
-    readFile(new URL("app/offer/delivery-trace/trace-rail.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/delivery-trace/use-trace-progress.ts", projectRoot), "utf8"),
+    readFile(new URL("app/offer/live-system/live-system-data.ts", projectRoot), "utf8"),
+    readFile(new URL("app/offer/live-system/live-system-caption.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/live-system/live-system-scene.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/live-system/use-scroll-phase.ts", projectRoot), "utf8"),
     readFile(new URL("app/offer/offer-content.ts", projectRoot), "utf8"),
   ]);
 
   assert.match(preview, /index: false/);
   assert.match(preview, /follow: false/);
-  assert.match(steps, /from "\.\.\/offer-content"/);
+  assert.match(data, /from "\.\.\/offer-content"/);
   assert.match(content, /export const processSteps/);
+  assert.match(content, /export const problemHeading/);
   for (const day of ["J1", "J2", "J3", "J4", "J5"]) {
-    assert.ok(steps.includes(`${day}: {`), day);
+    assert.ok(data.includes(`${day}: {`), day);
   }
-  assert.match(trace, /placement="offer-trace"/);
-  assert.match(rail, /aria-label="Étapes du diagnostic"/);
-  assert.match(rail, /aria-current=\{index === activeIndex \? "step" : undefined\}/);
-  assert.match(progress, /IntersectionObserver/);
-  assert.ok(!progress.includes("addEventListener(\"scroll\""));
+  for (const issue of ["Déploiements risqués", "Rollbacks flous", "Environnements divergents", "Alertes inutiles"]) {
+    assert.ok(data.includes(`issue: "${issue}"`), issue);
+  }
+  assert.match(caption, /placement="offer-trace"/);
+  assert.match(scene, /aria-hidden="true"/);
+  assert.match(phaseHook, /prefers-reduced-motion: reduce/);
+  assert.match(phaseHook, /passive: true/);
 });

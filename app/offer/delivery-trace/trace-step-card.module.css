@@ -1,0 +1,99 @@
+/* Step cards of the delivery trace, matching the offer card surfaces. */
+.card {
+  --trace-ease: 520ms cubic-bezier(.2, .8, .2, 1);
+  padding: 22px;
+  border: 1px solid var(--offer-border);
+  border-radius: 6px;
+  background: rgba(226, 223, 234, .62);
+  box-shadow: 0 14px 34px rgba(17, 16, 20, .06);
+  scroll-margin-top: 104px;
+  transition: opacity var(--trace-ease), border-color var(--trace-ease);
+}
+
+:global([data-tracking="true"]) .card:not([data-active="true"]) {
+  opacity: .64;
+}
+
+.card[data-active="true"] {
+  border-color: var(--offer-violet);
+}
+
+.cardDay {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--offer-violet);
+  font-weight: 700;
+}
+
+.card h3 {
+  margin: 0;
+  color: var(--offer-ink);
+  font-size: 1.2rem;
+  line-height: 1.18;
+  text-transform: uppercase;
+}
+
+.card p {
+  margin: 14px 0 0;
+  color: var(--offer-muted);
+  line-height: 1.52;
+}
+
+.cardGroup {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--offer-border);
+}
+
+.card .cardLabel {
+  margin: 0 0 10px;
+  color: var(--offer-violet);
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.issueList,
+.outputList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.issueList li {
+  padding: 6px 12px;
+  border: 1px solid rgba(var(--offer-violet-rgb), .42);
+  border-radius: 999px;
+  color: var(--offer-violet);
+  font-size: .86rem;
+  font-weight: 700;
+}
+
+.outputList {
+  flex-direction: column;
+}
+
+.outputList li {
+  color: var(--offer-muted);
+  line-height: 1.45;
+}
+
+.outputList strong {
+  color: var(--offer-ink);
+}
+
+@media (min-width: 981px) {
+  .card {
+    padding: 28px;
+    scroll-margin-top: 18svh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

@@ -171,11 +171,12 @@ test("live system preview reuses real offer content", async () => {
   assert.match(data, /from "\.\.\/offer-content"/);
   assert.match(content, /export const processSteps/);
   assert.match(content, /export const problemHeading/);
+  assert.match(data, /from "\.\.\/hero-topology"/);
   for (const day of ["J1", "J2", "J3", "J4", "J5"]) {
-    assert.ok(data.includes(`${day}: {`), day);
+    assert.ok(data.includes(`${day}: [`), day);
   }
   for (const issue of ["Déploiements risqués", "Rollbacks flous", "Environnements divergents", "Alertes inutiles"]) {
-    assert.ok(data.includes(`issue: "${issue}"`), issue);
+    assert.ok(data.includes(`"${issue}"`), issue);
   }
   assert.match(caption, /placement="offer-trace"/);
   assert.match(scene, /aria-hidden="true"/);

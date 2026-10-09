@@ -117,11 +117,13 @@ test("contact CTAs book through Cal.com only", async () => {
 });
 
 test("offer page exposes the commercial diagnostic", async () => {
-  const [offer, header, motion] = await Promise.all([
+  const [offerPage, offerContent, header, motion] = await Promise.all([
     readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/offer-content.ts", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
     readFile(new URL("app/offer-motion.tsx", projectRoot), "utf8"),
   ]);
+  const offer = `${offerPage}${offerContent}`;
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
   assert.ok(offer.includes("Vos déploiements"));
@@ -154,26 +156,26 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(!offer.includes("offre-content"));
 });
 
-test("effect lab exposes an isolated accessible system trace", async () => {
-  const [page, experience, styles] = await Promise.all([
-    readFile(new URL("app/effect-lab/page.tsx", projectRoot), "utf8"),
-    readFile(
-      new URL("app/effect-lab/effect-lab-experience.tsx", projectRoot),
-      "utf8",
-    ),
-    readFile(
-      new URL("app/effect-lab/effect-lab.module.css", projectRoot),
-      "utf8",
-    ),
+test("delivery trace preview reuses real offer content", async () => {
+  const [preview, trace, steps, rail, progress, content] = await Promise.all([
+    readFile(new URL("app/offer/trace-preview/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/delivery-trace/delivery-trace.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/delivery-trace/trace-steps.ts", projectRoot), "utf8"),
+    readFile(new URL("app/offer/delivery-trace/trace-rail.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/delivery-trace/use-trace-progress.ts", projectRoot), "utf8"),
+    readFile(new URL("app/offer/offer-content.ts", projectRoot), "utf8"),
   ]);
 
-  assert.match(page, /index: false/);
-  assert.match(page, /follow: false/);
-  assert.match(experience, /requestAnimationFrame/);
-  assert.match(experience, /getPointAtLength/);
-  assert.match(experience, /prefers-reduced-motion: reduce/);
-  assert.match(experience, /aria-label="Parcours de delivery du code aux métriques"/);
-  assert.match(experience, /data-trace-step/);
-  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(styles, /\.traceStage\s*\{[\s\S]*?position: sticky/);
+  assert.match(preview, /index: false/);
+  assert.match(preview, /follow: false/);
+  assert.match(steps, /from "\.\.\/offer-content"/);
+  assert.match(content, /export const processSteps/);
+  for (const day of ["J1", "J2", "J3", "J4", "J5"]) {
+    assert.ok(steps.includes(`${day}: {`), day);
+  }
+  assert.match(trace, /placement="offer-trace"/);
+  assert.match(rail, /aria-label="Étapes du diagnostic"/);
+  assert.match(rail, /aria-current=\{index === activeIndex \? "step" : undefined\}/);
+  assert.match(progress, /IntersectionObserver/);
+  assert.ok(!progress.includes("addEventListener(\"scroll\""));
 });

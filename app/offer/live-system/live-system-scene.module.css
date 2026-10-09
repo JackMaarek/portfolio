@@ -9,9 +9,8 @@
 .mesh line {
   stroke: rgba(183, 176, 255, .34);
   stroke-width: 1.35;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transition: stroke-dashoffset 1400ms cubic-bezier(.34, .88, .36, 1);
+  opacity: .3;
+  transition: opacity 900ms ease-out;
 }
 
 .mesh circle {
@@ -21,7 +20,7 @@
 }
 
 .scene[data-mapped="true"] .mesh line {
-  stroke-dashoffset: 0;
+  opacity: 1;
 }
 
 .scene[data-mapped="true"] .mesh circle {
@@ -134,10 +133,6 @@
 }
 
 .packet circle {
-  fill: rgba(239, 237, 245, .5);
-}
-
-.packet[data-restored="true"] circle {
   fill: var(--paper);
   filter: url("#live-system-glow");
 }

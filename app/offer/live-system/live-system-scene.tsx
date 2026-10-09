@@ -49,7 +49,6 @@ export function LiveSystemScene({ phase, current }: LiveSystemSceneProps) {
             y1={from.y}
             x2={to.x}
             y2={to.y}
-            pathLength={1}
           />
         ))}
         {meshPoints.map(({ x, y }) => (
@@ -97,22 +96,12 @@ export function LiveSystemScene({ phase, current }: LiveSystemSceneProps) {
         </g>
       ))}
 
-      <g className={styles.packet} data-restored={isRestored}>
-        <circle r="4.5" />
-        {isRestored ? (
-          <animateMotion key="steady" dur="3.6s" repeatCount="indefinite" path={routePath} />
-        ) : (
-          <animateMotion
-            key="stalled"
-            dur="6s"
-            repeatCount="indefinite"
-            path={routePath}
-            calcMode="linear"
-            keyPoints="0;.2;.2;.42;.42;0"
-            keyTimes="0;.2;.45;.62;.9;1"
-          />
-        )}
-      </g>
+      {isRestored && (
+        <g className={styles.packet}>
+          <circle r="4.5" />
+          <animateMotion dur="3.6s" repeatCount="indefinite" path={routePath} />
+        </g>
+      )}
     </svg>
   );
 }

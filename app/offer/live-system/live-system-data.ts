@@ -12,9 +12,9 @@ const project = (x: number, y: number) => ({
 // Portrait label offsets, chosen so each tag sits beside its own node.
 const labelOffsets: Record<string, { dx: number; dy: number }> = {
   Code: { dx: 28, dy: -22 },
-  CI: { dx: 30, dy: 8 },
-  Registry: { dx: -60, dy: -44 },
-  ArgoCD: { dx: 14, dy: -30 },
+  CI: { dx: -64, dy: 0 },
+  Registry: { dx: 16, dy: -34 },
+  ArgoCD: { dx: 12, dy: -34 },
   EKS: { dx: -86, dy: -16 },
   Metrics: { dx: 28, dy: 34 },
 };

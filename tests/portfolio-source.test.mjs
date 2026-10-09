@@ -92,6 +92,30 @@ test("document metadata describes the portfolio", async () => {
   assert.match(offer, /canonical: `\$\{origin\}\/offer`/);
 });
 
+test("contact CTAs book through Cal.com only", async () => {
+  const [portfolio, offer, contact, bookingLink, header] = await Promise.all([
+    readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/site-contact.ts", projectRoot), "utf8"),
+    readFile(new URL("app/booking-link.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
+  ]);
+  const sources = `${portfolio}${offer}${bookingLink}${header}`;
+
+  assert.match(contact, /CONTACT_BOOKING_URL = "https:\/\/cal\.com\/jack-maarek-zmdq16\/30min"/);
+  assert.match(contact, /utm_source", "site"/);
+  assert.ok(!sources.includes("cal.com"));
+  assert.ok(!`${sources}${contact}`.includes("mailto:"));
+  assert.ok(!`${sources}${contact}`.includes("gmail.com"));
+  assert.match(bookingLink, /target="_blank"/);
+  assert.match(bookingLink, /rel="noopener noreferrer"/);
+  assert.match(portfolio, /placement="home-contact"/);
+  for (const placement of ["offer-hero", "offer-short", "offer-full", "offer-contact"]) {
+    assert.ok(offer.includes(`"${placement}"`), placement);
+  }
+  assert.ok(header.includes('offerHref: "#contact"'));
+});
+
 test("offer page exposes the commercial diagnostic", async () => {
   const [offer, header, motion] = await Promise.all([
     readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),

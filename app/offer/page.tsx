@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
+import { BookingLink } from "../booking-link";
 import { OfferMotion } from "../offer-motion";
 import { SiteHeader } from "../site-header";
 import { getSiteOrigin, siteName } from "../site-metadata";
-
-const contactHref =
-  "mailto:jacques.maarek.dev@gmail.com?subject=Diagnostic%20CI%2FCD%20%26%20Observabilit%C3%A9";
 
 const painPoints = [
   {
@@ -133,6 +131,7 @@ const plans = [
     duration: "3 jours",
     price: "À partir de 1 560 € HT",
     cta: "Échanger sur le périmètre",
+    placement: "offer-short" as const,
     points: [
       "CI/CD et environnements",
       "Kubernetes / GitOps selon contexte",
@@ -144,6 +143,7 @@ const plans = [
     duration: "5 jours",
     price: "À partir de 2 600 € HT",
     cta: "Planifier un diagnostic",
+    placement: "offer-full" as const,
     recommended: true,
     points: [
       "CI/CD et chaîne de delivery",
@@ -323,10 +323,14 @@ export default function OfferPage() {
             <li>Alerting</li>
           </ul>
           <div className="offer-hero-actions">
-            <a className="offer-primary-link" href={contactHref}>
+            <BookingLink
+              className="offer-primary-link"
+              placement="offer-hero"
+              label="Planifier un échange"
+            >
               Planifier un échange
               <span aria-hidden="true">→</span>
-            </a>
+            </BookingLink>
             <a className="offer-secondary-link" href="#offer-content">
               Voir le diagnostic
             </a>
@@ -482,7 +486,9 @@ export default function OfferPage() {
                   <li key={point}>{point}</li>
                 ))}
               </ul>
-              <a href={contactHref}>{plan.cta}</a>
+              <BookingLink placement={plan.placement} label={plan.cta}>
+                {plan.cta}
+              </BookingLink>
             </article>
           ))}
         </div>
@@ -513,10 +519,14 @@ export default function OfferPage() {
           </h2>
           <p>Un échange de 30 minutes pour qualifier le périmètre.</p>
         </div>
-        <a className="offer-contact-link" href={contactHref}>
+        <BookingLink
+          className="offer-contact-link"
+          placement="offer-contact"
+          label="Échanger sur votre contexte"
+        >
           <span>Échanger sur votre contexte</span>
           <i aria-hidden="true">→</i>
-        </a>
+        </BookingLink>
       </footer>
     </div>
   );

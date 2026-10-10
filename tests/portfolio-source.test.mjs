@@ -126,7 +126,7 @@ test("offer page exposes the commercial diagnostic", async () => {
   ]);
   const offer = `${offerPage}${offerBody}${offerContent}`;
 
-  assert.ok(offerPage.includes("<OfferPageBody diagnostic={<OfferProcess />} />"));
+  assert.ok(offerPage.includes('<OfferPageBody layout="timeline" />'));
   assert.ok(offerBody.includes('<section id="diagnostic" className="offer-band offer-process">'));
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
@@ -172,7 +172,7 @@ test("live system preview reuses real offer content", async () => {
 
   assert.match(preview, /index: false/);
   assert.match(preview, /follow: false/);
-  assert.ok(preview.includes('<OfferPageBody diagnostic={<LiveSystem id="diagnostic" />} />'));
+  assert.ok(preview.includes('<OfferPageBody layout="trace" />'));
   assert.match(data, /from "\.\.\/offer-content"/);
   assert.match(content, /export const processSteps/);
   assert.match(content, /export const problemHeading/);
@@ -192,4 +192,28 @@ test("live system preview reuses real offer content", async () => {
   assert.match(scene, /aria-hidden="true"/);
   assert.match(phaseHook, /prefers-reduced-motion: reduce/);
   assert.match(phaseHook, /passive: true/);
+});
+
+test("trace layout hands the hero topology over to the live system scene", async () => {
+  const [body, liveSystem, scene, data] = await Promise.all([
+    readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/live-system/live-system.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/live-system/live-system-scene.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/live-system/live-system-data.ts", projectRoot), "utf8"),
+  ]);
+
+  // The scene replaces sections 02 and 05, so they only exist in the timeline layout.
+  assert.match(body, /layout === "timeline" \? \(/);
+  assert.match(body, /<OfferProblem \/>/);
+  assert.match(body, /\{layout === "timeline" && <OfferProcess \/>\}/);
+  assert.match(body, /<LiveSystem\s+hero=\{/);
+  assert.match(body, /trace: \{ deliverables: "05", formats: "06", faq: "07", contact: "08" \}/);
+  assert.match(body, /timeline: \{ deliverables: "06", formats: "07", faq: "08", contact: "09" \}/);
+  // The hero copy keeps its anchor target, now pointing at section 02 in the scene.
+  assert.match(body, /href="#offer-content"/);
+  assert.match(liveSystem, /id="offer-content"/);
+  // Behind the hero the scene shows the restored route, without findings.
+  assert.match(liveSystem, /phase=\{inLead \? restoredPhase : phase\}/);
+  assert.match(scene, /data-lead=\{lead\}/);
+  assert.match(data, /kicker: `\$\{diagnosticName\} · \$\{step\.day\}`/);
 });

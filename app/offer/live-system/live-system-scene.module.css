@@ -123,7 +123,7 @@
 .node[data-traced="true"] .label rect { stroke: rgba(239, 237, 245, .28); }
 .node[data-traced="true"] .label text { fill: var(--paper); }
 
-/* Open risk pulses; once traced it stays as a steady finding. */
+/* Open risk pulses; on its day it shows as a steady finding. */
 .badge circle {
   transform-box: fill-box;
   transform-origin: center;
@@ -137,7 +137,8 @@
 }
 
 .scene[data-lead="true"] .badge,
-.scene[data-lead="true"] .loop {
+.scene[data-lead="true"] .loop,
+.badge[data-state="hidden"] {
   opacity: 0;
 }
 

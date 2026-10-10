@@ -15,6 +15,13 @@ type LiveSystemSceneProps = {
 export function LiveSystemScene({ phase, lead }: LiveSystemSceneProps) {
   const isTraced = (label: string) => phase >= litAt(label);
   const isRestored = phase === 5 && !lead;
+  // A badge follows the active caption: all four blind spots are open in
+  // section 02, then each one only shows as a finding on the day that
+  // reports it in its "Constats".
+  const badgeState = (label: string) => {
+    if (phase === 0) return "open";
+    return litAt(label) === phase ? "finding" : "hidden";
+  };
   const currentTag = lead ? undefined : dayTags.find((tag) => tag.day === `J${phase}`);
 
   return (
@@ -77,7 +84,7 @@ export function LiveSystemScene({ phase, lead }: LiveSystemSceneProps) {
           {node.label in nodeIssues && (
             <g
               className={styles.badge}
-              data-state={isTraced(node.label) ? "finding" : "open"}
+              data-state={badgeState(node.label)}
               transform="translate(8 -9)"
             >
               <circle r="5.5" data-collide="badge" />

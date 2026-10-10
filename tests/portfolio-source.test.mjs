@@ -95,7 +95,7 @@ test("document metadata describes the portfolio", async () => {
 test("contact CTAs book through Cal.com only", async () => {
   const [portfolio, offer, contact, bookingLink, header] = await Promise.all([
     readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
     readFile(new URL("app/site-contact.ts", projectRoot), "utf8"),
     readFile(new URL("app/booking-link.tsx", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
@@ -117,13 +117,17 @@ test("contact CTAs book through Cal.com only", async () => {
 });
 
 test("offer page exposes the commercial diagnostic", async () => {
-  const [offerPage, offerContent, header, motion] = await Promise.all([
+  const [offerPage, offerBody, offerContent, header, motion] = await Promise.all([
     readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
     readFile(new URL("app/offer/offer-content.ts", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
     readFile(new URL("app/offer-motion.tsx", projectRoot), "utf8"),
   ]);
-  const offer = `${offerPage}${offerContent}`;
+  const offer = `${offerPage}${offerBody}${offerContent}`;
+
+  assert.ok(offerPage.includes("<OfferPageBody diagnostic={<OfferProcess />} />"));
+  assert.ok(offerBody.includes('<section id="diagnostic" className="offer-band offer-process">'));
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
   assert.ok(offer.includes("Vos déploiements"));

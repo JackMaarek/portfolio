@@ -215,5 +215,8 @@ test("trace layout hands the hero topology over to the live system scene", async
   // Behind the hero the scene shows the restored route, without findings.
   assert.match(liveSystem, /phase=\{inLead \? restoredPhase : phase\}/);
   assert.match(scene, /data-lead=\{lead\}/);
+  // Each finding badge only shows with the caption that lists it.
+  assert.match(scene, /data-state=\{badgeState\(node\.label\)\}/);
+  assert.match(scene, /litAt\(label\) === phase \? "finding" : "hidden"/);
   assert.match(data, /kicker: `\$\{diagnosticName\} · \$\{step\.day\}`/);
 });

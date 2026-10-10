@@ -29,7 +29,7 @@ export function LiveSystemScene({ phase, lead }: LiveSystemSceneProps) {
     >
       <defs>
         <filter id="live-system-glow" x="-80%" y="-80%" width="260%" height="260%">
-          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -67,21 +67,21 @@ export function LiveSystemScene({ phase, lead }: LiveSystemSceneProps) {
           data-traced={isTraced(node.label)}
           transform={`translate(${node.x} ${node.y})`}
         >
-          <circle className={styles.halo} r="18" />
-          <circle className={styles.ring} r="12" data-collide="node" />
-          <circle className={styles.core} r="6" />
+          <circle className={styles.halo} r="10" />
+          <circle className={styles.ring} r="6" data-collide="node" />
+          <circle className={styles.core} r="2.5" />
           <g className={styles.label} transform={`translate(${node.dx} ${node.dy})`}>
-            <rect x="0" y="-16" width={node.width} height="28" rx="3" data-collide="label" />
-            <text x="10" y="3">{node.label}</text>
+            <rect x="0" y="-11" width={node.width} height="21" rx="2" data-collide="label" />
+            <text x="7" y="3">{node.label}</text>
           </g>
           {node.label in nodeIssues && (
             <g
               className={styles.badge}
               data-state={isTraced(node.label) ? "finding" : "open"}
-              transform="translate(13 -13)"
+              transform="translate(8 -9)"
             >
-              <circle r="8" data-collide="badge" />
-              <text y="4">!</text>
+              <circle r="5.5" data-collide="badge" />
+              <text y="2.7">!</text>
             </g>
           )}
         </g>
@@ -101,7 +101,7 @@ export function LiveSystemScene({ phase, lead }: LiveSystemSceneProps) {
 
       {isRestored && (
         <g className={styles.packet}>
-          <circle r="4.5" />
+          <circle r="2.5" />
           <animateMotion dur="3.6s" repeatCount="indefinite" path={routePath} />
         </g>
       )}

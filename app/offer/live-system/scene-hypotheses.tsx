@@ -42,13 +42,13 @@ export function SceneHypotheses({ phase }: SceneHypothesesProps) {
           data-settled={phase >= 3}
           cx={x}
           cy={y}
-          r="4"
+          r="2.5"
         />
       ))}
 
       {phase <= 1 &&
         wanderingPaths.map((path, index) => (
-          <circle key={path} className={styles.wanderer} r="3.5" opacity="0">
+          <circle key={path} className={styles.wanderer} r="2.5" opacity="0">
             <animateMotion
               dur="4.2s"
               begin={`${index * 1.1}s`}

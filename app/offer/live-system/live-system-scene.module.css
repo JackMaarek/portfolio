@@ -10,15 +10,15 @@
 /* Unknown system: every link is an equally plausible grey path. */
 .candidate,
 .deadEnd {
-  stroke: rgba(239, 237, 245, .28);
-  stroke-width: 1.4;
-  stroke-dasharray: 3 6;
+  stroke: rgba(239, 237, 245, .22);
+  stroke-width: .8;
+  stroke-dasharray: 2 5;
   transition: stroke var(--scene-ease), stroke-dasharray var(--scene-ease), opacity var(--scene-ease);
 }
 
 /* Settled: the eliminated hypothesis becomes the hero background mesh. */
 .candidate[data-settled="true"] {
-  stroke: rgba(183, 176, 255, .34);
+  stroke: rgba(183, 176, 255, .22);
   stroke-dasharray: none;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .meshPoint[data-settled="true"] {
-  fill: #b9b1ff;
+  fill: rgba(185, 177, 255, .6);
 }
 
 .wanderer {
@@ -41,8 +41,8 @@
 
 /* Real route, drawn section by section as each day traces it. */
 .traced {
-  stroke: rgba(255, 189, 116, .95);
-  stroke-width: 3;
+  stroke: rgba(255, 189, 116, .9);
+  stroke-width: 1.4;
   stroke-linecap: round;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -56,8 +56,8 @@
 
 .loop {
   fill: none;
-  stroke: rgba(255, 189, 116, .5);
-  stroke-width: 1.4;
+  stroke: rgba(255, 189, 116, .35);
+  stroke-width: .8;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   transition: stroke-dashoffset 1600ms ease-in-out;
@@ -76,7 +76,7 @@
 .ring {
   fill: var(--ink);
   stroke: rgba(239, 237, 245, .32);
-  stroke-width: 3;
+  stroke-width: 1.1;
   transition: stroke var(--scene-ease), stroke-width var(--scene-ease);
 }
 
@@ -85,18 +85,14 @@
   transition: fill var(--scene-ease);
 }
 
-.node[data-traced="true"] {
-  filter: url("#live-system-glow");
-}
-
 .node[data-traced="true"] .halo {
-  fill: rgba(255, 189, 116, .16);
-  stroke: rgba(255, 189, 116, .68);
-  stroke-width: 1.4;
+  fill: rgba(255, 189, 116, .07);
+  stroke: rgba(255, 189, 116, .3);
+  stroke-width: .7;
   animation: node-breathe 3600ms ease-in-out infinite;
 }
 
-.node[data-traced="true"] .ring { stroke: var(--acid); stroke-width: 4.5; }
+.node[data-traced="true"] .ring { stroke: var(--acid); stroke-width: 1.4; }
 .node[data-traced="true"] .core { fill: var(--acid); }
 
 /* Node names only appear once J1 has mapped the chain. */
@@ -111,20 +107,20 @@
 
 .label rect {
   fill: rgba(11, 11, 13, .72);
-  stroke: rgba(239, 237, 245, .32);
-  stroke-width: 1;
+  stroke: rgba(239, 237, 245, .12);
+  stroke-width: .6;
 }
 
 .label text {
   fill: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .12em;
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: .14em;
   text-transform: uppercase;
   transition: fill var(--scene-ease);
 }
 
-.node[data-traced="true"] .label rect { stroke: rgba(239, 237, 245, .58); }
+.node[data-traced="true"] .label rect { stroke: rgba(239, 237, 245, .28); }
 .node[data-traced="true"] .label text { fill: var(--paper); }
 
 /* Open risk pulses; once traced it stays as a steady finding. */
@@ -147,8 +143,8 @@
 
 .badge text {
   fill: var(--ink);
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 7.5px;
+  font-weight: 700;
   text-anchor: middle;
 }
 
@@ -164,10 +160,10 @@
 .dayTag {
   fill: var(--acid);
   stroke: var(--ink);
-  stroke-width: 5px;
+  stroke-width: 4px;
   paint-order: stroke;
-  font-size: 10.5px;
-  font-weight: 700;
+  font-size: 8.5px;
+  font-weight: 500;
   letter-spacing: .12em;
   text-transform: uppercase;
   animation: tag-in 600ms ease-out both;

@@ -17,18 +17,22 @@ const project = (x: number, y: number) => ({
 
 // Portrait label offsets, chosen so each tag sits beside its own node.
 const labelOffsets: Record<string, { dx: number; dy: number }> = {
-  Code: { dx: 28, dy: -22 },
-  CI: { dx: -64, dy: 0 },
-  Registry: { dx: 16, dy: -34 },
-  ArgoCD: { dx: 12, dy: -34 },
-  EKS: { dx: -86, dy: -16 },
-  Metrics: { dx: 28, dy: 34 },
+  Code: { dx: 14, dy: -16 },
+  CI: { dx: -46, dy: 0 },
+  Registry: { dx: 10, dy: -22 },
+  ArgoCD: { dx: 10, dy: -22 },
+  EKS: { dx: -54, dy: -12 },
+  Metrics: { dx: 12, dy: 22 },
 };
+
+// Label boxes are drawn smaller than in the hero to keep the scene light.
+const labelScale = 0.8;
 
 export const systemNodes = heroTopology.nodes.map((node) => ({
   ...node,
   ...project(node.x, node.y),
   ...labelOffsets[node.label],
+  width: Math.round(node.width * labelScale),
 }));
 
 export const meshPoints = heroTopology.backgroundNodes.map(([x, y]) => project(x, y));

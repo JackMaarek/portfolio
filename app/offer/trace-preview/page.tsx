@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { SiteHeader } from "../../site-header";
 import { LiveSystem } from "../live-system/live-system";
-import styles from "./trace-preview.module.css";
+import { OfferPageBody } from "../offer-page-body";
 
-// Test route: the live system scene in the offer context before it replaces
-// section 05 of the offer page.
+// Test route: the full offer page with the live system scene in place of
+// section 05, to review the final render before it replaces the timeline.
 export const metadata: Metadata = {
   title: "Le diagnostic — Jacques Maarek",
   robots: {
@@ -14,14 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function TracePreviewPage() {
-  return (
-    <div className="offer-shell">
-      <div className={styles.headerStrip}>
-        <SiteHeader page="offer" />
-      </div>
-      <main>
-        <LiveSystem />
-      </main>
-    </div>
-  );
+  return <OfferPageBody diagnostic={<LiveSystem id="diagnostic" />} />;
 }

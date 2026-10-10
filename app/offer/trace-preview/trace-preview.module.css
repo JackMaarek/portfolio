@@ -1,6 +1,0 @@
-/* Dark strip so the offer header keeps the contrast it has over the hero. */
-.headerStrip {
-  position: relative;
-  min-height: 84px;
-  background: var(--ink);
-}

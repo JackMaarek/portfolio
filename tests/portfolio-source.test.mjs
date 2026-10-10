@@ -172,6 +172,7 @@ test("live system preview reuses real offer content", async () => {
 
   assert.match(preview, /index: false/);
   assert.match(preview, /follow: false/);
+  assert.ok(preview.includes('<OfferPageBody diagnostic={<LiveSystem id="diagnostic" />} />'));
   assert.match(data, /from "\.\.\/offer-content"/);
   assert.match(content, /export const processSteps/);
   assert.match(content, /export const problemHeading/);

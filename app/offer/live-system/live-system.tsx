@@ -9,11 +9,11 @@ import styles from "./live-system.module.css";
 
 const dayPhases = phases.slice(1);
 
-export function LiveSystem() {
+export function LiveSystem({ id }: { id?: string }) {
   const { sectionRef, phase } = useScrollPhase(phases.length);
 
   return (
-    <section className={styles.liveSystem} aria-labelledby="live-system-title">
+    <section id={id} className={styles.liveSystem} aria-labelledby="live-system-title">
       <div className="hero-grid" aria-hidden="true" />
       <div className={styles.intro}>
         <p className="offer-section-label">{diagnosticHeading.label}</p>

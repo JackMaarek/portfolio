@@ -1,5 +1,11 @@
 import { heroTopology } from "../hero-topology";
-import { deliverables, painPoints, problemHeading, processSteps } from "../offer-content";
+import {
+  deliverables,
+  diagnosticHeading,
+  painPoints,
+  problemHeading,
+  processSteps,
+} from "../offer-content";
 
 export const scene = { width: 400, height: 480 };
 
@@ -56,6 +62,9 @@ const dayOutputs: Record<string, string[]> = {
   J5: ["Risques", "Quick wins", "Roadmap 30/60 jours", "Recommandations"],
 };
 
+// Section name without its /offer number: the scene carries it for J1–J5.
+const diagnosticName = diagnosticHeading.label.replace(/^\d+ \/ /, "");
+
 const findTitle = <T extends { title: string }>(items: readonly T[], title: string) => {
   const item = items.find((candidate) => candidate.title === title);
   if (!item) throw new Error(`Unknown offer content title: ${title}`);
@@ -76,7 +85,7 @@ export const phases = [
     const focus = dayFocus[step.day] ?? [];
     return {
       key: step.day,
-      kicker: step.day,
+      kicker: `${diagnosticName} · ${step.day}`,
       title: step.title,
       body: step.body,
       focus,

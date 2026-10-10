@@ -5,20 +5,24 @@ import styles from "./live-system-scene.module.css";
 
 type LiveSystemSceneProps = {
   phase: number;
+  lead: boolean;
 };
 
 // Phase 0 shows an unknown system full of candidate paths; each day then
 // traces one section of the real route until the hero topology is restored.
-export function LiveSystemScene({ phase }: LiveSystemSceneProps) {
+// In the lead state, behind the hero, the restored route is drawn without
+// findings, feedback loop or packet, exactly like the hero topology.
+export function LiveSystemScene({ phase, lead }: LiveSystemSceneProps) {
   const isTraced = (label: string) => phase >= litAt(label);
-  const isRestored = phase === 5;
-  const currentTag = dayTags.find((tag) => tag.day === `J${phase}`);
+  const isRestored = phase === 5 && !lead;
+  const currentTag = lead ? undefined : dayTags.find((tag) => tag.day === `J${phase}`);
 
   return (
     <svg
       className={styles.scene}
       viewBox={`0 0 ${scene.width} ${scene.height}`}
       data-labelled={phase >= 1}
+      data-lead={lead}
       aria-hidden="true"
       focusable="false"
       overflow="visible"

@@ -134,6 +134,17 @@
   transition: fill var(--scene-ease);
 }
 
+/* Behind the hero: no findings and no feedback loop yet. */
+.badge,
+.loop {
+  transition: opacity var(--scene-ease), stroke-dashoffset 1600ms ease-in-out;
+}
+
+.scene[data-lead="true"] .badge,
+.scene[data-lead="true"] .loop {
+  opacity: 0;
+}
+
 .badge text {
   fill: var(--ink);
   font-size: 11px;

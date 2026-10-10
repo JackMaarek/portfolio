@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getSiteOrigin, siteName } from "../site-metadata";
-import { OfferPageBody, OfferProcess } from "./offer-page-body";
+import { OfferPageBody } from "./offer-page-body";
 
 const offerTitle = "Offre Diagnostic CI/CD & Observabilité — Jacques Maarek";
 const offerDescription =
@@ -33,5 +33,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function OfferPage() {
-  return <OfferPageBody diagnostic={<OfferProcess />} />;
+  return <OfferPageBody layout="timeline" />;
 }

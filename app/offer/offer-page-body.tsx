@@ -1,10 +1,11 @@
-// Shared /offer body. Section 05 is a slot so the noindex trace preview can
-// render the live system scene in the full page before it replaces the timeline.
-import type { ReactNode } from "react";
+// Shared /offer body. The "trace" layout, reviewed on the noindex preview,
+// pins the live system scene behind the hero and lets it carry sections 02
+// and 05 before it replaces the "timeline" layout on /offer.
 import { BookingLink } from "../booking-link";
 import { OfferMotion } from "../offer-motion";
 import { SiteHeader } from "../site-header";
 import { heroTopology } from "./hero-topology";
+import { LiveSystem } from "./live-system/live-system";
 import {
   deliverables,
   diagnosticHeading,
@@ -12,6 +13,15 @@ import {
   problemHeading,
   processSteps,
 } from "./offer-content";
+
+export type OfferLayout = "timeline" | "trace";
+
+// The trace layout merges sections 02 and 05 into the scene, so the
+// sections after it move up by one.
+const sectionNumbers: Record<OfferLayout, Record<"deliverables" | "formats" | "faq" | "contact", string>> = {
+  timeline: { deliverables: "06", formats: "07", faq: "08", contact: "09" },
+  trace: { deliverables: "05", formats: "06", faq: "07", contact: "08" },
+};
 
 const decisionOutcomes = [
   {
@@ -97,7 +107,72 @@ const faqs = [
   },
 ];
 
-export function OfferProcess() {
+function OfferHeroCopy() {
+  return (
+    <>
+      <div className="offer-hero-copy">
+        <p className="offer-section-label">01 / Diagnostic CI/CD & Observabilité</p>
+        <h1>
+          Vos déploiements,
+          <span> enfin lisibles.</span>
+        </h1>
+        <p>
+          En 3 à 5 jours, j’identifie ce qui fragilise votre delivery et ce
+          qui ralentit le diagnostic de vos incidents.
+        </p>
+        <ul className="offer-hero-tags" aria-label="Périmètre du diagnostic">
+          <li>CI/CD</li>
+          <li>Kubernetes</li>
+          <li>GitOps</li>
+          <li>Logs</li>
+          <li>Métriques</li>
+          <li>Alerting</li>
+        </ul>
+        <div className="offer-hero-actions">
+          <BookingLink
+            className="offer-primary-link"
+            placement="offer-hero"
+            label="Planifier un échange"
+          >
+            Planifier un échange
+            <span aria-hidden="true">→</span>
+          </BookingLink>
+          <a className="offer-secondary-link" href="#offer-content">
+            Voir le diagnostic
+          </a>
+        </div>
+      </div>
+      <p className="offer-hero-foot">
+        Intervention courte · plan d’action concret
+      </p>
+    </>
+  );
+}
+
+function OfferProblem() {
+  return (
+    <section id="offer-content" className="offer-band offer-problem">
+      <div className="offer-section-intro" data-offer-reveal="intro">
+        <p className="offer-section-label">{problemHeading.label}</p>
+        <h2>
+          {problemHeading.title}
+          <span>{` ${problemHeading.accent}`}</span>
+        </h2>
+      </div>
+      <div className="offer-issue-grid" data-offer-reveal="content">
+        {painPoints.map((point) => (
+          <article className="offer-issue" key={point.index}>
+            <span>{point.index}</span>
+            <h3>{point.title}</h3>
+            <p>{point.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function OfferProcess() {
   return (
     <section id="diagnostic" className="offer-band offer-process">
       <div className="offer-section-intro" data-offer-reveal="intro">
@@ -179,7 +254,9 @@ function OfferTopology() {
   );
 }
 
-export function OfferPageBody({ diagnostic }: { diagnostic: ReactNode }) {
+export function OfferPageBody({ layout }: { layout: OfferLayout }) {
+  const number = sectionNumbers[layout];
+
   return (
     <div className="offer-shell">
       <OfferMotion />
@@ -190,64 +267,24 @@ export function OfferPageBody({ diagnostic }: { diagnostic: ReactNode }) {
       <SiteHeader page="offer" />
 
       <main id="offer-main" className="page-main" tabIndex={-1}>
-        <section className="offer-hero" id="top">
-        <div className="hero-grid" aria-hidden="true" />
-        <OfferTopology />
-        <div className="offer-hero-copy">
-          <p className="offer-section-label">01 / Diagnostic CI/CD & Observabilité</p>
-          <h1>
-            Vos déploiements,
-            <span> enfin lisibles.</span>
-          </h1>
-          <p>
-            En 3 à 5 jours, j’identifie ce qui fragilise votre delivery et ce
-            qui ralentit le diagnostic de vos incidents.
-          </p>
-          <ul className="offer-hero-tags" aria-label="Périmètre du diagnostic">
-            <li>CI/CD</li>
-            <li>Kubernetes</li>
-            <li>GitOps</li>
-            <li>Logs</li>
-            <li>Métriques</li>
-            <li>Alerting</li>
-          </ul>
-          <div className="offer-hero-actions">
-            <BookingLink
-              className="offer-primary-link"
-              placement="offer-hero"
-              label="Planifier un échange"
-            >
-              Planifier un échange
-              <span aria-hidden="true">→</span>
-            </BookingLink>
-            <a className="offer-secondary-link" href="#offer-content">
-              Voir le diagnostic
-            </a>
-          </div>
-        </div>
-        <p className="offer-hero-foot">
-          Intervention courte · plan d’action concret
-        </p>
-        </section>
-
-      <section id="offer-content" className="offer-band offer-problem">
-        <div className="offer-section-intro" data-offer-reveal="intro">
-          <p className="offer-section-label">{problemHeading.label}</p>
-          <h2>
-            {problemHeading.title}
-            <span>{` ${problemHeading.accent}`}</span>
-          </h2>
-        </div>
-        <div className="offer-issue-grid" data-offer-reveal="content">
-          {painPoints.map((point) => (
-            <article className="offer-issue" key={point.index}>
-              <span>{point.index}</span>
-              <h3>{point.title}</h3>
-              <p>{point.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+        {layout === "timeline" ? (
+          <>
+            <section className="offer-hero" id="top">
+              <div className="hero-grid" aria-hidden="true" />
+              <OfferTopology />
+              <OfferHeroCopy />
+            </section>
+            <OfferProblem />
+          </>
+        ) : (
+          <LiveSystem
+            hero={
+              <section className="offer-hero offer-hero-over-scene" id="top">
+                <OfferHeroCopy />
+              </section>
+            }
+          />
+        )}
 
       <section className="offer-band offer-promise">
         <div className="offer-section-intro" data-offer-reveal="intro">
@@ -312,11 +349,11 @@ export function OfferPageBody({ diagnostic }: { diagnostic: ReactNode }) {
         </div>
       </section>
 
-      {diagnostic}
+      {layout === "timeline" && <OfferProcess />}
 
       <section className="offer-band offer-deliverables">
         <div className="offer-section-intro" data-offer-reveal="intro">
-          <p className="offer-section-label">06 / Ce que vous obtenez</p>
+          <p className="offer-section-label">{`${number.deliverables} / Ce que vous obtenez`}</p>
           <h2>
             Cartographie des risques
             <span> et plan de remédiation exploitable.</span>
@@ -335,7 +372,7 @@ export function OfferPageBody({ diagnostic }: { diagnostic: ReactNode }) {
 
       <section id="formats" className="offer-band offer-formats">
         <div className="offer-section-intro" data-offer-reveal="intro">
-          <p className="offer-section-label">07 / Formats</p>
+          <p className="offer-section-label">{`${number.formats} / Formats`}</p>
           <h2>
             Deux niveaux d’analyse adaptés
             <span> à la maturité de votre chaîne de delivery.</span>
@@ -371,7 +408,7 @@ export function OfferPageBody({ diagnostic }: { diagnostic: ReactNode }) {
 
       <section className="offer-faq">
         <p className="offer-section-label" data-offer-reveal="intro">
-          08 / Questions fréquentes
+          {`${number.faq} / Questions fréquentes`}
         </p>
         {faqs.map((item) => (
           <details data-offer-reveal="content" key={item.question}>
@@ -384,7 +421,7 @@ export function OfferPageBody({ diagnostic }: { diagnostic: ReactNode }) {
 
       <footer id="contact" className="offer-contact">
         <div data-offer-reveal="intro">
-          <p className="offer-section-label">09 / Contact</p>
+          <p className="offer-section-label">{`${number.contact} / Contact`}</p>
           <h2>
             Parlons de votre
             <span> chaîne de delivery.</span>

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { LiveSystem } from "../live-system/live-system";
 import { OfferPageBody } from "../offer-page-body";
 
-// Test route: the full offer page with the live system scene in place of
-// section 05, to review the final render before it replaces the timeline.
+// Test route: the full offer page in the trace layout, to review the final
+// render before it replaces the timeline layout on /offer.
 export const metadata: Metadata = {
   title: "Le diagnostic — Jacques Maarek",
   robots: {
@@ -13,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function TracePreviewPage() {
-  return <OfferPageBody diagnostic={<LiveSystem id="diagnostic" />} />;
+  return <OfferPageBody layout="trace" />;
 }

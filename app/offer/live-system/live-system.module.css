@@ -8,6 +8,22 @@
     var(--ink);
 }
 
+/* Exit: the dark scene fades into the light band of the next section
+   (.offer-promise) instead of cutting from ink to lavender. */
+.liveSystem::after {
+  position: relative;
+  display: block;
+  height: 26svh;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(var(--offer-violet-rgb), .14) 38%,
+    rgba(201, 198, 216, .72) 78%,
+    var(--offer-surface-deep) 100%
+  );
+  content: "";
+}
+
 /* The hero scrolls over the pinned stage; without JavaScript it just flows. */
 .track {
   position: relative;

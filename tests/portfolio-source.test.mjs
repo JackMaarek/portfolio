@@ -205,10 +205,14 @@ test("trace layout hands the hero topology over to the live system scene", async
   // The scene replaces sections 02 and 05, so they only exist in the timeline layout.
   assert.match(body, /layout === "timeline" \? \(/);
   assert.match(body, /<OfferProblem \/>/);
-  assert.match(body, /\{layout === "timeline" && <OfferProcess \/>\}/);
+  assert.match(body, /<OfferScope \/>\s+<OfferProcess \/>/);
   assert.match(body, /<LiveSystem\s+hero=\{/);
-  assert.match(body, /trace: \{ deliverables: "05", formats: "06", faq: "07", contact: "08" \}/);
-  assert.match(body, /timeline: \{ deliverables: "06", formats: "07", faq: "08", contact: "09" \}/);
+  assert.match(body, /trace: \{ result: "03", formats: "04", faq: "05", contact: "06" \}/);
+  assert.match(body, /timeline: \{ result: "03", formats: "07", faq: "08", contact: "09" \}/);
+  // Result and deliverables merge; the scope becomes a note under the formats.
+  assert.match(body, /<OfferResult label=\{`\$\{number\.result\} \/ Ce que vous obtenez`\} \/>/);
+  assert.match(body, /withScope=\{layout === "trace"\}/);
+  assert.match(body, /className="offer-scope-note"/);
   // The hero copy keeps its anchor target, now pointing at section 02 in the scene.
   assert.match(body, /href="#offer-content"/);
   assert.match(liveSystem, /id="offer-content"/);

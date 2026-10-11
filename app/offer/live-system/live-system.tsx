@@ -34,10 +34,12 @@ export function LiveSystem({ hero }: LiveSystemProps) {
           <div className={styles.sceneFrame}>
             <LiveSystemScene phase={inLead ? restoredPhase : phase} lead={inLead} />
           </div>
-          <div className={styles.copy}>
-            <LiveSystemCaption phases={phases} activePhase={phase} onFocusPhase={scrollToPhase} />
-          </div>
-          <nav className={styles.progress} aria-label="Étapes du diagnostic">
+          <nav
+            className={styles.progress}
+            aria-label="Étapes du diagnostic"
+            // Tabbing past the hero brings the scene in at section 02.
+            onFocus={inLead ? () => scrollToPhase(0) : undefined}
+          >
             <a className={styles.skip} href="#formats">
               Passer aux formats
               <span aria-hidden="true"> →</span>
@@ -57,6 +59,11 @@ export function LiveSystem({ hero }: LiveSystemProps) {
               ))}
             </ol>
           </nav>
+          {/* After the day navigation in the DOM so keyboard users meet the
+              skip link and J1–J5 before the J5 booking link. */}
+          <div className={styles.copy}>
+            <LiveSystemCaption phases={phases} activePhase={phase} onFocusPhase={scrollToPhase} />
+          </div>
         </section>
       </div>
     </div>

@@ -75,17 +75,17 @@
   inset: 0 0 auto;
 }
 
-/* Behind the hero only the schema shows; captions and days come with 02. */
+/* Behind the hero only the schema shows; captions and days come with 02.
+   Hidden with opacity only, so screen readers still read the whole story. */
 .copy,
 .progress {
-  transition: opacity 480ms cubic-bezier(.2, .8, .2, 1), visibility 0s;
+  transition: opacity 480ms cubic-bezier(.2, .8, .2, 1);
 }
 
 .stage[data-lead="true"] .copy,
 .stage[data-lead="true"] .progress {
-  visibility: hidden;
   opacity: 0;
-  transition: opacity 480ms cubic-bezier(.2, .8, .2, 1), visibility 0s linear 480ms;
+  pointer-events: none;
 }
 
 .track[data-live="true"] .stage {

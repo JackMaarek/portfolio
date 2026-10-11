@@ -1,4 +1,6 @@
-/* Phase captions in the offer hero typography; cross-faded once live. */
+/* Phase captions in the offer hero typography; cross-faded once live.
+   Inactive captions only fade out (they keep their visibility) so assistive
+   technologies read every phase in order. */
 .captions {
   position: relative;
   display: grid;
@@ -16,17 +18,17 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  visibility: hidden;
   opacity: 0;
+  pointer-events: none;
   transform: translateY(16px);
-  transition: opacity var(--caption-ease), transform var(--caption-ease), visibility 0s linear 480ms;
+  transition: opacity var(--caption-ease), transform var(--caption-ease);
 }
 
 :global([data-live="true"]) .caption[data-active="true"] {
-  visibility: visible;
   opacity: 1;
+  pointer-events: auto;
   transform: none;
-  transition: opacity var(--caption-ease) 140ms, transform var(--caption-ease) 140ms, visibility 0s;
+  transition: opacity var(--caption-ease) 140ms, transform var(--caption-ease) 140ms;
 }
 
 .kicker {
@@ -146,8 +148,8 @@
   :global([data-live="true"]) .caption {
     position: static;
     display: block;
-    visibility: visible;
     opacity: 1;
+    pointer-events: auto;
     transform: none;
     transition: none;
   }

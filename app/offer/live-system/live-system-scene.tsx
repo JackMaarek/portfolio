@@ -78,8 +78,10 @@ export function LiveSystemScene({ phase, lead }: LiveSystemSceneProps) {
           <circle className={styles.ring} r="6" data-collide="node" />
           <circle className={styles.core} r="2.5" />
           <g className={styles.label} transform={`translate(${node.dx} ${node.dy})`}>
-            <rect x="0" y="-11" width={node.width} height="21" rx="2" data-collide="label" />
-            <text x="7" y="3">{node.label}</text>
+            <g className={styles.labelBody} data-side={node.dx < 0 ? "left" : "right"}>
+              <rect x="0" y="-11" width={node.width} height="21" rx="2" data-collide="label" />
+              <text x="7" y="3">{node.label}</text>
+            </g>
           </g>
           {node.label in nodeIssues && (
             <g

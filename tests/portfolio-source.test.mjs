@@ -219,6 +219,12 @@ test("trace layout hands the hero topology over to the live system scene", async
   // Behind the hero the scene shows the restored route, without findings.
   assert.match(liveSystem, /phase=\{inLead \? restoredPhase : phase\}/);
   assert.match(scene, /data-lead=\{lead\}/);
+  // The scene is shorter, weighted per phase and can be navigated or skipped.
+  assert.match(data, /const dayWeights: Record<string, number> = \{ J1: 0\.6, J5: 0\.8 \}/);
+  assert.match(liveSystem, /useScrollPhase\(phaseWeights\)/);
+  assert.match(liveSystem, /onClick=\{\(\) => scrollToPhase\(index \+ 1\)\}/);
+  assert.match(liveSystem, /aria-current=\{phase === index \+ 1 \? "step" : undefined\}/);
+  assert.match(liveSystem, /href="#formats"/);
   // Each finding badge only shows with the caption that lists it.
   assert.match(scene, /data-state=\{badgeState\(node\.label\)\}/);
   assert.match(scene, /litAt\(label\) === phase \? "finding" : "hidden"/);

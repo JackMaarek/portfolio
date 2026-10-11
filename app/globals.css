@@ -2007,6 +2007,62 @@ summary:focus-visible,
   transform: translateY(-1px);
 }
 
+/* Trace layout: the scope closes the formats as a note. */
+.offer-scope-note {
+  display: grid;
+  gap: 28px;
+  padding-top: 40px;
+  border-top: 1px solid var(--offer-border);
+}
+
+.offer-scope-note h3 {
+  margin: 0;
+  color: var(--offer-ink);
+  font-size: clamp(1.6rem, 2.6vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.offer-scope-note h3 span {
+  color: var(--offer-violet);
+}
+
+/* As a note the scope items read as compact tags, not a table. */
+.offer-scope-note .offer-scope-panel {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+}
+
+.offer-scope-note .offer-scope-panel ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border: 0;
+}
+
+.offer-scope-note .offer-scope-panel li {
+  min-height: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--offer-border);
+  border-radius: 999px;
+  font-size: .82rem;
+}
+
+.offer-scope-note .offer-scope-panel li:hover {
+  box-shadow: none;
+}
+
+.offer-scope-note .offer-scope-panel aside {
+  padding-top: 0;
+  border-top: 0;
+}
+
+@media (max-width: 900px) {
+  .offer-scope-note .offer-scope-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
 .offer-continuation {
   margin: 0;
   padding: 20px 24px;

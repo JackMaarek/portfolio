@@ -75,9 +75,13 @@ const findTitle = <T extends { title: string }>(items: readonly T[], title: stri
   return item;
 };
 
+// Scroll share of each phase: J1 and J5 carry less than the traced days.
+const dayWeights: Record<string, number> = { J1: 0.6, J5: 0.8 };
+
 export const phases = [
   {
     key: "incident",
+    weight: 1.1,
     kicker: problemHeading.label,
     title: problemHeading.title,
     body: problemHeading.accent,
@@ -89,6 +93,7 @@ export const phases = [
     const focus = dayFocus[step.day] ?? [];
     return {
       key: step.day,
+      weight: dayWeights[step.day] ?? 1,
       kicker: `${diagnosticName} · ${step.day}`,
       title: step.title,
       body: step.body,

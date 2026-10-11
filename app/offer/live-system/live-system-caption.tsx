@@ -5,9 +5,10 @@ import styles from "./live-system-caption.module.css";
 type LiveSystemCaptionProps = {
   phases: Phase[];
   activePhase: number;
+  onFocusPhase: (index: number) => void;
 };
 
-export function LiveSystemCaption({ phases, activePhase }: LiveSystemCaptionProps) {
+export function LiveSystemCaption({ phases, activePhase, onFocusPhase }: LiveSystemCaptionProps) {
   const lastPhase = phases.length - 1;
 
   return (
@@ -19,6 +20,8 @@ export function LiveSystemCaption({ phases, activePhase }: LiveSystemCaptionProp
             key={phase.key}
             className={styles.caption}
             data-active={index === activePhase}
+            // Tabbing to a link of a hidden caption scrolls to its phase.
+            onFocus={index === activePhase ? undefined : () => onFocusPhase(index)}
           >
             <p className={styles.kicker}>{phase.kicker}</p>
             {isIncident ? (

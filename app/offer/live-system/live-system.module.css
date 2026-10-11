@@ -51,7 +51,7 @@
 .progress { grid-area: progress; }
 
 .track[data-live="true"] {
-  height: calc(620svh + var(--lead-height, 0px));
+  height: calc(480svh + var(--lead-height, 0px));
 }
 
 .track[data-live="true"] .lead {
@@ -84,18 +84,36 @@
 
 .progress {
   display: grid;
+  gap: 10px;
+}
+
+.progress ol {
+  display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   margin: 0;
   padding: 0;
-  color: var(--muted);
-  font-size: .7rem;
-  font-weight: 700;
-  letter-spacing: .08em;
   list-style: none;
 }
 
-.progress li::before {
+/* Each day is a jump target; the line above it is the progress bar. */
+.progress button {
+  display: block;
+  width: 100%;
+  padding: 0 0 2px;
+  border: 0;
+  color: var(--muted);
+  background: none;
+  font: inherit;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-align: left;
+  cursor: pointer;
+  transition: color 300ms ease;
+}
+
+.progress button::before {
   display: block;
   height: 1px;
   margin-bottom: 8px;
@@ -104,12 +122,30 @@
   transition: background-color 500ms ease;
 }
 
-.progress li[data-reached="true"] {
+.progress li[data-reached="true"] button {
   color: var(--acid);
 }
 
-.progress li[data-reached="true"]::before {
+.progress li[data-reached="true"] button::before {
   background: var(--acid);
+}
+
+.progress button:hover,
+.progress button:focus-visible {
+  color: var(--paper);
+}
+
+.skip {
+  justify-self: end;
+  color: var(--muted);
+  font-size: .72rem;
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.skip:hover,
+.skip:focus-visible {
+  color: var(--paper);
 }
 
 @media (min-width: 981px) {

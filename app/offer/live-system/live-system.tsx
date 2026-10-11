@@ -9,6 +9,7 @@ import styles from "./live-system.module.css";
 
 const dayPhases = phases.slice(1);
 const restoredPhase = phases.length - 1;
+const phaseWeights = phases.map((phase) => phase.weight);
 
 type LiveSystemProps = {
   hero: ReactNode;
@@ -18,7 +19,7 @@ type LiveSystemProps = {
 // (the whole route traced). Once the hero is gone the route switches off,
 // the blind spots open (section 02) and each diagnostic day traces it back.
 export function LiveSystem({ hero }: LiveSystemProps) {
-  const { sectionRef, leadRef, phase, inLead } = useScrollPhase(phases.length);
+  const { sectionRef, leadRef, phase, inLead, scrollToPhase } = useScrollPhase(phaseWeights);
 
   return (
     <div className={styles.liveSystem}>
@@ -34,15 +35,28 @@ export function LiveSystem({ hero }: LiveSystemProps) {
             <LiveSystemScene phase={inLead ? restoredPhase : phase} lead={inLead} />
           </div>
           <div className={styles.copy}>
-            <LiveSystemCaption phases={phases} activePhase={phase} />
+            <LiveSystemCaption phases={phases} activePhase={phase} onFocusPhase={scrollToPhase} />
           </div>
-          <ol className={styles.progress} aria-hidden="true">
-            {dayPhases.map((dayPhase, index) => (
-              <li key={dayPhase.key} data-reached={phase >= index + 1}>
-                {dayPhase.key}
-              </li>
-            ))}
-          </ol>
+          <nav className={styles.progress} aria-label="Étapes du diagnostic">
+            <a className={styles.skip} href="#formats">
+              Passer aux formats
+              <span aria-hidden="true"> →</span>
+            </a>
+            <ol>
+              {dayPhases.map((dayPhase, index) => (
+                <li key={dayPhase.key} data-reached={phase >= index + 1}>
+                  <button
+                    type="button"
+                    aria-label={`${dayPhase.key} · ${dayPhase.title}`}
+                    aria-current={phase === index + 1 ? "step" : undefined}
+                    onClick={() => scrollToPhase(index + 1)}
+                  >
+                    {dayPhase.key}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </nav>
         </section>
       </div>
     </div>

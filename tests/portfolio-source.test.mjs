@@ -227,6 +227,10 @@ test("trace layout hands the hero topology over to the live system scene", async
   assert.match(liveSystem, /href="#formats"/);
   // Keyboard users meet the day navigation before the captions' booking link.
   assert.ok(liveSystem.indexOf("<nav") < liveSystem.indexOf("<LiveSystemCaption"));
+  // Within a day the route is drawn as one stroke: segments are chained.
+  assert.match(data, /segment\.delay = previous\.delay \+ previous\.duration/);
+  assert.match(scene, /"--trace-delay": `\$\{delay\}ms`/);
+  assert.match(scene, /"--arrival": `\$\{nodeArrival\[node\.label\] \?\? 0\}ms`/);
   // Each finding badge only shows with the caption that lists it.
   assert.match(scene, /data-state=\{badgeState\(node\.label\)\}/);
   assert.match(scene, /litAt\(label\) === phase \? "finding" : "hidden"/);

@@ -98,6 +98,9 @@ export type SceneLabel = {
   phone: boolean;
   width: number;
   height: number;
+  // Last styles written, so unchanged frames touch no DOM.
+  opacity: string;
+  transform: string;
 };
 
 export function createLabels(layer: HTMLElement, classNames: LabelClassNames) {
@@ -132,6 +135,8 @@ export function createLabels(layer: HTMLElement, classNames: LabelClassNames) {
       phone,
       width: 0,
       height: 0,
+      opacity: "",
+      transform: "",
       priority: tonePriority[tone],
     };
     labels.push(label);

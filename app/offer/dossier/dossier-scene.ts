@@ -248,7 +248,8 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   let free: SceneFrame = { band: false, left: 0, right: 0, top: 0 };
   // Distance scale per page, fitted to the free part of the canvas.
   const fit = framings.map(() => 1);
-  let active = true;
+  // The loop only runs once the page reports the scene in view.
+  let active = false;
   const cameraPosition = new Vector3();
   const cameraTarget = new Vector3();
   const desiredPosition = new Vector3();
@@ -503,11 +504,20 @@ export function createDossierScene(options: SceneOptions): DossierScene {
       }
       changed ||= label.placed !== (place !== null);
       label.placed = place !== null;
-      scratch.copy(label.anchor).project(camera); // DEBUG-SWEEP
-      label.element.dataset.dropped = String(!place && label.alpha > 0.3 && !(compact && !label.phone) && Math.abs(scratch.x) < 0.95 && Math.abs(scratch.y) < 0.95 && scratch.z < 1 && (scratch.x * 0.5 + 0.5) * width > free.left && (scratch.x * 0.5 + 0.5) * width < width - free.right); // DEBUG-SWEEP
       if (place) heldSpot.set(label, place.key);
-      label.element.style.opacity = place ? label.alpha.toFixed(3) : "0";
-      if (place) label.element.style.transform = `translate(${place.left.toFixed(1)}px, ${place.top.toFixed(1)}px)`;
+      // Styles are only written when they change: most labels hold still.
+      const opacity = place ? label.alpha.toFixed(2) : "0";
+      if (opacity !== label.opacity) {
+        label.opacity = opacity;
+        label.element.style.opacity = opacity;
+      }
+      if (place) {
+        const transform = `translate(${place.left.toFixed(1)}px, ${place.top.toFixed(1)}px)`;
+        if (transform !== label.transform) {
+          label.transform = transform;
+          label.element.style.transform = transform;
+        }
+      }
     }
     return changed;
   };
@@ -529,14 +539,21 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     sampledFrames = 0;
   };
 
+  const featureRested = features.map(() => false);
   const state: FrameState = { time: 0, clock: 0, reduced: reducedMotion, compact: false, packets: packetTs };
 
+  // Once the camera has settled only the idle motion is left (packets,
+  // sweep, sway): it renders at half rate to spare the GPU and battery.
+  const idleInterval = 1000 / 30;
+  let settled = false;
   let lastTime = performance.now();
   const frame = (time: number) => {
     if (reducedMotion && !dirty) return;
+    if (settled && !dirty && time - lastTime < idleInterval - 2) return;
     const delta = Math.min((time - lastTime) / 1000, 0.1);
     lastTime = time;
-    if (initialised) watchFrameTime(delta);
+    // Frames spaced by the idle cap are not slow frames.
+    if (initialised && !settled) watchFrameTime(delta);
     // Exponential damping; reduced motion snaps straight to the target.
     const ease = (rate: number) => (reducedMotion || !initialised ? 1 : 1 - Math.exp(-rate * delta));
 
@@ -555,6 +572,9 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     fog.near = distance + 4;
     fog.far = distance + 34;
     initialised = true;
+    settled =
+      cameraPosition.distanceToSquared(desiredPosition) < 1e-4 &&
+      cameraTarget.distanceToSquared(desiredTarget) < 1e-4;
 
     const page = pages[pageIndex];
     for (const node of nodeObjects) {
@@ -601,13 +621,18 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     state.time = time;
     state.clock = clock;
     state.compact = compact;
-    for (const feature of features) {
+    features.forEach((feature, index) => {
       const [inStart, inEnd, outStart, outEnd] = feature.window;
       const target = smoothstep(inStart, inEnd, progress) * (1 - smoothstep(outStart, outEnd, progress));
       feature.amount += (target - feature.amount) * ease(3);
       if (feature.amount < 0.001) feature.amount = 0;
+      // A hidden day is updated once more to hide its group and labels,
+      // then skipped until the progress brings it back.
+      const rested = feature.amount === 0 && target === 0;
+      if (rested && featureRested[index]) return;
+      featureRested[index] = rested;
       feature.update(state);
-    }
+    });
 
     renderer.render(scene, camera);
     const placementChanged = updateLabels();
@@ -619,15 +644,16 @@ export function createDossierScene(options: SceneOptions): DossierScene {
 
   // A lost GPU context (memory pressure on phones): stop and let the page
   // fall back to the text-only dossier.
+  let lost = false;
   const onContextLost = (event: Event) => {
     event.preventDefault();
+    lost = true;
     renderer.setAnimationLoop(null);
     options.onContextLost();
   };
   canvas.addEventListener("webglcontextlost", onContextLost);
 
   resize();
-  renderer.setAnimationLoop(frame);
 
   return {
     setProgress(value) {
@@ -641,7 +667,7 @@ export function createDossierScene(options: SceneOptions): DossierScene {
       resize();
     },
     setActive(value) {
-      if (value === active) return;
+      if (value === active || lost) return;
       active = value;
       lastTime = performance.now();
       dirty = true;

@@ -211,7 +211,7 @@ test("trace layout hands the hero topology over to the live system scene", async
   assert.match(body, /timeline: \{ result: "03", formats: "07", faq: "08", contact: "09" \}/);
   // Result and deliverables merge; the scope becomes a note under the formats.
   assert.match(body, /<OfferResult label=\{`\$\{number\.result\} \/ Ce que vous obtenez`\} \/>/);
-  assert.match(body, /withScope=\{layout === "trace"\}/);
+  assert.match(body, /withScope=\{layout !== "timeline"\}/);
   assert.match(body, /className="offer-scope-note"/);
   // The hero copy keeps its anchor target, now pointing at section 02 in the scene.
   assert.match(body, /href="#offer-content"/);
@@ -256,16 +256,20 @@ test("live system scene stays readable by assistive technologies", async () => {
 });
 
 test("dossier preview stays a noindex test route built on the offer copy", async () => {
-  const [page, dossier, content, scene, portfolio, offerBody] = await Promise.all([
+  const [page, dossier, content, scene, portfolio, offerBody, offerPage] = await Promise.all([
     readFile(new URL("app/offer/dossier-preview/page.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/dossier-preview/dossier.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/dossier-preview/dossier-content.ts", projectRoot), "utf8"),
-    readFile(new URL("app/offer/dossier-preview/dossier-scene.ts", projectRoot), "utf8"),
+    readFile(new URL("app/offer/dossier/dossier.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/dossier/dossier-content.ts", projectRoot), "utf8"),
+    readFile(new URL("app/offer/dossier/dossier-scene.ts", projectRoot), "utf8"),
     readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
     readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
   ]);
 
   assert.match(page, /robots: \{\s+index: false,\s+follow: false,/);
+  // The preview is the full offer page; /offer keeps the timeline layout.
+  assert.ok(page.includes('<OfferPageBody layout="dossier" />'));
+  assert.ok(offerPage.includes('<OfferPageBody layout="timeline" />'));
   // Not linked from the indexed pages while it is a render test.
   assert.ok(!`${portfolio}${offerBody}`.includes("dossier-preview"));
   // Day copy comes from the offer content, not a second source.
@@ -278,4 +282,6 @@ test("dossier preview stays a noindex test route built on the offer copy", async
   // Rendering pauses off-screen and falls back to text if the GPU drops it.
   assert.match(scene, /setActive\(value\)/);
   assert.match(scene, /"webglcontextlost"/);
+  // Three.js only loads once the dossier nears the viewport.
+  assert.match(dossier, /const loadScene = \(\) =>/);
 });

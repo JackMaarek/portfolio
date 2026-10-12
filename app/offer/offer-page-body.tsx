@@ -1,9 +1,12 @@
-// Shared /offer body. The "trace" layout, reviewed on the noindex preview,
-// pins the live system scene behind the hero and lets it carry sections 02
-// and 05 before it replaces the "timeline" layout on /offer.
+// Shared /offer body. The "trace" and "dossier" layouts, reviewed on their
+// noindex previews, carry sections 02, 05 and 06 in a scene before one of
+// them replaces the "timeline" layout on /offer. "trace" pins the live
+// system scene behind the hero; "dossier" follows the hero with the 3D
+// engineering dossier.
 import { BookingLink } from "../booking-link";
 import { OfferMotion } from "../offer-motion";
 import { SiteHeader } from "../site-header";
+import { Dossier } from "./dossier/dossier";
 import { heroTopology } from "./hero-topology";
 import { LiveSystem } from "./live-system/live-system";
 import {
@@ -15,7 +18,7 @@ import {
   recommendationSteps,
 } from "./offer-content";
 
-export type OfferLayout = "timeline" | "trace";
+export type OfferLayout = "timeline" | "trace" | "dossier";
 
 // The trace layout carries sections 02 and 05 in the scene, merges the
 // expected result with the deliverables (all listed by the scene) and moves
@@ -24,6 +27,7 @@ type SectionKey = "result" | "formats" | "faq" | "contact";
 const sectionNumbers: Record<OfferLayout, Record<SectionKey, string>> = {
   timeline: { result: "03", formats: "07", faq: "08", contact: "09" },
   trace: { result: "03", formats: "04", faq: "05", contact: "06" },
+  dossier: { result: "03", formats: "04", faq: "05", contact: "06" },
 };
 
 const decisionOutcomes = [
@@ -412,16 +416,7 @@ export function OfferPageBody({ layout }: { layout: OfferLayout }) {
       <SiteHeader page="offer" />
 
       <main id="offer-main" className="page-main" tabIndex={-1}>
-        {layout === "timeline" ? (
-          <>
-            <section className="offer-hero" id="top">
-              <div className="hero-grid" aria-hidden="true" />
-              <OfferTopology />
-              <OfferHeroCopy />
-            </section>
-            <OfferProblem />
-          </>
-        ) : (
+        {layout === "trace" ? (
           <LiveSystem
             hero={
               <section className="offer-hero offer-hero-over-scene" id="top">
@@ -429,6 +424,15 @@ export function OfferPageBody({ layout }: { layout: OfferLayout }) {
               </section>
             }
           />
+        ) : (
+          <>
+            <section className="offer-hero" id="top">
+              <div className="hero-grid" aria-hidden="true" />
+              <OfferTopology />
+              <OfferHeroCopy />
+            </section>
+            {layout === "timeline" ? <OfferProblem /> : <Dossier />}
+          </>
         )}
 
       {layout === "timeline" ? (
@@ -438,11 +442,14 @@ export function OfferPageBody({ layout }: { layout: OfferLayout }) {
           <OfferProcess />
           <OfferDeliverables label="06 / Ce que vous obtenez" />
         </>
-      ) : (
+      ) : layout === "trace" ? (
         <OfferResult label={`${number.result} / Ce que vous obtenez`} />
+      ) : (
+        // The dossier's last sheet already lists what the client gets.
+        <OfferResult label={`${number.result} / Le résultat attendu`} />
       )}
 
-      <OfferFormats label={`${number.formats} / Formats`} withScope={layout === "trace"} />
+      <OfferFormats label={`${number.formats} / Formats`} withScope={layout !== "timeline"} />
 
       <section className="offer-faq">
         <p className="offer-section-label" data-offer-reveal="intro">

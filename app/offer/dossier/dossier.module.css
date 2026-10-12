@@ -1,6 +1,7 @@
 /* Engineering dossier: the offer's ink blueprint scene with lavender
-   dossier sheets scrolling over it. Tokens mirror .offer-shell. */
-.shell {
+   dossier sheets scrolling over it, between the hero and the formats.
+   Tokens mirror .offer-shell. */
+.dossier {
   --sheet: #d8d6e3;
   --sheet-ink: #111014;
   --sheet-muted: #4f4c59;
@@ -8,52 +9,13 @@
   --sheet-violet: #4c40af;
   --index-height: 64px;
   position: relative;
-  min-height: 100svh;
   background: var(--ink);
   color: var(--paper);
 }
 
-.shell ::selection {
+.dossier ::selection {
   background: var(--violet);
   color: var(--ink);
-}
-
-.topbar {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px var(--page-gutter);
-  font-size: .82rem;
-  letter-spacing: .02em;
-}
-
-.brand,
-.back {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--touch-target);
-  text-decoration: none;
-}
-
-.brand {
-  font-weight: 700;
-}
-
-.back {
-  color: var(--muted);
-  transition: color 180ms ease;
-}
-
-.back:hover,
-.back:focus-visible {
-  color: var(--violet);
-}
-
-.dossier {
-  position: relative;
 }
 
 /* Scene pinned behind the sheets for the length of the dossier. */
@@ -174,6 +136,14 @@
   right: var(--page-gutter);
   top: 50%;
   transform: translateY(-50%);
+  transition: opacity 240ms ease;
+}
+
+/* Out of the dossier the index fades but stays reachable by keyboard:
+   focusing a day brings it back. */
+.index[data-shown="false"]:not(:focus-within) {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Ink backdrop so the index never sits directly on the model. */
@@ -287,7 +257,6 @@
   outline-offset: 3px;
 }
 
-.sheet h1,
 .sheet h2 {
   margin: 0;
   font-weight: 500;
@@ -296,11 +265,12 @@
   text-wrap: balance;
 }
 
-.sheet h1 {
+.sheet .cover {
+  display: block;
   font-size: clamp(2.05rem, 3vw, 2.75rem);
 }
 
-.sheet h1 span {
+.sheet .cover span {
   color: var(--sheet-violet);
 }
 
@@ -311,7 +281,6 @@
   font-size: clamp(1.75rem, 2.4vw, 2.2rem);
 }
 
-.sheet h1:focus,
 .sheet h2:focus {
   outline: none;
 }
@@ -567,6 +536,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .canvas,
+  .index,
   .index button::after {
     transition: none;
   }

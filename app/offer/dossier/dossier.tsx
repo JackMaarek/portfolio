@@ -25,8 +25,7 @@ const pageName = (index: number) => {
 // Mirrors the media query in dossier.module.css.
 const phoneQuery = "(max-width: 599px), (max-width: 1180px) and (min-height: 500px)";
 
-function readProgress(sections: HTMLElement[], stage: HTMLElement | null) {
-  const phone = window.matchMedia(phoneQuery).matches;
+function readProgress(sections: HTMLElement[], stage: HTMLElement | null, phone: boolean) {
   const anchor = phone && stage ? stage.getBoundingClientRect().bottom + 24 : window.innerHeight / 2;
   const marks = sections.map((section) => {
     const rect = section.getBoundingClientRect();
@@ -52,6 +51,7 @@ export function Dossier() {
   const indexRef = useRef<HTMLElement>(null);
   const sectionRefs = useRef<HTMLElement[]>([]);
   const [activePage, setActivePage] = useState(0);
+  const [indexShown, setIndexShown] = useState(false);
   const [sceneState, setSceneState] = useState<"loading" | "ready" | "unavailable">("loading");
 
   useEffect(() => {
@@ -60,24 +60,36 @@ export function Dossier() {
     if (!canvas || !labelLayer) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const phoneMedia = window.matchMedia(phoneQuery);
     let scene: DossierScene | undefined;
     let disposed = false;
+    let loading = false;
+    let near = false;
     let pending = 0;
 
     const sync = () => {
       pending = 0;
-      const progress = readProgress(sectionRefs.current, stageRef.current);
+      const progress = readProgress(sectionRefs.current, stageRef.current, phoneMedia.matches);
       scene?.setProgress(progress);
       setActivePage(Math.round(progress));
     };
+    // Scroll far from the dossier reads no layout: progress only moves
+    // while it is near the viewport.
     const onScroll = () => {
-      if (!pending) pending = requestAnimationFrame(sync);
+      if (near && !pending) pending = requestAnimationFrame(sync);
     };
 
     // Pause rendering once the dossier has scrolled out of view.
     const visibilityObserver = new IntersectionObserver(([entry]) => {
       scene?.setActive(entry.isIntersecting);
     });
+    // The fixed page index only shows while the dossier holds the middle of
+    // the viewport, not over the hero or the sections after it.
+    const indexObserver = new IntersectionObserver(
+      ([entry]) => setIndexShown(entry.isIntersecting),
+      { rootMargin: "-50% 0px -50% 0px" },
+    );
+    if (rootRef.current) indexObserver.observe(rootRef.current);
 
     // Tell the scene which part of the canvas is free: beside the sheet and
     // the index on wide screens, the whole band on phones.
@@ -87,16 +99,18 @@ export function Dossier() {
       const index = indexRef.current;
       if (!stage || !sheet || !index) return;
       const stageRect = stage.getBoundingClientRect();
+      // The site header only overlaps the stage when the dossier opens the page.
       const topbar = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
-      if (window.matchMedia(phoneQuery).matches) {
-        scene?.setFrame({ band: true, left: 0, right: 0, top: Math.max(topbar - stageRect.top, 0) + 4 });
+      const top = Math.max(topbar - stageRect.top, 0) + 4;
+      if (phoneMedia.matches) {
+        scene?.setFrame({ band: true, left: 0, right: 0, top });
         return;
       }
       scene?.setFrame({
         band: false,
         left: sheet.getBoundingClientRect().right - stageRect.left + 16,
         right: stageRect.right - index.getBoundingClientRect().left + 12,
-        top: topbar + 4,
+        top,
       });
     };
 
@@ -105,45 +119,63 @@ export function Dossier() {
       onScroll();
     });
 
-    import("./dossier-scene")
-      .then(({ createDossierScene }) => {
-        if (disposed) return;
-        scene = createDossierScene({
-          canvas,
-          labelLayer,
-          pages: scenePages,
-          nodes: chainNodes,
-          findings: nodeFindings,
-          quickWins,
-          reducedMotion,
-          classNames: {
-            label: styles.label,
-            name: styles.labelName,
-            meta: styles.labelMeta,
-            node: styles.node,
-            tag: styles.tag,
-            finding: styles.finding,
-            axis: styles.axis,
-          },
-          onContextLost: () => setSceneState("unavailable"),
-        });
-        measureFrame();
-        resizeObserver.observe(canvas);
-        if (rootRef.current) visibilityObserver.observe(rootRef.current);
-        sync();
-        setSceneState("ready");
-      })
-      // No WebGL (or the chunk failed): the dossier stays fully readable.
-      .catch(() => setSceneState("unavailable"));
+    // Three.js and the WebGL context are only paid for by visitors who
+    // scroll towards the dossier, not by those who leave from the hero.
+    const loadScene = () => {
+      if (loading) return;
+      loading = true;
+      import("./dossier-scene")
+        .then(({ createDossierScene }) => {
+          if (disposed) return;
+          scene = createDossierScene({
+            canvas,
+            labelLayer,
+            pages: scenePages,
+            nodes: chainNodes,
+            findings: nodeFindings,
+            quickWins,
+            reducedMotion,
+            classNames: {
+              label: styles.label,
+              name: styles.labelName,
+              meta: styles.labelMeta,
+              node: styles.node,
+              tag: styles.tag,
+              finding: styles.finding,
+              axis: styles.axis,
+            },
+            onContextLost: () => setSceneState("unavailable"),
+          });
+          measureFrame();
+          resizeObserver.observe(canvas);
+          if (rootRef.current) visibilityObserver.observe(rootRef.current);
+          sync();
+          setSceneState("ready");
+        })
+        // No WebGL (or the chunk failed): the dossier stays fully readable.
+        .catch(() => setSceneState("unavailable"));
+    };
+
+    const nearObserver = new IntersectionObserver(
+      ([entry]) => {
+        near = entry.isIntersecting;
+        if (!near) return;
+        loadScene();
+        onScroll();
+      },
+      { rootMargin: "50% 0px" },
+    );
+    if (rootRef.current) nearObserver.observe(rootRef.current);
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    sync();
 
     return () => {
       disposed = true;
       window.removeEventListener("scroll", onScroll);
       resizeObserver.disconnect();
       visibilityObserver.disconnect();
+      indexObserver.disconnect();
+      nearObserver.disconnect();
       if (pending) cancelAnimationFrame(pending);
       scene?.dispose();
     };
@@ -160,17 +192,22 @@ export function Dossier() {
       ? window.scrollY + rect.top - band
       : window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
     window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
-    section.querySelector<HTMLElement>("h1, h2")?.focus({ preventScroll: true });
+    section.querySelector<HTMLElement>("h2")?.focus({ preventScroll: true });
   };
 
   return (
-    <div ref={rootRef} className={styles.dossier}>
+    <div ref={rootRef} id="offer-content" className={styles.dossier}>
       <div ref={stageRef} className={styles.stage} data-scene={sceneState} aria-hidden="true">
         <canvas ref={canvasRef} className={styles.canvas} />
         <div ref={labelsRef} className={styles.labels} />
       </div>
 
-      <nav ref={indexRef} className={styles.index} aria-label="Pages du dossier">
+      <nav
+        ref={indexRef}
+        className={styles.index}
+        data-shown={indexShown}
+        aria-label="Pages du dossier"
+      >
         <a className={styles.skip} href="#dossier-report">
           Aller à la restitution
         </a>
@@ -204,10 +241,10 @@ export function Dossier() {
           <article className={styles.sheet}>
             {index === 0 ? (
               <>
-                <h1 id={`dossier-${page.key}-title`} tabIndex={-1}>
+                <h2 id={`dossier-${page.key}-title`} className={styles.cover} tabIndex={-1}>
                   {cover.title}
                   <span> {cover.accent}</span>
-                </h1>
+                </h2>
                 <p className={styles.lead}>{cover.problem}</p>
                 <ul className={styles.blindSpots}>
                   {cover.blindSpots.map((point) => (
@@ -263,8 +300,8 @@ export function Dossier() {
                       >
                         Planifier un diagnostic
                       </BookingLink>
-                      <a className={styles.secondary} href="/offer">
-                        Voir l’offre complète
+                      <a className={styles.secondary} href="#formats">
+                        Voir les formats
                       </a>
                     </div>
                   </>

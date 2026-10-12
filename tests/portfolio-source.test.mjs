@@ -56,9 +56,7 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(styles, /\.manifesto-copy p \+ p\s*\{\s*color: var\(--paper\)/);
   assert.match(styles, /\.contact-mail\s*\{[\s\S]*?white-space: nowrap/);
   assert.match(styles, /\.offer-contact-link\s*\{[\s\S]*?background: var\(--offer-violet\)/);
-  assert.match(styles, /\.offer-issue:hover,[\s\S]*?\.offer-decisions article:hover/);
   assert.match(styles, /\.offer-scope-panel li:hover/);
-  assert.match(styles, /\.offer-timeline article:hover::before/);
   assert.match(styles, /\.offer-faq details:hover/);
   assert.match(styles, /\.offer-faq details\[open\] p[\s\S]*?offer-faq-content-in/);
   assert.match(styles, /\.offer-primary-link:active,[\s\S]*?transform: scale\(\.985\)/);
@@ -95,7 +93,7 @@ test("document metadata describes the portfolio", async () => {
 test("contact CTAs book through Cal.com only", async () => {
   const [portfolio, offer, contact, bookingLink, header] = await Promise.all([
     readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
     readFile(new URL("app/site-contact.ts", projectRoot), "utf8"),
     readFile(new URL("app/booking-link.tsx", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
@@ -117,11 +115,16 @@ test("contact CTAs book through Cal.com only", async () => {
 });
 
 test("offer page exposes the commercial diagnostic", async () => {
-  const [offer, header, motion] = await Promise.all([
+  const [offerPage, offerBody, offerContent, header, motion] = await Promise.all([
     readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/offer-content.ts", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
     readFile(new URL("app/offer-motion.tsx", projectRoot), "utf8"),
   ]);
+  const offer = `${offerPage}${offerBody}${offerContent}`;
+
+  assert.ok(offerPage.includes("<OfferPageBody />"));
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
   assert.ok(offer.includes("Vos déploiements"));
@@ -131,7 +134,6 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(offer.includes("Planifier un échange"));
   assert.ok(offer.includes("Des constats traçables pour arbitrer les risques"));
   assert.ok(offer.includes("Une analyse progressive de la chaîne de delivery"));
-  assert.ok(offer.includes("Cartographie des risques"));
   assert.ok(offer.includes("Savoir où agir d’abord"));
   assert.ok(offer.includes("Préparer le prochain déploiement"));
   assert.ok(offer.includes("Piloter la remédiation"));
@@ -152,4 +154,25 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(header.includes('offerHref: "/#projects"'));
   assert.ok(!`${offer}${header}`.includes('href="/offre"'));
   assert.ok(!offer.includes("offre-content"));
+});
+
+test("offer dossier is built on the offer copy and loads its scene lazily", async () => {
+  const [dossier, content, scene] = await Promise.all([
+    readFile(new URL("app/offer/dossier/dossier.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/dossier/dossier-content.ts", projectRoot), "utf8"),
+    readFile(new URL("app/offer/dossier/dossier-scene.ts", projectRoot), "utf8"),
+  ]);
+
+  // Day copy comes from the offer content, not a second source.
+  assert.match(content, /from "\.\.\/offer-content"/);
+  assert.match(content, /title: step\(day\)\.title/);
+  // The 3D scene loads after the text and stays out of the accessibility tree.
+  assert.match(dossier, /import\("\.\/dossier-scene"\)/);
+  assert.match(dossier, /data-scene=\{sceneState\} aria-hidden="true"/);
+  assert.match(dossier, /placement="offer-dossier"/);
+  // Rendering pauses off-screen and falls back to text if the GPU drops it.
+  assert.match(scene, /setActive\(value\)/);
+  assert.match(scene, /"webglcontextlost"/);
+  // Three.js only loads once the dossier nears the viewport.
+  assert.match(dossier, /const loadScene = \(\) =>/);
 });

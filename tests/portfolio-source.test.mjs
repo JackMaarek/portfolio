@@ -56,9 +56,7 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(styles, /\.manifesto-copy p \+ p\s*\{\s*color: var\(--paper\)/);
   assert.match(styles, /\.contact-mail\s*\{[\s\S]*?white-space: nowrap/);
   assert.match(styles, /\.offer-contact-link\s*\{[\s\S]*?background: var\(--offer-violet\)/);
-  assert.match(styles, /\.offer-issue:hover,[\s\S]*?\.offer-decisions article:hover/);
   assert.match(styles, /\.offer-scope-panel li:hover/);
-  assert.match(styles, /\.offer-timeline article:hover::before/);
   assert.match(styles, /\.offer-faq details:hover/);
   assert.match(styles, /\.offer-faq details\[open\] p[\s\S]*?offer-faq-content-in/);
   assert.match(styles, /\.offer-primary-link:active,[\s\S]*?transform: scale\(\.985\)/);
@@ -127,7 +125,6 @@ test("offer page exposes the commercial diagnostic", async () => {
   const offer = `${offerPage}${offerBody}${offerContent}`;
 
   assert.ok(offerPage.includes('<OfferPageBody layout="dossier" />'));
-  assert.ok(offerBody.includes('<section id="diagnostic" className="offer-band offer-process">'));
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
   assert.ok(offer.includes("Vos déploiements"));
@@ -137,7 +134,6 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(offer.includes("Planifier un échange"));
   assert.ok(offer.includes("Des constats traçables pour arbitrer les risques"));
   assert.ok(offer.includes("Une analyse progressive de la chaîne de delivery"));
-  assert.ok(offer.includes("Cartographie des risques"));
   assert.ok(offer.includes("Savoir où agir d’abord"));
   assert.ok(offer.includes("Préparer le prochain déploiement"));
   assert.ok(offer.includes("Piloter la remédiation"));
@@ -202,16 +198,8 @@ test("trace layout hands the hero topology over to the live system scene", async
     readFile(new URL("app/offer/live-system/live-system-data.ts", projectRoot), "utf8"),
   ]);
 
-  // The scene replaces sections 02 and 05, so they only exist in the timeline layout.
-  assert.match(body, /layout === "timeline" \? \(/);
-  assert.match(body, /<OfferProblem \/>/);
-  assert.match(body, /<OfferScope \/>\s+<OfferProcess \/>/);
   assert.match(body, /<LiveSystem\s+hero=\{/);
-  assert.match(body, /trace: \{ result: "03", formats: "04", faq: "05", contact: "06" \}/);
-  assert.match(body, /timeline: \{ result: "03", formats: "07", faq: "08", contact: "09" \}/);
-  // Result and deliverables merge; the scope becomes a note under the formats.
-  assert.match(body, /<OfferResult label=\{`\$\{number\.result\} \/ Ce que vous obtenez`\} \/>/);
-  assert.match(body, /withScope=\{layout !== "timeline"\}/);
+  // The scope is a note under the formats.
   assert.match(body, /className="offer-scope-note"/);
   // The hero copy keeps its anchor target, now pointing at section 02 in the scene.
   assert.match(body, /href="#offer-content"/);

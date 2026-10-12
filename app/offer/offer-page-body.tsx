@@ -1,33 +1,16 @@
 // Shared /offer body. /offer uses the "dossier" layout: the hero is followed
-// by the 3D engineering dossier, which carries sections 02, 05 and 06.
-// "trace" (noindex preview) pins the live system scene behind the hero
-// instead; "timeline" is the previous text-only layout.
+// by the 3D engineering dossier. "trace" (noindex preview) pins the live
+// system scene behind the hero instead. Both scenes carry the problem, the
+// five days and the deliverables, then the sections below follow.
 import { BookingLink } from "../booking-link";
 import { OfferMotion } from "../offer-motion";
 import { SiteHeader } from "../site-header";
 import { Dossier } from "./dossier/dossier";
 import { heroTopology } from "./hero-topology";
 import { LiveSystem } from "./live-system/live-system";
-import {
-  deliverables,
-  diagnosticHeading,
-  painPoints,
-  problemHeading,
-  processSteps,
-  recommendationSteps,
-} from "./offer-content";
+import { recommendationSteps } from "./offer-content";
 
-export type OfferLayout = "timeline" | "trace" | "dossier";
-
-// The trace layout carries sections 02 and 05 in the scene, merges the
-// expected result with the deliverables (all listed by the scene) and moves
-// the scope under the formats, so the sections after the scene move up.
-type SectionKey = "result" | "formats" | "faq" | "contact";
-const sectionNumbers: Record<OfferLayout, Record<SectionKey, string>> = {
-  timeline: { result: "03", formats: "07", faq: "08", contact: "09" },
-  trace: { result: "03", formats: "04", faq: "05", contact: "06" },
-  dossier: { result: "03", formats: "04", faq: "05", contact: "06" },
-};
+export type OfferLayout = "trace" | "dossier";
 
 const decisionOutcomes = [
   {
@@ -147,52 +130,6 @@ function OfferHeroCopy() {
   );
 }
 
-function OfferProblem() {
-  return (
-    <section id="offer-content" className="offer-band offer-problem">
-      <div className="offer-section-intro" data-offer-reveal="intro">
-        <p className="offer-section-label">{problemHeading.label}</p>
-        <h2>
-          {problemHeading.title}
-          <span>{` ${problemHeading.accent}`}</span>
-        </h2>
-      </div>
-      <div className="offer-issue-grid" data-offer-reveal="content">
-        {painPoints.map((point) => (
-          <article className="offer-issue" key={point.index}>
-            <span>{point.index}</span>
-            <h3>{point.title}</h3>
-            <p>{point.body}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function OfferProcess() {
-  return (
-    <section id="diagnostic" className="offer-band offer-process">
-      <div className="offer-section-intro" data-offer-reveal="intro">
-        <p className="offer-section-label">{diagnosticHeading.label}</p>
-        <h2>
-          {diagnosticHeading.title}
-          <span>{` ${diagnosticHeading.accent}`}</span>
-        </h2>
-      </div>
-      <div className="offer-timeline" data-offer-reveal="content">
-        {processSteps.map((step) => (
-          <article key={step.day}>
-            <span>{step.day}</span>
-            <h3>{step.title}</h3>
-            <p>{step.body}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function OfferResult({ label }: { label: string }) {
   return (
     <section className="offer-band offer-promise">
@@ -238,25 +175,10 @@ function OfferResult({ label }: { label: string }) {
   );
 }
 
-function OfferScope() {
+// Revealed with the formats note around it.
+function OfferScopePanel() {
   return (
-    <section className="offer-band offer-scope">
-      <div className="offer-section-intro" data-offer-reveal="intro">
-        <p className="offer-section-label">04 / Périmètre</p>
-        <h2>
-          Un diagnostic volontairement cadré.
-          <span> Pas un audit cloud généraliste.</span>
-        </h2>
-      </div>
-      <OfferScopePanel reveal />
-    </section>
-  );
-}
-
-// Revealed on its own as a section; inside the formats note the note reveals.
-function OfferScopePanel({ reveal = false }: { reveal?: boolean }) {
-  return (
-    <div className="offer-scope-panel" data-offer-reveal={reveal ? "content" : undefined}>
+    <div className="offer-scope-panel">
       <ul aria-label="Sujets inclus">
         {scopeItems.map((item) => (
           <li key={item}>{item}</li>
@@ -271,34 +193,11 @@ function OfferScopePanel({ reveal = false }: { reveal?: boolean }) {
   );
 }
 
-function OfferDeliverables({ label }: { label: string }) {
-  return (
-    <section className="offer-band offer-deliverables">
-      <div className="offer-section-intro" data-offer-reveal="intro">
-        <p className="offer-section-label">{label}</p>
-        <h2>
-          Cartographie des risques
-          <span> et plan de remédiation exploitable.</span>
-        </h2>
-      </div>
-      <div className="offer-deliverable-grid" data-offer-reveal="content">
-        {deliverables.map((item) => (
-          <article className="offer-deliverable" key={item.index}>
-            <span>{item.index}</span>
-            <h3>{item.title}</h3>
-            <p>{item.body}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function OfferFormats({ label, withScope }: { label: string; withScope: boolean }) {
+function OfferFormats() {
   return (
     <section id="formats" className="offer-band offer-formats">
       <div className="offer-section-intro" data-offer-reveal="intro">
-        <p className="offer-section-label">{label}</p>
+        <p className="offer-section-label">04 / Formats</p>
         <h2>
           Deux niveaux d’analyse adaptés
           <span> à la maturité de votre chaîne de delivery.</span>
@@ -330,15 +229,13 @@ function OfferFormats({ label, withScope }: { label: string; withScope: boolean 
       <p className="offer-continuation" data-offer-reveal="content">
         Ensuite / sprint de remédiation · 10 à 20 jours · périmètre sur mesure
       </p>
-      {withScope && (
-        <div className="offer-scope-note" data-offer-reveal="content">
-          <h3>
-            Un diagnostic volontairement cadré.
-            <span> Pas un audit cloud généraliste.</span>
-          </h3>
-          <OfferScopePanel />
-        </div>
-      )}
+      <div className="offer-scope-note" data-offer-reveal="content">
+        <h3>
+          Un diagnostic volontairement cadré.
+          <span> Pas un audit cloud généraliste.</span>
+        </h3>
+        <OfferScopePanel />
+      </div>
     </section>
   );
 }
@@ -403,8 +300,6 @@ function OfferTopology() {
 }
 
 export function OfferPageBody({ layout }: { layout: OfferLayout }) {
-  const number = sectionNumbers[layout];
-
   return (
     <div className="offer-shell">
       <OfferMotion />
@@ -430,29 +325,20 @@ export function OfferPageBody({ layout }: { layout: OfferLayout }) {
               <OfferTopology />
               <OfferHeroCopy />
             </section>
-            {layout === "timeline" ? <OfferProblem /> : <Dossier />}
+            <Dossier />
           </>
         )}
 
-      {layout === "timeline" ? (
-        <>
-          <OfferResult label="03 / Le résultat attendu" />
-          <OfferScope />
-          <OfferProcess />
-          <OfferDeliverables label="06 / Ce que vous obtenez" />
-        </>
-      ) : layout === "trace" ? (
-        <OfferResult label={`${number.result} / Ce que vous obtenez`} />
-      ) : (
-        // The dossier's last sheet already lists what the client gets.
-        <OfferResult label={`${number.result} / Le résultat attendu`} />
-      )}
+      {/* The dossier's last sheet already lists what the client gets. */}
+      <OfferResult
+        label={layout === "trace" ? "03 / Ce que vous obtenez" : "03 / Le résultat attendu"}
+      />
 
-      <OfferFormats label={`${number.formats} / Formats`} withScope={layout !== "timeline"} />
+      <OfferFormats />
 
       <section className="offer-faq">
         <p className="offer-section-label" data-offer-reveal="intro">
-          {`${number.faq} / Questions fréquentes`}
+          05 / Questions fréquentes
         </p>
         {faqs.map((item) => (
           <details data-offer-reveal="content" key={item.question}>
@@ -465,7 +351,7 @@ export function OfferPageBody({ layout }: { layout: OfferLayout }) {
 
       <footer id="contact" className="offer-contact">
         <div data-offer-reveal="intro">
-          <p className="offer-section-label">{`${number.contact} / Contact`}</p>
+          <p className="offer-section-label">06 / Contact</p>
           <h2>
             Parlons de votre
             <span> chaîne de delivery.</span>

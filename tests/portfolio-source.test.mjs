@@ -5,10 +5,12 @@ import test from "node:test";
 const projectRoot = new URL("../", import.meta.url);
 
 test("portfolio exposes its core positioning", async () => {
-  const [portfolio, header] = await Promise.all([
+  const [component, content, header] = await Promise.all([
     readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/home-content.ts", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
   ]);
+  const portfolio = `${component}${content}`;
 
   assert.match(portfolio, /Platform Engineer spécialisé Kubernetes/);
   assert.match(portfolio, /Le cloud, prêt pour la production/);
@@ -176,4 +178,20 @@ test("offer dossier is built on the offer copy and loads its scene lazily", asyn
   assert.match(hook, /rootMargin: "50% 0px"/);
   assert.match(loop, /setActive\(value: boolean\)/);
   assert.match(loop, /"webglcontextlost"/);
+});
+
+test("home preview renders the career stack from the home copy", async () => {
+  const [preview, home, stack] = await Promise.all([
+    readFile(new URL("app/home-preview/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/career/career-stack.tsx", projectRoot), "utf8"),
+  ]);
+
+  // Noindex test route; / keeps the classic layout until the review.
+  assert.match(preview, /robots: \{\s+index: false,\s+follow: false,/);
+  assert.ok(preview.includes('<Portfolio layout="stack" />'));
+  assert.ok(home.includes('<Portfolio layout="classic" />'));
+  // Copy comes from the home content; the scene is a lazy chunk.
+  assert.match(stack, /from "\.\.\/home-content"/);
+  assert.match(stack, /import\("\.\/stack-scene"\)/);
 });

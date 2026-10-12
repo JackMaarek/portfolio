@@ -1,8 +1,7 @@
-// Shared /offer body. The "trace" and "dossier" layouts, reviewed on their
-// noindex previews, carry sections 02, 05 and 06 in a scene before one of
-// them replaces the "timeline" layout on /offer. "trace" pins the live
-// system scene behind the hero; "dossier" follows the hero with the 3D
-// engineering dossier.
+// Shared /offer body. /offer uses the "dossier" layout: the hero is followed
+// by the 3D engineering dossier, which carries sections 02, 05 and 06.
+// "trace" (noindex preview) pins the live system scene behind the hero
+// instead; "timeline" is the previous text-only layout.
 import { BookingLink } from "../booking-link";
 import { OfferMotion } from "../offer-motion";
 import { SiteHeader } from "../site-header";

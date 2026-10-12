@@ -126,7 +126,7 @@ test("offer page exposes the commercial diagnostic", async () => {
   ]);
   const offer = `${offerPage}${offerBody}${offerContent}`;
 
-  assert.ok(offerPage.includes('<OfferPageBody layout="timeline" />'));
+  assert.ok(offerPage.includes('<OfferPageBody layout="dossier" />'));
   assert.ok(offerBody.includes('<section id="diagnostic" className="offer-band offer-process">'));
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
@@ -255,23 +255,13 @@ test("live system scene stays readable by assistive technologies", async () => {
   assert.match(sceneStyles, /@media \(max-width: 980px\) \{\s+\.labelBody \{\s+transform: scale\(1\.3\)/);
 });
 
-test("dossier preview stays a noindex test route built on the offer copy", async () => {
-  const [page, dossier, content, scene, portfolio, offerBody, offerPage] = await Promise.all([
-    readFile(new URL("app/offer/dossier-preview/page.tsx", projectRoot), "utf8"),
+test("offer dossier is built on the offer copy and loads its scene lazily", async () => {
+  const [dossier, content, scene] = await Promise.all([
     readFile(new URL("app/offer/dossier/dossier.tsx", projectRoot), "utf8"),
     readFile(new URL("app/offer/dossier/dossier-content.ts", projectRoot), "utf8"),
     readFile(new URL("app/offer/dossier/dossier-scene.ts", projectRoot), "utf8"),
-    readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/page.tsx", projectRoot), "utf8"),
   ]);
 
-  assert.match(page, /robots: \{\s+index: false,\s+follow: false,/);
-  // The preview is the full offer page; /offer keeps the timeline layout.
-  assert.ok(page.includes('<OfferPageBody layout="dossier" />'));
-  assert.ok(offerPage.includes('<OfferPageBody layout="timeline" />'));
-  // Not linked from the indexed pages while it is a render test.
-  assert.ok(!`${portfolio}${offerBody}`.includes("dossier-preview"));
   // Day copy comes from the offer content, not a second source.
   assert.match(content, /from "\.\.\/offer-content"/);
   assert.match(content, /title: step\(day\)\.title/);

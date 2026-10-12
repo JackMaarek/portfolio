@@ -25,6 +25,7 @@ FORM: Code-led extension of the incumbent /offer world; structure pinned by the 
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
+Day representations (no decorative device — each shows what is audited): J1 survey line charts the chain; J2 CI → Registry opens into Build/Tests/Scan/Publication stages with a flaky tests stage, a gate and a registry version stack with a rollback arc; J3 cluster namespaces with GitOps sync wave and one drifted staging pod; J4 golden-signal bars with an alert threshold the error bar crosses; J5 findings fly from their nodes onto an impact × effort grid labelled "Exemple de classement" (ranking method shown, no client ranking claimed).
 Signature interaction: scroll scrubs the camera between page framings; on J3 the cluster puck opens into namespaces with pods syncing from the GitOps node.
 Motion grammar: exponential ease-out camera damping; reduced motion = instant reframes, static traffic.
 

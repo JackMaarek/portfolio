@@ -66,6 +66,7 @@ export function LiveSystem({ hero }: LiveSystemProps) {
           </div>
         </section>
       </div>
+      <div className={styles.exit} aria-hidden="true" />
     </div>
   );
 }

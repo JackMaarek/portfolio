@@ -7,7 +7,8 @@ export type BookingPlacement =
   | "offer-short"
   | "offer-full"
   | "offer-contact"
-  | "offer-trace";
+  | "offer-trace"
+  | "offer-dossier";
 
 // Tags each CTA with UTM parameters so bookings can be attributed to a placement.
 export function buildBookingUrl(placement: BookingPlacement) {

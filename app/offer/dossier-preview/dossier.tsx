@@ -1,0 +1,264 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { BookingLink } from "../../booking-link";
+import { recommendationSteps } from "../offer-content";
+import { chainNodes, cover, dossierPages, nodeFindings } from "./dossier-content";
+import type { DossierScene } from "./dossier-scene";
+import styles from "./dossier.module.css";
+
+const lastPage = dossierPages.length - 1;
+const scenePages = dossierPages.map((page, index) => ({
+  focus: page.focus,
+  findings: index === lastPage ? nodeFindings : {},
+}));
+
+const pageName = (index: number) => {
+  const page = dossierPages[index];
+  return page.day ? `${page.day} · ${page.title}` : "Couverture";
+};
+
+// Continuous page position: 0 on the cover, 1 on J1, fractions in between.
+// Wide screens: a page is current when its sheet is centred in the viewport.
+// Phones: the scene is a band at the top and a page is current once its
+// sheet reaches the band; the camera moves in the gap before the next one.
+const phoneQuery = "(max-width: 899px)";
+
+function readProgress(sections: HTMLElement[], stage: HTMLElement | null) {
+  const phone = window.matchMedia(phoneQuery).matches;
+  const anchor = phone && stage ? stage.getBoundingClientRect().bottom + 24 : window.innerHeight / 2;
+  const marks = sections.map((section) => {
+    const rect = section.getBoundingClientRect();
+    return phone ? rect.top : rect.top + rect.height / 2;
+  });
+  if (anchor <= marks[0]) return 0;
+  for (let index = 0; index < marks.length - 1; index += 1) {
+    if (anchor < marks[index + 1]) {
+      const fraction = (anchor - marks[index]) / (marks[index + 1] - marks[index]);
+      if (!phone) return index + fraction;
+      const t = Math.min(Math.max((fraction - 0.7) / 0.3, 0), 1);
+      return index + t * t * (3 - 2 * t);
+    }
+  }
+  return marks.length - 1;
+}
+
+export function Dossier() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const labelsRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<HTMLElement[]>([]);
+  const [activePage, setActivePage] = useState(0);
+  const [sceneState, setSceneState] = useState<"loading" | "ready" | "unavailable">("loading");
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const labelLayer = labelsRef.current;
+    if (!canvas || !labelLayer) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let scene: DossierScene | undefined;
+    let disposed = false;
+    let pending = 0;
+
+    const sync = () => {
+      pending = 0;
+      const progress = readProgress(sectionRefs.current, stageRef.current);
+      scene?.setProgress(progress);
+      setActivePage(Math.round(progress));
+    };
+    const onScroll = () => {
+      if (!pending) pending = requestAnimationFrame(sync);
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      scene?.resize();
+      onScroll();
+    });
+
+    import("./dossier-scene")
+      .then(({ createDossierScene }) => {
+        if (disposed) return;
+        scene = createDossierScene({
+          canvas,
+          labelLayer,
+          pages: scenePages,
+          nodes: chainNodes,
+          reducedMotion,
+          classNames: {
+            label: styles.label,
+            name: styles.labelName,
+            meta: styles.labelMeta,
+            namespace: styles.namespace,
+          },
+        });
+        resizeObserver.observe(canvas);
+        sync();
+        setSceneState("ready");
+      })
+      // No WebGL (or the chunk failed): the dossier stays fully readable.
+      .catch(() => setSceneState("unavailable"));
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    sync();
+
+    return () => {
+      disposed = true;
+      window.removeEventListener("scroll", onScroll);
+      resizeObserver.disconnect();
+      if (pending) cancelAnimationFrame(pending);
+      scene?.dispose();
+    };
+  }, []);
+
+  const goToPage = (index: number) => {
+    const section = sectionRefs.current[index];
+    if (!section) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const phone = window.matchMedia(phoneQuery).matches;
+    const band = phone ? (stageRef.current?.offsetHeight ?? 0) : 0;
+    const rect = section.getBoundingClientRect();
+    const top = phone
+      ? window.scrollY + rect.top - band
+      : window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
+    window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+    section.querySelector<HTMLElement>("h1, h2")?.focus({ preventScroll: true });
+  };
+
+  return (
+    <div className={styles.dossier}>
+      <div ref={stageRef} className={styles.stage} data-scene={sceneState} aria-hidden="true">
+        <canvas ref={canvasRef} className={styles.canvas} />
+        <div ref={labelsRef} className={styles.labels} />
+      </div>
+
+      <nav className={styles.index} aria-label="Pages du dossier">
+        <a className={styles.skip} href="#dossier-report">
+          Aller à la restitution
+        </a>
+        <ol>
+          {dossierPages.map((page, index) => (
+            <li key={page.key}>
+              <button
+                type="button"
+                aria-label={pageName(index)}
+                aria-current={activePage === index ? "step" : undefined}
+                onClick={() => goToPage(index)}
+              >
+                {page.day ?? "Dossier"}
+              </button>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      {dossierPages.map((page, index) => (
+        <section
+          key={page.key}
+          id={index === lastPage ? "dossier-report" : `dossier-${page.key}`}
+          ref={(element) => {
+            if (element) sectionRefs.current[index] = element;
+          }}
+          className={styles.page}
+          data-active={activePage === index}
+          aria-labelledby={`dossier-${page.key}-title`}
+        >
+          <article className={styles.sheet}>
+            {index === 0 ? (
+              <>
+                <h1 id={`dossier-${page.key}-title`} tabIndex={-1}>
+                  {cover.title}
+                  <span> {cover.accent}</span>
+                </h1>
+                <p className={styles.lead}>{cover.problem}</p>
+                <ul className={styles.blindSpots}>
+                  {cover.blindSpots.map((point) => (
+                    <li key={point.title}>{point.title}</li>
+                  ))}
+                </ul>
+                <p className={styles.cue}>Faites défiler pour ouvrir le dossier, jour par jour.</p>
+              </>
+            ) : (
+              <>
+                <h2 id={`dossier-${page.key}-title`} tabIndex={-1}>
+                  <span className={styles.day}>{page.day}</span>
+                  {page.title}
+                </h2>
+                <p className={styles.lead}>{page.body}</p>
+
+                {page.checks.length > 0 && (
+                  <>
+                    <h3>Ce qui est vérifié</h3>
+                    <ul className={styles.checks}>
+                      {page.checks.map((check) => (
+                        <li key={check.title}>
+                          <strong>{check.title}</strong>
+                          <span>{check.body}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {index === lastPage ? (
+                  <>
+                    <h3>Ce que vous obtenez</h3>
+                    <ul className={styles.checks}>
+                      {page.outputs.map((output) => (
+                        <li key={output.title}>
+                          <strong>{output.title}</strong>
+                          <span>{output.body}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <h3>Chaque constat suit la même trame</h3>
+                    <ol className={styles.trame}>
+                      {recommendationSteps.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ol>
+                    <div className={styles.actions}>
+                      <BookingLink
+                        className={styles.primary}
+                        placement="offer-dossier"
+                        label="Planifier un diagnostic"
+                      >
+                        Planifier un diagnostic
+                      </BookingLink>
+                      <a className={styles.secondary} href="/offer">
+                        Voir l’offre complète
+                      </a>
+                    </div>
+                  </>
+                ) : (
+                  (page.blindSpots.length > 0 || page.outputs.length > 0) && (
+                    <dl className={styles.meta}>
+                      {page.blindSpots.length > 0 && (
+                        <div>
+                          <dt>Angle mort visé</dt>
+                          <dd>{page.blindSpots.join(" · ")}</dd>
+                        </div>
+                      )}
+                      {page.outputs.length > 0 && (
+                        <div>
+                          <dt>Livrable</dt>
+                          <dd>{page.outputs.map((output) => output.title).join(" · ")}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  )
+                )}
+              </>
+            )}
+            <p className={styles.folio}>
+              <span>Diagnostic CI/CD & Observabilité</span>
+              <span>
+                {index + 1} / {dossierPages.length}
+              </span>
+            </p>
+          </article>
+        </section>
+      ))}
+    </div>
+  );
+}

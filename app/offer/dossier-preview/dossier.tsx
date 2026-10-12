@@ -20,7 +20,10 @@ const pageName = (index: number) => {
 // Wide screens: a page is current when its sheet is centred in the viewport.
 // Phones: the scene is a band at the top and a page is current once its
 // sheet reaches the band; the camera moves in the gap before the next one.
-const phoneQuery = "(max-width: 899px)";
+// Band layout (scene above, sheets below): phones and tablets. Landscape
+// phones (short viewports) keep the side layout.
+// Mirrors the media query in dossier.module.css.
+const phoneQuery = "(max-width: 599px), (max-width: 1180px) and (min-height: 500px)";
 
 function readProgress(sections: HTMLElement[], stage: HTMLElement | null) {
   const phone = window.matchMedia(phoneQuery).matches;
@@ -46,6 +49,7 @@ export function Dossier() {
   const labelsRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const indexRef = useRef<HTMLElement>(null);
   const sectionRefs = useRef<HTMLElement[]>([]);
   const [activePage, setActivePage] = useState(0);
   const [sceneState, setSceneState] = useState<"loading" | "ready" | "unavailable">("loading");
@@ -75,8 +79,29 @@ export function Dossier() {
       scene?.setActive(entry.isIntersecting);
     });
 
+    // Tell the scene which part of the canvas is free: beside the sheet and
+    // the index on wide screens, the whole band on phones.
+    const measureFrame = () => {
+      const stage = stageRef.current;
+      const sheet = sectionRefs.current[0]?.querySelector("article");
+      const index = indexRef.current;
+      if (!stage || !sheet || !index) return;
+      const stageRect = stage.getBoundingClientRect();
+      const topbar = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+      if (window.matchMedia(phoneQuery).matches) {
+        scene?.setFrame({ band: true, left: 0, right: 0, top: Math.max(topbar - stageRect.top, 0) + 4 });
+        return;
+      }
+      scene?.setFrame({
+        band: false,
+        left: sheet.getBoundingClientRect().right - stageRect.left + 16,
+        right: stageRect.right - index.getBoundingClientRect().left + 12,
+        top: topbar + 4,
+      });
+    };
+
     const resizeObserver = new ResizeObserver(() => {
-      scene?.resize();
+      measureFrame();
       onScroll();
     });
 
@@ -102,6 +127,7 @@ export function Dossier() {
           },
           onContextLost: () => setSceneState("unavailable"),
         });
+        measureFrame();
         resizeObserver.observe(canvas);
         if (rootRef.current) visibilityObserver.observe(rootRef.current);
         sync();
@@ -144,7 +170,7 @@ export function Dossier() {
         <div ref={labelsRef} className={styles.labels} />
       </div>
 
-      <nav className={styles.index} aria-label="Pages du dossier">
+      <nav ref={indexRef} className={styles.index} aria-label="Pages du dossier">
         <a className={styles.skip} href="#dossier-report">
           Aller à la restitution
         </a>

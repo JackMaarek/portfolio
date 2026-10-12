@@ -2,7 +2,7 @@
 // observability node. Errors spike past the alert threshold now and then —
 // the one alert worth waking someone for.
 import { BoxGeometry, Group, Mesh, MeshBasicMaterial } from "three";
-import { layout, palette, puckTop, type Feature, type Kit } from "./kit";
+import { followLabel, layout, palette, puckTop, type Feature, type Kit } from "./kit";
 
 const threshold = 0.82;
 
@@ -42,6 +42,7 @@ export function createSignals({ scene, labels }: Kit): Feature {
   const thresholdLabel = labels.add("Seuil d’alerte", { tone: "tag", above: true });
   thresholdLabel.anchor.set(x - 1.05, puckTop + threshold + 0.1, z + 0.1);
 
+  let thresholdShown = 0;
   const feature: Feature = {
     window: [3.4, 3.95, 4.4, 4.9],
     amount: 0,
@@ -64,7 +65,8 @@ export function createSignals({ scene, labels }: Kit): Feature {
         signal.label.alpha = amount;
       }
       thresholdMaterial.color.copy(alerting ? palette.amber : palette.violet);
-      thresholdMaterial.opacity = amount * 0.9;
+      thresholdShown = followLabel(thresholdLabel, thresholdShown, reduced);
+      thresholdMaterial.opacity = amount * 0.9 * thresholdShown;
       thresholdLabel.alpha = amount;
     },
   };

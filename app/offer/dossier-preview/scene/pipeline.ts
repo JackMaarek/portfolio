@@ -13,7 +13,7 @@ import {
   TubeGeometry,
   Vector3,
 } from "three";
-import { layout, palette, type Feature, type Kit } from "./kit";
+import { followLabel, layout, palette, type Feature, type Kit } from "./kit";
 
 const stageNames = ["Build", "Tests", "Scan", "Publication"];
 const stageAt = [0.18, 0.38, 0.58, 0.78];
@@ -90,6 +90,7 @@ export function createPipeline({ scene, route, labels, detail }: Kit): Feature {
   const rollbackLabel = labels.add("Rollback", { tone: "tag", above: true });
   rollbackLabel.anchor.set(x + 0.9, 1, z);
 
+  let rollbackShown = 0;
   const feature: Feature = {
     window: [1.35, 1.95, 2.35, 2.9],
     amount: 0,
@@ -125,7 +126,8 @@ export function createPipeline({ scene, route, labels, detail }: Kit): Feature {
       versionMaterials.forEach((material, index) => {
         material.opacity = amount * (index === 0 ? 1 : 0.8);
       });
-      rollbackMaterial.opacity = amount * (reduced ? 0.8 : 0.45 + 0.4 * Math.sin(clock * 2.2));
+      rollbackShown = followLabel(rollbackLabel, rollbackShown, reduced);
+      rollbackMaterial.opacity = amount * rollbackShown * (reduced ? 0.8 : 0.45 + 0.4 * Math.sin(clock * 2.2));
       rollbackLabel.alpha = amount;
     },
   };

@@ -64,6 +64,21 @@ export type Route = ReturnType<typeof createRoute>;
 
 export type LabelTone = "node" | "tag" | "finding" | "axis";
 
+// Findings first, then the parts a day opens, which name the day's own
+// representation and so outrank even an audited node in focus (raised by
+// 2), then axes and nodes at rest.
+const tonePriority: Record<LabelTone, number> = { finding: 4.5, tag: 3.2, axis: 1.5, node: 1 };
+
+// Where a label sits relative to its anchor.
+export type LabelSpot = "below" | "above" | "right" | "left";
+
+// Nothing is shown unexplained: a secondary element follows its label,
+// easing out while the label has no room and back in once it is placed.
+export const followLabel = (label: SceneLabel, current: number, reduced: boolean) => {
+  const target = label.placed ? 1 : 0;
+  return reduced ? target : current + (target - current) * 0.12;
+};
+
 export type LabelClassNames = Record<LabelTone, string> & { label: string; name: string; meta: string };
 
 export type SceneLabel = {
@@ -71,8 +86,14 @@ export type SceneLabel = {
   anchor: Vector3;
   // Feature-controlled visibility, multiplied by the in-frame check.
   alpha: number;
-  // Labels sit below their anchor, or above it when `above` is set.
-  above: boolean;
+  // Spots around the anchor in order of preference; the fallback anchor,
+  // when set, is tried (above it) right after the first spot.
+  spots: LabelSpot[];
+  alt?: Vector3;
+  // Whether the last layout found the label a free spot.
+  placed: boolean;
+  // When two labels collide, the higher priority one is kept.
+  priority: number;
   // Dropped on the phone band, where the frame is too small for it.
   phone: boolean;
   width: number;
@@ -84,9 +105,11 @@ export function createLabels(layer: HTMLElement, classNames: LabelClassNames) {
 
   const add = (
     name: string,
-    options: { meta?: string; tone?: LabelTone; above?: boolean; phone?: boolean } = {},
+    options: { meta?: string; tone?: LabelTone; above?: boolean; phone?: boolean; spots?: LabelSpot[] } = {},
   ) => {
     const { meta, tone = "node", above = false, phone = true } = options;
+    // Beside the anchor is the last resort when the preferred side is taken.
+    const spots = options.spots ?? [above ? "above" : "below", "right", "left"];
     const element = document.createElement("div");
     element.className = `${classNames.label} ${classNames[tone]}`;
     const nameElement = document.createElement("span");
@@ -100,7 +123,17 @@ export function createLabels(layer: HTMLElement, classNames: LabelClassNames) {
       element.append(metaElement);
     }
     layer.append(element);
-    const label: SceneLabel = { element, anchor: new Vector3(), alpha: 0, above, phone, width: 0, height: 0 };
+    const label: SceneLabel = {
+      element,
+      anchor: new Vector3(),
+      alpha: 0,
+      spots,
+      placed: false,
+      phone,
+      width: 0,
+      height: 0,
+      priority: tonePriority[tone],
+    };
     labels.push(label);
     return label;
   };

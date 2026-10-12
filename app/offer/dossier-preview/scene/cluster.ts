@@ -43,8 +43,10 @@ export function createCluster({ scene, labels }: Kit): Feature {
     const tray = new LineSegments(trayGeometry, trayMaterial);
     tray.position.set((index - 1) * spacing, 0.05, 0);
     interior.add(tray);
-    const tag = labels.add(name, { tone: "tag", above: true });
-    tag.anchor.set(x + (index - 1) * spacing * openScale, 0.62, z - 0.95 * openScale);
+    // The middle tag sits on the front edge so neighbours never collide.
+    const front = index === 1;
+    const tag = labels.add(name, { tone: "tag", above: !front });
+    tag.anchor.set(x + (index - 1) * spacing * openScale, 0.62, z + (front ? 0.95 : -0.95) * openScale);
     return tag;
   });
 

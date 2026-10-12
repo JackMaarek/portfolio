@@ -103,6 +103,8 @@
   background: rgba(11, 11, 13, .78);
   white-space: nowrap;
   will-change: transform, opacity;
+  /* Labels that give way to a higher priority one fade rather than blink. */
+  transition: opacity 220ms ease;
 }
 
 .labelName {
@@ -474,9 +476,10 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Phones: the scene is a band pinned at the top and the sheets scroll
-   under it, so the model and the text stay visible together. */
-@media (max-width: 899px) {
+/* Phones and tablets: the scene is a band pinned at the top and
+   the sheets scroll under it, so the model and the text stay visible
+   together. Mirrors phoneQuery in dossier.tsx. */
+@media (max-width: 599px), (max-width: 1180px) and (min-height: 500px) {
   .stage {
     z-index: 3;
     height: 40svh;
@@ -497,6 +500,8 @@
 
   .sheet {
     width: 100%;
+    max-width: 42rem;
+    margin-inline: auto;
     padding: 22px 20px;
   }
 
@@ -509,6 +514,14 @@
   }
 
   .labelMeta {
+    font-size: .62rem;
+  }
+
+  .finding {
+    padding: 3px 6px 4px;
+  }
+
+  .finding .labelName {
     font-size: .62rem;
   }
 

@@ -39,6 +39,7 @@ import { createCluster } from "./scene/cluster";
 import {
   createLabels,
   createRoute,
+  followLabel,
   layout,
   order,
   palette,
@@ -49,8 +50,9 @@ import {
   type FrameState,
   type Kit,
   type LabelClassNames,
+  type LabelSpot,
 } from "./scene/kit";
-import { createMatrix } from "./scene/matrix";
+import { createMatrix, matrixBounds, matrixCells } from "./scene/matrix";
 import { createPipeline } from "./scene/pipeline";
 import { createSignals } from "./scene/signals";
 import { createSurvey } from "./scene/survey";
@@ -65,7 +67,6 @@ const framings = [
   { target: [5.3, 0.7, 1.3], offset: [-1.4, 4.2, 6.2] },
   { target: [1.5, 0, 2.6], offset: [3.2, 13, 13] },
 ] as const;
-const widePages = new Set([0, 1, 5]);
 
 const routePackets = 16;
 const signalPackets = 7;
@@ -84,8 +85,13 @@ export type SceneOptions = {
   onContextLost: () => void;
 };
 
+// Free part of the canvas, in CSS pixels: what the dossier sheet, the page
+// index and the top bar leave visible. `band` is the phone/tablet layout.
+export type SceneFrame = { band: boolean; left: number; right: number; top: number };
+
 export type DossierScene = {
   setProgress: (progress: number) => void;
+  setFrame: (frame: SceneFrame) => void;
   setActive: (active: boolean) => void;
   resize: () => void;
   dispose: () => void;
@@ -103,7 +109,8 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   renderer.setClearColor(palette.ink);
 
   const scene = new Scene();
-  scene.fog = new Fog(palette.ink, 24, 56);
+  const fog = new Fog(palette.ink, 24, 56);
+  scene.fog = fog;
   const camera = new PerspectiveCamera(35, 1, 0.1, 120);
 
   scene.add(new AmbientLight(0xffffff, 0.55));
@@ -187,21 +194,36 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   const signalMaterial = new MeshBasicMaterial({ color: palette.violet, transparent: true, opacity: 0.25 });
   const signals = new InstancedMesh(packetGeometry, signalMaterial, signalPackets);
   scene.add(signals);
+  const signalTrackMaterial = new MeshBasicMaterial({ color: palette.violet, transparent: true, opacity: 0.12 });
   scene.add(
     new Mesh(
       new TubeGeometry(signalCurve, 32, 0.012, 6, false),
-      new MeshBasicMaterial({ color: palette.violet, transparent: true, opacity: 0.12 }),
+      signalTrackMaterial,
     ),
   );
 
   // HTML labels, positioned from projected 3D anchors.
   const labels = createLabels(labelLayer, classNames);
+  // Code sits at the back of the chain with open floor behind it; its label
+  // goes there, leaving the gap in front to CI, which sits just ahead of it.
+  const behind = (nodeKey: NodeKey) => nodeKey === "code";
   const nodeLabels = options.nodes.map((node) => {
-    const label = labels.add(node.label, { meta: node.examples });
+    const label = labels.add(node.label, { meta: node.examples, above: behind(node.key) });
     const { x, z, radius } = layout[node.key];
-    label.anchor.set(x, 0.3, z + radius + 0.35);
+    if (behind(node.key)) {
+      label.anchor.set(x, 0.4, z - radius - 0.2);
+    } else {
+      label.anchor.set(x, 0.3, z + radius + 0.35);
+      label.alt = new Vector3(x, 0.4, z - radius - 0.2);
+    }
     return { key: node.key, label };
   });
+
+  // The violet stream: signals returning from the cluster to observability.
+  const signalLabel = labels.add("Signaux", { tone: "tag", above: true });
+  // Background scenery outside J4: it gives way to the nodes.
+  signalLabel.priority = 2;
+  signalLabel.anchor.copy(signalCurve.getPoint(0.5)).setY(signalCurve.getPoint(0.5).y + 0.15);
 
   // Each day's representation of what is audited.
   const kit: Kit = { scene, route, labels, detail };
@@ -219,10 +241,13 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   let pageIndex = 0;
   let width = 1;
   let height = 1;
-  let portrait = false;
   let compact = false;
-  let freeLeft = 8;
-  let freeRight = 8;
+  // J5 frames the findings grid alone when the canvas is too small for the
+  // whole chain and the grid together: the phone band or a landscape phone.
+  let gridOnly = false;
+  let free: SceneFrame = { band: false, left: 0, right: 0, top: 0 };
+  // Distance scale per page, fitted to the free part of the canvas.
+  const fit = framings.map(() => 1);
   let active = true;
   const cameraPosition = new Vector3();
   const cameraTarget = new Vector3();
@@ -231,34 +256,151 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   const nextPosition = new Vector3();
   const nextTarget = new Vector3();
   const scratch = new Vector3();
-  const yAxis = new Vector3(0, 1, 0);
   const matrix = new Matrix4();
   const dummy = new Object3D();
   const packetTs = new Array<number>(routePackets).fill(0);
   let initialised = false;
   let dirty = true;
+  let signalShown = 0;
+  let settling = false;
 
-  const framingAt = (index: number, position: Vector3, target: Vector3) => {
+  // Base framing of a page: target and the direction the camera looks from.
+  const baseFraming = (index: number, offset: Vector3, target: Vector3) => {
     const framing = framings[index];
     target.set(framing.target[0], framing.target[1], framing.target[2]);
-    position.set(framing.offset[0], framing.offset[1], framing.offset[2]);
-    if (portrait) {
-      // Look down the chain so it recedes into depth instead of overflowing.
-      position.applyAxisAngle(yAxis, -Math.PI / 2.6);
-      position.multiplyScalar(widePages.has(index) ? 1.08 : 1.15);
+    offset.set(framing.offset[0], framing.offset[1], framing.offset[2]);
+    if (gridOnly && index === 5) {
+      // Seen from higher up, impact spreads vertically and the wide finding
+      // labels stack instead of colliding side by side.
+      target.set(0.6, 0, 4.8);
+      offset.set(0.2, 9, 3.4);
     }
-    if (compact) {
-      // Phone band: the whole width is free, so the camera comes closer;
-      // on J5 it frames the findings grid rather than the whole chain.
-      if (index === 5) {
-        target.set(0.6, 0, 4.4);
-        position.set(0.4, 7, 6.2);
-      } else {
-        position.multiplyScalar(widePages.has(index) ? 0.66 : index === 3 ? 0.46 : 0.72);
-      }
-      if (index === 0 || index === 1) target.x += 0.45;
+  };
+
+  const framingAt = (index: number, position: Vector3, target: Vector3) => {
+    baseFraming(index, position, target);
+    position.multiplyScalar(fit[index]).add(target);
+  };
+
+  // What each page must show, with the room its label needs in pixels.
+  type FitPoint = { at: Vector3; padX: number; padTop: number; padBottom: number };
+  const nodePoints = (keys: NodeKey[]): FitPoint[] =>
+    keys.flatMap((nodeKey) => {
+      const label = nodeLabels.find((entry) => entry.key === nodeKey)!.label;
+      const room = label.height + 6;
+      return [
+        { at: new Vector3(layout[nodeKey].x, puckTop, layout[nodeKey].z), padX: 36, padTop: 24, padBottom: 12 },
+        behind(nodeKey)
+          ? { at: label.anchor, padX: label.width / 2 + 6, padTop: room, padBottom: 0 }
+          : { at: label.anchor, padX: label.width / 2 + 6, padTop: 0, padBottom: room },
+      ];
+    });
+  const box = (x: number, y: number, z: number, padX = 12, padTop = 12, padBottom = 12): FitPoint => ({
+    at: new Vector3(x, y, z),
+    padX,
+    padTop,
+    padBottom,
+  });
+  const { cluster: c, observability: o, registry: r } = layout;
+  const mustSee = (index: number): FitPoint[] => {
+    switch (index) {
+      case 2:
+        return [...nodePoints(["code", "ci", "registry"]), box(r.x + 0.9, 1.1, r.z, 50, 30)];
+      case 3:
+        return [
+          ...nodePoints(["gitops"]),
+          box(c.x - 1.35, 0.6, c.z - 0.95, 12, 34),
+          box(c.x + 1.35, 0.6, c.z - 0.95, 40, 34),
+          box(c.x - 1.35, 0.55, c.z + 0.95),
+          box(c.x + 1.35, 0.55, c.z + 0.95),
+          // The staging tag hangs below the front edge.
+          box(c.x, 0.62, c.z + 0.76, 40, 0, 30),
+        ];
+      case 4:
+        return [
+          ...nodePoints(["observability"]),
+          box(o.x - 0.7, puckTop + 1.1, o.z, 60, 30),
+          box(o.x + 0.7, puckTop + 1.1, o.z, 24, 20),
+          box(c.x + 0.6, 0.7, c.z),
+        ];
+      case 5:
+        return [
+          ...(gridOnly ? [] : nodePoints(order)),
+          // Finding labels hang below their pin on the grid.
+          ...matrixCells().map((at) => box(at.x, at.y + 0.15, at.z, 72, 12, 30)),
+          box(matrixBounds.left, 0.1, matrixBounds.back, 30, 30),
+          box(matrixBounds.right, 0.1, matrixBounds.back, 30, 20),
+          box(matrixBounds.left, 0.1, matrixBounds.front, 40, 12, 30),
+          box(matrixBounds.right, 0.1, matrixBounds.front, 30, 12, 30),
+        ];
+      default:
+        return nodePoints(order);
     }
-    position.add(target);
+  };
+
+  // Closest camera distance at which every must-see point and its label
+  // fit inside the free part of the frame; recomputed on every resize.
+  const fitScratch = new Vector3();
+  const fitOffset = new Vector3();
+  const fitTarget = new Vector3();
+  const fitsAt = (points: FitPoint[], scale: number, topLimit: number) => {
+    camera.position.copy(fitOffset).multiplyScalar(scale).add(fitTarget);
+    camera.lookAt(fitTarget);
+    camera.updateMatrixWorld();
+    return points.every(({ at, padX, padTop, padBottom }) => {
+      fitScratch.copy(at).project(camera);
+      const x = (fitScratch.x * 0.5 + 0.5) * width;
+      const y = (fitScratch.y * -0.5 + 0.5) * height;
+      return (
+        fitScratch.z < 1 &&
+        x - padX >= free.left + 8 &&
+        x + padX <= width - free.right - 8 &&
+        y - padTop >= topLimit &&
+        y + padBottom <= height - 8
+      );
+    });
+  };
+  // Optical centre: the middle of the free part of the frame. On the cover
+  // it also sits below the top bar; that shift eases out with the scroll.
+  let appliedShift = Number.NaN;
+  const centreOptics = (coverShare: number) => {
+    const shiftX = width / 2 - (free.left + width - free.right) / 2;
+    const shiftY = -(free.top / 2) * coverShare;
+    if (shiftY === appliedShift && !Number.isNaN(appliedShift)) return;
+    appliedShift = shiftY;
+    camera.setViewOffset(width, height, shiftX, shiftY, width, height);
+    camera.updateProjectionMatrix();
+  };
+
+  const fitFramings = () => {
+    framings.forEach((_, index) => {
+      appliedShift = Number.NaN;
+      centreOptics(index === 0 ? 1 : 0);
+      baseFraming(index, fitOffset, fitTarget);
+      // Only the cover shares the first viewport with the top bar.
+      const topLimit = index === 0 ? free.top : 8;
+      const all = mustSee(index);
+      // Closest scale at which `points` fit, or the far limit if none does.
+      const closest = (points: FitPoint[]) => {
+        let low = 0.2;
+        let high = 4;
+        if (!fitsAt(points, high, topLimit)) return high;
+        for (let step = 0; step < 18; step += 1) {
+          const middle = (low + high) / 2;
+          if (fitsAt(points, middle, topLimit)) high = middle;
+          else low = middle;
+        }
+        return high;
+      };
+      // Objects always fit; labels only earn extra distance while it stays
+      // modest; past that a few labels give way rather than the scene shrink.
+      const core = closest(all.map((point) => ({ ...point, padX: Math.min(point.padX, 28), padBottom: 10 })));
+      const full = closest(all);
+      // A little air so the idle sway never pushes anything out.
+      fit[index] = Math.min(full, core * 1.3) * 1.04;
+    });
+    appliedShift = Number.NaN;
+    initialised = false;
   };
 
   const computeDesired = () => {
@@ -274,58 +416,100 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   const resize = () => {
     width = canvas.clientWidth || 1;
     height = canvas.clientHeight || 1;
-    portrait = width / height < 0.9;
-    compact = width < 900 && !portrait;
-    // Wide screens: the sheet covers the left (gutter + min(33rem, 40vw))
-    // and the index the right edge; labels only show in between.
-    freeLeft = width >= 900 ? Math.min(width * 0.4, 528) + 42 : 8;
-    freeRight = width >= 900 ? 150 : 8;
+    compact = free.band;
+    gridOnly = compact || height < 560;
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
-    // Shift the optical centre into the free band between sheet and index.
-    if (portrait) camera.setViewOffset(width, height, 0, height * 0.2, width, height);
-    else if (width >= 900) camera.setViewOffset(width, height, -width * 0.15, 0, width, height);
-    else camera.clearViewOffset();
-    camera.updateProjectionMatrix();
     labels.measure();
+    fitFramings();
     dirty = true;
   };
 
   const allLitPage = () => pageIndex === 0 || pageIndex === pages.length - 1;
 
+  // Where a label may go, in its order of preference: its first spot, its
+  // fallback anchor above, then its other spots; only spots that fit.
+  const placeLabel = (label: (typeof labels.labels)[number]) => {
+    const tryAnchor = (anchor: Vector3, side: LabelSpot) => {
+      scratch.copy(anchor).project(camera);
+      const x = (scratch.x * 0.5 + 0.5) * width;
+      const y = (scratch.y * -0.5 + 0.5) * height;
+      const left =
+        side === "right" ? x + 12 : side === "left" ? x - label.width - 12 : x - label.width / 2;
+      const top =
+        side === "above" ? y - label.height : side === "below" ? y : y - label.height / 2;
+      const fits =
+        scratch.z < 1 &&
+        left > free.left + 4 &&
+        left + label.width < width - free.right - 4 &&
+        top > 4 &&
+        top + label.height < height - 4;
+      return fits ? { left, top, key: anchor === label.alt ? "alt" : side } : null;
+    };
+    // Candidate spots in order of preference; the caller keeps the first
+    // one that does not cover a label already placed.
+    const [first, ...rest] = label.spots;
+    return [
+      tryAnchor(label.anchor, first),
+      label.alt ? tryAnchor(label.alt, "above") : null,
+      ...rest.map((side) => tryAnchor(label.anchor, side)),
+    ].filter((spot) => spot !== null);
+  };
+
+  // The spot each label held on the last frame: a label that is showing
+  // keeps it while it still fits, so the idle sway never makes it jump.
+  const heldSpot = new Map<(typeof labels.labels)[number], string>();
+
   const updateLabels = () => {
+    const focusCount = pages[pageIndex]?.focus.length ?? 0;
+    const narrow = focusCount > 0 && focusCount <= 3;
     for (const { key: nodeKey, label } of nodeLabels) {
       const level = nodeByKey[nodeKey].level;
       const hidden = nodeKey === "cluster" ? smoothstep(0, 0.4, cluster.amount) : 0;
       label.alpha = (0.35 + level * 0.65) * (1 - hidden);
       label.element.dataset.focus = level > 0.7 ? "true" : "false";
       // On phones only the nodes of a narrow focus keep their second line.
-      const focusCount = pages[pageIndex]?.focus.length ?? 0;
-      const narrow = focusCount > 0 && focusCount <= 3;
-      label.element.dataset.detail = String(!compact || (level > 0.7 && narrow));
-    }
-    for (const label of labels.labels) {
-      if (label.alpha <= 0.01 || (compact && !label.phone)) {
-        label.element.style.opacity = "0";
-        continue;
-      }
-      scratch.copy(label.anchor).project(camera);
-      const x = (scratch.x * 0.5 + 0.5) * width;
-      const y = (scratch.y * -0.5 + 0.5) * height;
-      const top = label.above ? y - label.height : y;
-      // A label only shows while its anchor is in the free part of the frame:
-      // not cut by an edge, not under the dossier sheet or the page index.
-      const visible =
-        scratch.z < 1 &&
-        x - label.width / 2 > freeLeft &&
-        x + label.width / 2 < width - freeRight &&
-        top > 0 &&
-        top + label.height < height;
-      label.element.style.opacity = visible ? label.alpha.toFixed(3) : "0";
-      if (visible) {
-        label.element.style.transform = `translate(${(x - label.width / 2).toFixed(1)}px, ${top.toFixed(1)}px)`;
+      const detail = String(!compact || (level > 0.7 && narrow));
+      if (label.element.dataset.detail !== detail) {
+        label.element.dataset.detail = detail;
+        label.width = label.element.offsetWidth;
+        label.height = label.element.offsetHeight;
       }
     }
+    let changed = false;
+    // Place labels by priority; one that would cover a placed label waits.
+    const placed: { left: number; top: number; right: number; bottom: number }[] = [];
+    const ordered = labels.labels
+      .map((label) => ({ label, rank: label.priority + label.alpha + (label.element.dataset.focus === "true" ? 2 : 0) }))
+      .sort((a, b) => b.rank - a.rank);
+    for (const { label } of ordered) {
+      const spots = label.alpha > 0.05 && !(compact && !label.phone) ? placeLabel(label) : [];
+      const held = label.placed ? heldSpot.get(label) : undefined;
+      spots.sort((a, b) => Number(b.key === held) - Number(a.key === held));
+      // A label already showing gets a tighter margin: hysteresis against
+      // flicker when a neighbour drifts a pixel closer.
+      const margin = label.placed ? 1 : 3;
+      let place: (typeof spots)[number] | null = null;
+      for (const spot of spots) {
+        const rect = { left: spot.left - margin, top: spot.top - margin, right: spot.left + label.width + margin, bottom: spot.top + label.height + margin };
+        const collides = placed.some(
+          (other) => rect.left < other.right && rect.right > other.left && rect.top < other.bottom && rect.bottom > other.top,
+        );
+        if (!collides) {
+          place = spot;
+          placed.push({ left: spot.left - 3, top: spot.top - 3, right: spot.left + label.width + 3, bottom: spot.top + label.height + 3 });
+          break;
+        }
+      }
+      changed ||= label.placed !== (place !== null);
+      label.placed = place !== null;
+      scratch.copy(label.anchor).project(camera); // DEBUG-SWEEP
+      label.element.dataset.dropped = String(!place && label.alpha > 0.3 && !(compact && !label.phone) && Math.abs(scratch.x) < 0.95 && Math.abs(scratch.y) < 0.95 && scratch.z < 1 && (scratch.x * 0.5 + 0.5) * width > free.left && (scratch.x * 0.5 + 0.5) * width < width - free.right); // DEBUG-SWEEP
+      if (place) heldSpot.set(label, place.key);
+      label.element.style.opacity = place ? label.alpha.toFixed(3) : "0";
+      if (place) label.element.style.transform = `translate(${place.left.toFixed(1)}px, ${place.top.toFixed(1)}px)`;
+    }
+    return changed;
   };
 
   // Frame budget watch: if frames keep running long, lower the pixel ratio.
@@ -356,6 +540,7 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     // Exponential damping; reduced motion snaps straight to the target.
     const ease = (rate: number) => (reducedMotion || !initialised ? 1 : 1 - Math.exp(-rate * delta));
 
+    centreOptics(1 - smoothstep(0, 0.6, progress));
     computeDesired();
     cameraPosition.lerp(desiredPosition, ease(3.2));
     cameraTarget.lerp(desiredTarget, ease(3.2));
@@ -365,6 +550,10 @@ export function createDossierScene(options: SceneOptions): DossierScene {
       camera.position.y += Math.sin(time / 6100) * 0.1;
     }
     camera.lookAt(cameraTarget);
+    // Fog follows the camera distance, so a fitted wide shot never fades out.
+    const distance = camera.position.distanceTo(cameraTarget);
+    fog.near = distance + 4;
+    fog.far = distance + 34;
     initialised = true;
 
     const page = pages[pageIndex];
@@ -403,7 +592,11 @@ export function createDossierScene(options: SceneOptions): DossierScene {
       signals.setMatrixAt(index, matrix);
     }
     signals.instanceMatrix.needsUpdate = true;
-    signalMaterial.opacity = 0.2 + nodeByKey.observability.level * 0.75;
+    signalShown = followLabel(signalLabel, signalShown, reducedMotion);
+    signalMaterial.opacity = (0.2 + nodeByKey.observability.level * 0.75) * signalShown;
+    signalTrackMaterial.opacity = 0.12 * signalShown;
+    // Named whenever the stream is in view, except over the open cluster.
+    signalLabel.alpha = (0.4 + nodeByKey.observability.level * 0.6) * (1 - cluster.amount * (pageIndex === 3 ? 1 : 0));
 
     state.time = time;
     state.clock = clock;
@@ -417,8 +610,11 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     }
 
     renderer.render(scene, camera);
-    updateLabels();
-    dirty = false;
+    const placementChanged = updateLabels();
+    // Reduced motion renders on demand: one more pass lets the elements that
+    // follow a label catch up with where it was just placed.
+    dirty = placementChanged && !settling;
+    settling = dirty;
   };
 
   // A lost GPU context (memory pressure on phones): stop and let the page
@@ -440,6 +636,10 @@ export function createDossierScene(options: SceneOptions): DossierScene {
       dirty = true;
     },
     // Rendering stops entirely while the scene is scrolled out of view.
+    setFrame(next) {
+      free = next;
+      resize();
+    },
     setActive(value) {
       if (value === active) return;
       active = value;

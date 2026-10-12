@@ -18,22 +18,36 @@ import {
   Vector3,
 } from "three";
 import type { NodeKey } from "../dossier-content";
-import { layout, palette, smoothstep, type Feature, type Kit } from "./kit";
+import { followLabel, layout, palette, smoothstep, type Feature, type Kit } from "./kit";
 
 const centre = new Vector3(0.6, 0.03, 4.9);
 const width = 4.6;
-const depth = 2.8;
+const depth = 3.2;
 
 // Example placement: effort along x (left = low), impact along -z (back = high).
+// Each finding gets its own impact row so the wide labels never share one.
 const placement: Partial<Record<NodeKey, { effort: number; impact: number }>> = {
-  observability: { effort: 0.27, impact: 0.6 },
-  ci: { effort: 0.72, impact: 0.9 },
-  registry: { effort: 0.84, impact: 0.56 },
-  gitops: { effort: 0.5, impact: 0.32 },
+  ci: { effort: 0.84, impact: 0.92 },
+  // Low enough that its label clears the quick wins tag in the corner.
+  observability: { effort: 0.24, impact: 0.58 },
+  registry: { effort: 0.84, impact: 0.54 },
+  // Kept off the front edge, where the example caption hangs.
+  gitops: { effort: 0.56, impact: 0.24 },
 };
 
 const cell = ({ effort, impact }: { effort: number; impact: number }) =>
   new Vector3(centre.x - width / 2 + effort * width, 0.32, centre.z + depth / 2 - impact * depth);
+
+// Grid positions of the findings, for camera fitting.
+export const matrixCells = () => Object.values(placement).map((spot) => cell(spot!));
+
+// Outer corners of the grid with its axes, for camera fitting.
+export const matrixBounds = {
+  left: centre.x - width / 2 - 0.2,
+  right: centre.x + width / 2 + 0.2,
+  back: centre.z - depth / 2 - 0.3,
+  front: centre.z + depth / 2 + 0.3,
+};
 
 export function createMatrix(
   { scene, labels }: Kit,
@@ -86,14 +100,15 @@ export function createMatrix(
   group.add(impactAxis, impactHead, effortAxis, effortHead);
 
   const axisLabels = [
-    labels.add("Impact", { tone: "axis" }),
+    labels.add("Impact", { tone: "axis", spots: ["below", "left"] }),
     labels.add("Effort", { tone: "axis" }),
-    labels.add(quickWins, { tone: "tag" }),
+    // Outside the grid, level with its quadrant, where no finding lands.
+    labels.add(quickWins, { tone: "tag", spots: ["left", "right"] }),
     labels.add("Exemple de classement", { tone: "axis", above: true }),
   ];
   axisLabels[0].anchor.set(centre.x - width / 2 - 0.2, 0.1, centre.z - depth / 2 - 0.45);
   axisLabels[1].anchor.set(centre.x + width / 2 + 0.2, 0.1, centre.z + depth / 2 + 0.35);
-  axisLabels[2].anchor.set(centre.x - width / 2 + 0.5, 0.08, centre.z - depth / 2 + 0.12);
+  axisLabels[2].anchor.set(centre.x - width / 2 - 0.2, 0.08, centre.z - depth / 4);
   axisLabels[3].anchor.set(centre.x - width / 4 + 0.3, 0.1, centre.z + depth / 2 + 0.75);
 
   // Findings travel from their node to their place on the grid.
@@ -104,7 +119,7 @@ export function createMatrix(
       const material = new MeshBasicMaterial({ color: palette.violet, transparent: true, opacity: 0 });
       const pin = new Mesh(pinGeometry, material);
       group.add(pin);
-      const label = labels.add(findings[key] ?? "", { tone: "finding" });
+      const label = labels.add(findings[key] ?? "", { tone: "finding", spots: ["below", "right", "left"] });
       return {
         pin,
         material,
@@ -114,6 +129,7 @@ export function createMatrix(
       };
     });
 
+  let quadrantShown = 0;
   const feature: Feature = {
     window: [4.4, 4.95, 99, 99],
     amount: 0,
@@ -123,7 +139,8 @@ export function createMatrix(
       plateMaterial.opacity = amount * 0.92;
       edgeMaterial.opacity = amount * 0.3;
       dividerMaterial.opacity = amount * 0.6;
-      quadrantMaterial.opacity = amount * 0.09;
+      quadrantShown = followLabel(axisLabels[2], quadrantShown, reduced);
+      quadrantMaterial.opacity = amount * 0.09 * quadrantShown;
       axisMaterial.opacity = amount * 0.55;
       for (const label of axisLabels) label.alpha = smoothstep(0.5, 1, amount);
 
@@ -136,6 +153,9 @@ export function createMatrix(
         entry.pin.rotation.y = reduced ? 0 : clock * 0.6;
         entry.material.opacity = amount;
         entry.label.anchor.copy(entry.pin.position).setY(entry.pin.position.y + 0.15);
+        // Fallback above the pin when the spot below is taken.
+        entry.label.alt ??= new Vector3();
+        entry.label.alt.copy(entry.pin.position).setY(entry.pin.position.y + 0.2);
         entry.label.alpha = smoothstep(0.85, 1, flight);
       });
     },

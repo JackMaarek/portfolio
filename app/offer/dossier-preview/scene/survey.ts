@@ -1,7 +1,7 @@
 // J1 · Cadrage: a survey line sweeps the floor and each component pings as
 // it is charted — the map of the real path from code to production.
 import { BoxGeometry, DoubleSide, Group, Mesh, MeshBasicMaterial, PlaneGeometry, RingGeometry } from "three";
-import { layout, order, palette, type Feature, type Kit } from "./kit";
+import { followLabel, layout, order, palette, type Feature, type Kit } from "./kit";
 
 const sweepStart = -7.6;
 const sweepEnd = 8;
@@ -39,6 +39,7 @@ export function createSurvey({ scene, labels, detail }: Kit): Feature {
 
   const tag = labels.add("Cartographie", { tone: "tag", above: true });
 
+  let sweepShown = 0;
   const feature: Feature = {
     window: [0.35, 0.95, 1.35, 1.9],
     amount: 0,
@@ -49,8 +50,9 @@ export function createSurvey({ scene, labels, detail }: Kit): Feature {
       const sweep = reduced ? sweepEnd : sweepStart + ((clock / sweepPeriod) % 1) * (sweepEnd - sweepStart);
       line.position.x = sweep;
       trail.position.x = sweep - 0.7;
-      lineMaterial.opacity = reduced ? 0 : amount * 0.9;
-      trailMaterial.opacity = reduced ? 0 : amount * 0.06;
+      sweepShown = followLabel(tag, sweepShown, reduced);
+      lineMaterial.opacity = reduced ? 0 : amount * 0.9 * sweepShown;
+      trailMaterial.opacity = reduced ? 0 : amount * 0.06 * sweepShown;
 
       for (const ping of pings) {
         const behind = sweep - ping.x;

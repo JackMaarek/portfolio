@@ -12,6 +12,7 @@ import {
   painPoints,
   problemHeading,
   processSteps,
+  recommendationSteps,
 } from "./offer-content";
 
 export type OfferLayout = "timeline" | "trace";
@@ -41,14 +42,6 @@ const decisionOutcomes = [
     title: "Piloter la remédiation",
     body: "Les actions sont séquencées avec leurs dépendances et un critère de réussite vérifiable.",
   },
-];
-
-const recommendationSteps = [
-  "Observation",
-  "Risque",
-  "Impact",
-  "Action",
-  "Priorité",
 ];
 
 const scopeItems = [

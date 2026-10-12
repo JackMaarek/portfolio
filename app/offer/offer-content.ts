@@ -94,3 +94,6 @@ export const deliverables = [
     body: "Techniques et concrètes.",
   },
 ];
+
+// How each finding is written up in the report.
+export const recommendationSteps = ["Observation", "Risque", "Impact", "Action", "Priorité"];

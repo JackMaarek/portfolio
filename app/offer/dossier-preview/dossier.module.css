@@ -86,6 +86,9 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /* Safari would otherwise inflate the small label text on phones. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .label {
@@ -121,19 +124,45 @@
   border-color: rgba(255, 189, 116, .5);
 }
 
-.label[data-finding="true"] .labelMeta {
-  color: var(--violet);
+.node {
+  z-index: 1;
 }
 
-.namespace {
+/* Parts revealed inside a component: stages, namespaces, signals. */
+.tag {
   padding: 3px 7px;
   border-color: rgba(171, 162, 255, .35);
 }
 
-.namespace .labelName {
+.tag .labelName {
   color: var(--violet);
   font-size: .64rem;
   font-weight: 600;
+}
+
+.finding {
+  z-index: 2;
+  border-color: rgba(171, 162, 255, .6);
+  background: rgba(11, 11, 13, .9);
+}
+
+.finding .labelName {
+  color: var(--paper);
+  font-size: .68rem;
+}
+
+/* Axis names sit on the floor without a box. */
+.axis {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.axis .labelName {
+  color: var(--muted);
+  font-size: .66rem;
+  font-weight: 600;
+  letter-spacing: .04em;
 }
 
 /* Page index: right edge on wide screens, bottom bar on phones. */

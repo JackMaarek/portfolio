@@ -2,16 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BookingLink } from "../../booking-link";
-import { recommendationSteps } from "../offer-content";
+import { deliverables, recommendationSteps } from "../offer-content";
 import { chainNodes, cover, dossierPages, nodeFindings } from "./dossier-content";
 import type { DossierScene } from "./dossier-scene";
 import styles from "./dossier.module.css";
 
 const lastPage = dossierPages.length - 1;
-const scenePages = dossierPages.map((page, index) => ({
-  focus: page.focus,
-  findings: index === lastPage ? nodeFindings : {},
-}));
+const scenePages = dossierPages.map((page) => ({ focus: page.focus }));
+const quickWins = deliverables.find((item) => item.title === "Quick wins")?.title ?? "Quick wins";
 
 const pageName = (index: number) => {
   const page = dossierPages[index];
@@ -47,6 +45,7 @@ export function Dossier() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<HTMLElement[]>([]);
   const [activePage, setActivePage] = useState(0);
   const [sceneState, setSceneState] = useState<"loading" | "ready" | "unavailable">("loading");
@@ -71,6 +70,11 @@ export function Dossier() {
       if (!pending) pending = requestAnimationFrame(sync);
     };
 
+    // Pause rendering once the dossier has scrolled out of view.
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      scene?.setActive(entry.isIntersecting);
+    });
+
     const resizeObserver = new ResizeObserver(() => {
       scene?.resize();
       onScroll();
@@ -84,15 +88,22 @@ export function Dossier() {
           labelLayer,
           pages: scenePages,
           nodes: chainNodes,
+          findings: nodeFindings,
+          quickWins,
           reducedMotion,
           classNames: {
             label: styles.label,
             name: styles.labelName,
             meta: styles.labelMeta,
-            namespace: styles.namespace,
+            node: styles.node,
+            tag: styles.tag,
+            finding: styles.finding,
+            axis: styles.axis,
           },
+          onContextLost: () => setSceneState("unavailable"),
         });
         resizeObserver.observe(canvas);
+        if (rootRef.current) visibilityObserver.observe(rootRef.current);
         sync();
         setSceneState("ready");
       })
@@ -106,6 +117,7 @@ export function Dossier() {
       disposed = true;
       window.removeEventListener("scroll", onScroll);
       resizeObserver.disconnect();
+      visibilityObserver.disconnect();
       if (pending) cancelAnimationFrame(pending);
       scene?.dispose();
     };
@@ -126,7 +138,7 @@ export function Dossier() {
   };
 
   return (
-    <div className={styles.dossier}>
+    <div ref={rootRef} className={styles.dossier}>
       <div ref={stageRef} className={styles.stage} data-scene={sceneState} aria-hidden="true">
         <canvas ref={canvasRef} className={styles.canvas} />
         <div ref={labelsRef} className={styles.labels} />

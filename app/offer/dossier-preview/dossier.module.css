@@ -145,6 +145,15 @@
   transform: translateY(-50%);
 }
 
+/* Ink backdrop so the index never sits directly on the model. */
+.index::before {
+  position: absolute;
+  inset: -40px calc(-1 * var(--page-gutter)) -40px -40px;
+  z-index: -1;
+  background: linear-gradient(to left, rgba(11, 11, 13, .92) 55%, transparent);
+  content: "";
+}
+
 .index ol {
   display: grid;
   gap: 4px;
@@ -228,8 +237,8 @@
 /* The cover sits low on the left so the chain owns the first viewport. */
 .page:first-of-type {
   align-items: flex-end;
-  min-height: 120svh;
-  padding-bottom: 8svh;
+  min-height: 100svh;
+  padding-bottom: 5svh;
 }
 
 .sheet {
@@ -476,6 +485,10 @@
 
   .blindSpots {
     grid-template-columns: 1fr;
+  }
+
+  .index::before {
+    display: none;
   }
 
   .index {

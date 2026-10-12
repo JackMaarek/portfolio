@@ -313,6 +313,8 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   let height = 1;
   let portrait = false;
   let compact = false;
+  let freeLeft = 8;
+  let freeRight = 8;
   const cameraPosition = new Vector3();
   const cameraTarget = new Vector3();
   const desiredPosition = new Vector3();
@@ -340,7 +342,7 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     }
     if (compact) {
       const wide = index === 0 || index === 1 || index === 5;
-      position.multiplyScalar(wide ? 0.66 : index === 3 ? 0.6 : 0.78);
+      position.multiplyScalar(wide ? 0.66 : index === 3 ? 0.46 : 0.78);
       if (wide) target.x += 0.45;
     }
     position.add(target);
@@ -362,6 +364,10 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     portrait = width / height < 0.9;
     // Phone band: the whole width is free, so the camera can come closer.
     compact = width < 900 && !portrait;
+    // Wide screens: the sheet covers the left 40% and the index the right edge.
+    // Mirrors .sheet: page gutter (30px max) + min(33rem, 40vw).
+    freeLeft = width >= 900 ? Math.min(width * 0.4, 528) + 42 : 8;
+    freeRight = width >= 900 ? 150 : 8;
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     // Shift the optical centre away from the dossier sheet: to the right of
@@ -380,11 +386,17 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     for (const label of nodeLabels) {
       const node = nodeByKey[label.key];
       scratch.copy(label.anchor).project(camera);
-      const visible = scratch.z < 1;
-      // Keep each label inside the frame, half its width from either edge.
-      const half = label.element.offsetWidth / 2 + 8;
-      const x = MathUtils.clamp((scratch.x * 0.5 + 0.5) * width, half, width - half);
-      const y = MathUtils.clamp((scratch.y * -0.5 + 0.5) * height, 8, height - label.element.offsetHeight - 8);
+      const x = (scratch.x * 0.5 + 0.5) * width;
+      const y = (scratch.y * -0.5 + 0.5) * height;
+      // A label only shows while its node is in the free part of the frame:
+      // not cut by an edge, not under the dossier sheet or the page index.
+      const half = label.element.offsetWidth / 2;
+      const visible =
+        scratch.z < 1 &&
+        x - half > freeLeft &&
+        x + half < width - freeRight &&
+        y > 0 &&
+        y + label.element.offsetHeight < height;
       label.element.style.transform = `translate(-50%, 0) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
       const fade = label.key === "cluster" ? 1 - smoothstep(0, 0.4, reveal) : 1;
       label.element.style.opacity = visible ? String((0.35 + node.level * 0.65) * fade) : "0";
@@ -397,8 +409,7 @@ export function createDossierScene(options: SceneOptions): DossierScene {
       const x = (scratch.x * 0.5 + 0.5) * width;
       const y = (scratch.y * -0.5 + 0.5) * height;
       label.element.style.transform = `translate(-50%, -100%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
-      // Too tight to read on a phone band: the trays carry the namespaces.
-      label.element.style.opacity = compact ? "0" : String(smoothstep(0.6, 1, reveal));
+      label.element.style.opacity = String(smoothstep(0.6, 1, reveal));
     }
   };
 

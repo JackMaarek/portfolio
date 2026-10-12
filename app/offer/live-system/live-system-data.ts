@@ -111,6 +111,36 @@ export type Phase = (typeof phases)[number];
 // Phase from which a node is traced: the first day whose section includes it.
 export const litAt = (label: string) => phases.findIndex((phase) => phase.focus.includes(label));
 
+// Pen speed of the traced route, in scene units per millisecond.
+const traceSpeed = 0.2;
+
+// Route segments in delivery order. A segment is traced on the phase that
+// lights its second node; within a phase segments are chained, each one
+// starting when the previous one ends, so the route reads as one stroke.
+export const routeSegments = systemNodes.slice(1).map((node, index) => {
+  const from = systemNodes[index];
+  return {
+    from,
+    to: node,
+    tracedAt: Math.max(litAt(from.label), litAt(node.label)),
+    duration: Math.round(Math.hypot(node.x - from.x, node.y - from.y) / traceSpeed),
+    delay: 0,
+  };
+});
+routeSegments.forEach((segment, index) => {
+  const previous = routeSegments[index - 1];
+  if (previous && previous.tracedAt === segment.tracedAt) {
+    segment.delay = previous.delay + previous.duration;
+  }
+});
+
+// When the pen reaches each node: the node lights up at that moment.
+export const nodeArrival = Object.fromEntries(
+  routeSegments
+    .filter((segment) => segment.tracedAt === litAt(segment.to.label))
+    .map((segment) => [segment.to.label, segment.delay + segment.duration]),
+) as Record<string, number>;
+
 export const routePath = systemNodes
   .map((node, index) => `${index === 0 ? "M" : "L"} ${node.x} ${node.y}`)
   .join(" ");

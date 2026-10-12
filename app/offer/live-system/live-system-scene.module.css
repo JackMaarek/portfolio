@@ -1,7 +1,6 @@
 /* Same drawing grammar as the offer hero topology (.offer-topology-*). */
 .scene {
   --scene-ease: 700ms cubic-bezier(.2, .8, .2, 1);
-  --trace-ease: 1100ms cubic-bezier(.34, .88, .36, 1);
   display: block;
   width: 100%;
   height: 100%;
@@ -39,7 +38,10 @@
   fill: rgba(239, 237, 245, .85);
 }
 
-/* Real route, drawn section by section as each day traces it. */
+/* Real route, drawn section by section as each day traces it. Within a
+   day the segments are chained at a constant (linear) speed, each one
+   waiting for the previous one, so the pen draws a single stroke. Going
+   back up, the route retracts at once. */
 .traced {
   stroke: rgba(255, 189, 116, .9);
   stroke-width: 1.4;
@@ -47,11 +49,12 @@
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   filter: url("#live-system-glow");
-  transition: stroke-dashoffset var(--trace-ease);
+  transition: stroke-dashoffset 500ms ease-in;
 }
 
 .traced[data-traced="true"] {
   stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--trace-duration, 700ms) linear var(--trace-delay, 0ms);
 }
 
 .loop {
@@ -68,9 +71,11 @@
 }
 
 .halo {
-  fill: none;
+  fill: transparent;
+  stroke: transparent;
   transform-box: fill-box;
   transform-origin: center;
+  transition: fill var(--scene-ease), stroke var(--scene-ease);
 }
 
 .ring {
@@ -95,6 +100,21 @@
 .node[data-traced="true"] .ring { stroke: var(--acid); stroke-width: 1.4; }
 .node[data-traced="true"] .core { fill: var(--acid); }
 
+/* A node lights up when the pen reaches it, not when its day starts. */
+.node[data-traced="true"] .halo,
+.node[data-traced="true"] .ring,
+.node[data-traced="true"] .core,
+.node[data-traced="true"] .label rect,
+.node[data-traced="true"] .label text,
+.node[data-traced="true"] .badge[data-state="finding"] {
+  transition-duration: 300ms;
+  transition-delay: var(--arrival, 0ms);
+}
+
+.node[data-traced="true"] .halo {
+  animation-delay: var(--arrival, 0ms);
+}
+
 /* Node names only appear once J1 has mapped the chain. */
 .label {
   opacity: 0;
@@ -109,6 +129,7 @@
   fill: rgba(11, 11, 13, .72);
   stroke: rgba(239, 237, 245, .12);
   stroke-width: .6;
+  transition: stroke var(--scene-ease);
 }
 
 .label text {

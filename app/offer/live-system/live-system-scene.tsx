@@ -1,4 +1,5 @@
-import { litAt, nodeIssues, routePath, scene, systemNodes } from "./live-system-data";
+import type { CSSProperties } from "react";
+import { litAt, nodeArrival, nodeIssues, routePath, routeSegments, scene, systemNodes } from "./live-system-data";
 import { dayTags, feedbackLoop } from "./live-system-paths";
 import { SceneHypotheses } from "./scene-hypotheses";
 import styles from "./live-system-scene.module.css";
@@ -46,24 +47,21 @@ export function LiveSystemScene({ phase, lead }: LiveSystemSceneProps) {
 
       <SceneHypotheses phase={phase} />
 
-      {systemNodes.slice(1).map((node, index) => {
-        const previous = systemNodes[index];
-        const traced = isTraced(previous.label) && isTraced(node.label);
-        return (
-          <g key={`${previous.label}-${node.label}`}>
-            <line className={styles.candidate} x1={previous.x} y1={previous.y} x2={node.x} y2={node.y} />
-            <line
-              className={styles.traced}
-              data-traced={traced}
-              x1={previous.x}
-              y1={previous.y}
-              x2={node.x}
-              y2={node.y}
-              pathLength={1}
-            />
-          </g>
-        );
-      })}
+      {routeSegments.map(({ from, to, delay, duration }) => (
+        <g key={`${from.label}-${to.label}`}>
+          <line className={styles.candidate} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />
+          <line
+            className={styles.traced}
+            data-traced={isTraced(from.label) && isTraced(to.label)}
+            style={{ "--trace-delay": `${delay}ms`, "--trace-duration": `${duration}ms` } as CSSProperties}
+            x1={from.x}
+            y1={from.y}
+            x2={to.x}
+            y2={to.y}
+            pathLength={1}
+          />
+        </g>
+      ))}
 
       <path className={styles.loop} data-traced={phase >= 4} d={feedbackLoop} pathLength={1} />
 
@@ -72,6 +70,7 @@ export function LiveSystemScene({ phase, lead }: LiveSystemSceneProps) {
           key={node.label}
           className={styles.node}
           data-traced={isTraced(node.label)}
+          style={{ "--arrival": `${nodeArrival[node.label] ?? 0}ms` } as CSSProperties}
           transform={`translate(${node.x} ${node.y})`}
         >
           <circle className={styles.halo} r="10" />

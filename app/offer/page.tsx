@@ -33,5 +33,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function OfferPage() {
-  return <OfferPageBody layout="dossier" />;
+  return <OfferPageBody />;
 }

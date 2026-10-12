@@ -1,4 +1,4 @@
-// Delivery chain drawn in the offer hero, reused by the live system scene.
+// Delivery chain drawn in the offer hero.
 const nodes = [
   { label: "Code", x: 150, y: 78, width: 64, dx: 28, dy: -22 },
   { label: "CI", x: 220, y: 220, width: 44, dx: 32, dy: 8 },

@@ -1,16 +1,11 @@
-// Shared /offer body. /offer uses the "dossier" layout: the hero is followed
-// by the 3D engineering dossier. "trace" (noindex preview) pins the live
-// system scene behind the hero instead. Both scenes carry the problem, the
-// five days and the deliverables, then the sections below follow.
+// /offer body: the hero, then the 3D engineering dossier, which carries the
+// problem, the five days and the deliverables, then the sections below.
 import { BookingLink } from "../booking-link";
 import { OfferMotion } from "../offer-motion";
 import { SiteHeader } from "../site-header";
 import { Dossier } from "./dossier/dossier";
 import { heroTopology } from "./hero-topology";
-import { LiveSystem } from "./live-system/live-system";
 import { recommendationSteps } from "./offer-content";
-
-export type OfferLayout = "trace" | "dossier";
 
 const decisionOutcomes = [
   {
@@ -299,7 +294,7 @@ function OfferTopology() {
   );
 }
 
-export function OfferPageBody({ layout }: { layout: OfferLayout }) {
+export function OfferPageBody() {
   return (
     <div className="offer-shell">
       <OfferMotion />
@@ -310,29 +305,15 @@ export function OfferPageBody({ layout }: { layout: OfferLayout }) {
       <SiteHeader page="offer" />
 
       <main id="offer-main" className="page-main" tabIndex={-1}>
-        {layout === "trace" ? (
-          <LiveSystem
-            hero={
-              <section className="offer-hero offer-hero-over-scene" id="top">
-                <OfferHeroCopy />
-              </section>
-            }
-          />
-        ) : (
-          <>
-            <section className="offer-hero" id="top">
-              <div className="hero-grid" aria-hidden="true" />
-              <OfferTopology />
-              <OfferHeroCopy />
-            </section>
-            <Dossier />
-          </>
-        )}
+        <section className="offer-hero" id="top">
+          <div className="hero-grid" aria-hidden="true" />
+          <OfferTopology />
+          <OfferHeroCopy />
+        </section>
+        <Dossier />
 
       {/* The dossier's last sheet already lists what the client gets. */}
-      <OfferResult
-        label={layout === "trace" ? "03 / Ce que vous obtenez" : "03 / Le résultat attendu"}
-      />
+      <OfferResult label="03 / Le résultat attendu" />
 
       <OfferFormats />
 

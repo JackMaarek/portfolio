@@ -124,7 +124,7 @@ test("offer page exposes the commercial diagnostic", async () => {
   ]);
   const offer = `${offerPage}${offerBody}${offerContent}`;
 
-  assert.ok(offerPage.includes('<OfferPageBody layout="dossier" />'));
+  assert.ok(offerPage.includes("<OfferPageBody />"));
 
   assert.ok(offer.includes("Diagnostic CI/CD & Observabilité"));
   assert.ok(offer.includes("Vos déploiements"));
@@ -154,93 +154,6 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(header.includes('offerHref: "/#projects"'));
   assert.ok(!`${offer}${header}`.includes('href="/offre"'));
   assert.ok(!offer.includes("offre-content"));
-});
-
-test("live system preview reuses real offer content", async () => {
-  const [preview, data, caption, scene, phaseHook, content] = await Promise.all([
-    readFile(new URL("app/offer/trace-preview/page.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/live-system/live-system-data.ts", projectRoot), "utf8"),
-    readFile(new URL("app/offer/live-system/live-system-caption.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/live-system/live-system-scene.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/live-system/use-scroll-phase.ts", projectRoot), "utf8"),
-    readFile(new URL("app/offer/offer-content.ts", projectRoot), "utf8"),
-  ]);
-
-  assert.match(preview, /index: false/);
-  assert.match(preview, /follow: false/);
-  assert.ok(preview.includes('<OfferPageBody layout="trace" />'));
-  assert.match(data, /from "\.\.\/offer-content"/);
-  assert.match(content, /export const processSteps/);
-  assert.match(content, /export const problemHeading/);
-  assert.match(data, /from "\.\.\/hero-topology"/);
-  for (const day of ["J1", "J2", "J3", "J4", "J5"]) {
-    assert.ok(data.includes(`${day}: [`), day);
-  }
-  for (const issue of ["Déploiements risqués", "Rollbacks flous", "Environnements divergents", "Alertes inutiles"]) {
-    assert.ok(data.includes(`"${issue}"`), issue);
-  }
-  const paths = await readFile(new URL("app/offer/live-system/live-system-paths.ts", projectRoot), "utf8");
-  assert.match(paths, /export const candidateLinks/);
-  assert.match(paths, /export const deadEnds/);
-  assert.match(paths, /export const feedbackLoop/);
-  assert.match(caption, /Constats/);
-  assert.match(caption, /placement="offer-trace"/);
-  assert.match(scene, /aria-hidden="true"/);
-  assert.match(phaseHook, /prefers-reduced-motion: reduce/);
-  assert.match(phaseHook, /passive: true/);
-});
-
-test("trace layout hands the hero topology over to the live system scene", async () => {
-  const [body, liveSystem, scene, data] = await Promise.all([
-    readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/live-system/live-system.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/live-system/live-system-scene.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/offer/live-system/live-system-data.ts", projectRoot), "utf8"),
-  ]);
-
-  assert.match(body, /<LiveSystem\s+hero=\{/);
-  // The scope is a note under the formats.
-  assert.match(body, /className="offer-scope-note"/);
-  // The hero copy keeps its anchor target, now pointing at section 02 in the scene.
-  assert.match(body, /href="#offer-content"/);
-  assert.match(liveSystem, /id="offer-content"/);
-  // Behind the hero the scene shows the restored route, without findings.
-  assert.match(liveSystem, /phase=\{inLead \? restoredPhase : phase\}/);
-  assert.match(scene, /data-lead=\{lead\}/);
-  // The scene is shorter, weighted per phase and can be navigated or skipped.
-  assert.match(data, /const dayWeights: Record<string, number> = \{ J1: 0\.6, J5: 0\.8 \}/);
-  assert.match(liveSystem, /useScrollPhase\(phaseWeights\)/);
-  assert.match(liveSystem, /onClick=\{\(\) => scrollToPhase\(index \+ 1\)\}/);
-  assert.match(liveSystem, /aria-current=\{phase === index \+ 1 \? "step" : undefined\}/);
-  assert.match(liveSystem, /href="#formats"/);
-  assert.match(liveSystem, /<div className=\{styles\.exit\} aria-hidden="true" \/>/);
-  // Keyboard users meet the day navigation before the captions' booking link.
-  assert.ok(liveSystem.indexOf("<nav") < liveSystem.indexOf("<LiveSystemCaption"));
-  // Within a day the route is drawn as one stroke: segments are chained.
-  assert.match(data, /segment\.delay = previous\.delay \+ previous\.duration/);
-  assert.match(scene, /"--trace-delay": `\$\{delay\}ms`/);
-  assert.match(scene, /"--arrival": `\$\{nodeArrival\[node\.label\] \?\? 0\}ms`/);
-  // Each finding badge only shows with the caption that lists it.
-  assert.match(scene, /data-state=\{badgeState\(node\.label\)\}/);
-  assert.match(scene, /litAt\(label\) === phase \? "finding" : "hidden"/);
-  assert.match(data, /kicker: `\$\{diagnosticName\} · \$\{step\.day\}`/);
-});
-
-test("live system scene stays readable by assistive technologies", async () => {
-  const [stageStyles, captionStyles, sceneStyles] = await Promise.all([
-    readFile(new URL("app/offer/live-system/live-system.module.css", projectRoot), "utf8"),
-    readFile(new URL("app/offer/live-system/live-system-caption.module.css", projectRoot), "utf8"),
-    readFile(new URL("app/offer/live-system/live-system-scene.module.css", projectRoot), "utf8"),
-  ]);
-
-  // Hidden phases fade out but stay in the accessibility tree.
-  assert.ok(!stageStyles.includes("visibility: hidden"));
-  assert.ok(!captionStyles.includes("visibility: hidden"));
-  // The exit into the light bands is a long eased gradient, not a hard cut.
-  assert.match(stageStyles, /\.exit \{\s+position: relative;\s+height: 50svh;/);
-  assert.match(stageStyles, /mask-image: linear-gradient\(180deg, transparent 35%, #000 100%\)/);
-  // Labels grow on phones, where the scene is drawn below 1:1.
-  assert.match(sceneStyles, /@media \(max-width: 980px\) \{\s+\.labelBody \{\s+transform: scale\(1\.3\)/);
 });
 
 test("offer dossier is built on the offer copy and loads its scene lazily", async () => {

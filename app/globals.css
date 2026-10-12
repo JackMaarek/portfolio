@@ -1227,18 +1227,6 @@ summary:focus-visible,
     var(--ink);
 }
 
-/* Trace layout: the hero copy scrolls over the pinned live system scene,
-   which draws the background and the topology. */
-.offer-hero-over-scene {
-  border-bottom: 0;
-  background: transparent;
-}
-
-/* The topology takes the right half: the foot joins the copy column. */
-.offer-hero-over-scene .offer-hero-foot {
-  position: static;
-}
-
 .offer-hero-copy {
   position: relative;
   z-index: 3;

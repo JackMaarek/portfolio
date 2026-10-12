@@ -9,8 +9,9 @@ import {
 } from "@fiddle-digital/string-tune";
 import { Accent } from "./accent";
 import { BookingLink } from "./booking-link";
-import { CareerStack } from "./career/career-stack";
-import { about, capabilities, experiences, project, results } from "./home-content";
+import { CareerColumn } from "./career/career-column";
+import { PlatformBreakdown } from "./career/platform-breakdown";
+import { about, capabilities, experiences, parcours, project, results } from "./home-content";
 import { SiteHeader } from "./site-header";
 
 const tune = (value: string, attributes: Record<string, string> = {}) =>
@@ -312,14 +313,14 @@ function TopologyCanvas() {
   return <canvas ref={canvasRef} className="topology" aria-hidden="true" />;
 }
 
-// "classic" is the current home; "stack" (noindex preview) replaces the
-// about, expertise, parcours, project and impact sections with the career
-// stack scene.
-export type HomeLayout = "classic" | "stack";
+// "classic" is the current home; "parcours" (noindex preview) presents the
+// missions around a column and k8s-platform as an exploded view, with the
+// impact figures on the mission they come from.
+export type HomeLayout = "classic" | "parcours";
 
 const sectionNumbers: Record<HomeLayout, { bridge: string; contact: string }> = {
   classic: { bridge: "06", contact: "07" },
-  stack: { bridge: "02", contact: "03" },
+  parcours: { bridge: "05", contact: "06" },
 };
 
 export function Portfolio({ layout }: { layout: HomeLayout }) {
@@ -445,8 +446,6 @@ export function Portfolio({ layout }: { layout: HomeLayout }) {
         </div>
         </section>
 
-      {layout === "classic" ? (
-        <>
         <section
           id="main-content"
           className="manifesto scroll-scene"
@@ -486,17 +485,16 @@ export function Portfolio({ layout }: { layout: HomeLayout }) {
           </div>
         </section>
 
+      {layout === "classic" ? (
+        <>
         <section id="experience" className="experience">
           <div className="section-heading experience-heading" data-reveal>
             <p className="section-label">03 / Parcours</p>
             <h2>
-              Du back-end aux plateformes<br />
-              cloud industrialisées.
+              {parcours.title}<br />
+              {parcours.accent}
             </h2>
-            <p className="experience-intro">
-              De 2018 à aujourd’hui, du développement back-end aux enjeux de
-              plateforme, dans des secteurs où la rigueur compte.
-            </p>
+            <p className="experience-intro">{parcours.intro}</p>
           </div>
           <div className="experience-panel" data-reveal>
             <div
@@ -627,7 +625,10 @@ export function Portfolio({ layout }: { layout: HomeLayout }) {
         </section>
         </>
       ) : (
-        <CareerStack />
+        <>
+          <CareerColumn label="03 / Parcours" />
+          <PlatformBreakdown />
+        </>
       )}
 
       <section id="offer-bridge" className="offer-bridge" aria-labelledby="offer-bridge-title">

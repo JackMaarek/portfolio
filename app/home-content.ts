@@ -107,6 +107,13 @@ export const capabilities = [
   },
 ];
 
+export const parcours = {
+  title: "Du back-end aux plateformes",
+  accent: "cloud industrialisées.",
+  intro:
+    "De 2018 à aujourd’hui, du développement back-end aux enjeux de plateforme, dans des secteurs où la rigueur compte.",
+};
+
 export const project = {
   label: "04 / Projet personnel",
   kicker: "PodYourLife présente",
@@ -118,6 +125,15 @@ export const project = {
   ],
   repository: "https://github.com/PodYourLife/k8s-platform",
   cli: "CLI Go · platform-bot",
+  // The platform's layers, bottom to top, as the exploded view shows them.
+  layers: [
+    { name: "AWS · Terraform · OIDC", note: "Infrastructure décrite en code", described: true },
+    { name: "EKS", note: "Kubernetes" },
+    { name: "ArgoCD · Helm", note: "Déploiements reproductibles" },
+    { name: "Istio mTLS · Kyverno · External Secrets Operator", note: "mTLS strict, politiques d’admission, secrets externalisés" },
+    { name: "Prometheus · Grafana · Loki", note: "Observabilité" },
+  ],
+  bot: { name: "platform-bot", note: "Prépare et configure les environnements" },
 };
 
 // Measured on the Padok missions (see experiences).

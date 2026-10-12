@@ -1,0 +1,248 @@
+/* k8s-platform exploded view: isometric layers that separate by
+   var(--explode) (0 assembled, 1 exploded). In the flow on phones and
+   tablets, pinned with the copy and the legend on wide screens. */
+.project {
+  --explode: 0;
+  --gap: 44px;
+  position: relative;
+  background:
+    linear-gradient(rgba(239, 237, 245, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(239, 237, 245, .045) 1px, transparent 1px),
+    var(--ink);
+  background-size: 64px 64px;
+  color: var(--paper);
+}
+
+.stage {
+  display: grid;
+  gap: 24px;
+  padding: 88px var(--page-gutter) 72px;
+}
+
+.kicker {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: .86rem;
+  font-weight: 700;
+}
+
+.copy h2 {
+  margin: 8px 0 0;
+  font-size: clamp(2.4rem, 3.4vw, 3.4rem);
+  font-weight: 500;
+  letter-spacing: -.05em;
+  line-height: 1;
+}
+
+.lead {
+  margin: 18px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.body {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: .94rem;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: .84rem;
+  font-weight: 700;
+}
+
+.github {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 3px;
+  background: var(--acid);
+  color: var(--acid-readable);
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform 180ms ease;
+}
+
+.github:active {
+  transform: scale(.985);
+}
+
+.github:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+
+/* Isometric view: each plate rises by its index times the gap. */
+.view {
+  display: grid;
+  place-items: center;
+  height: 400px;
+  perspective: 2400px;
+}
+
+.layers {
+  position: relative;
+  width: 230px;
+  height: 160px;
+  transform: rotateX(58deg) rotateZ(-38deg);
+  transform-style: preserve-3d;
+}
+
+.plate {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-content: center;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid rgba(239, 237, 245, .35);
+  border-radius: 4px;
+  background: rgba(24, 23, 29, .92);
+  transform: translateZ(calc(var(--i) * (6px + var(--explode) * var(--gap))));
+  transition: border-color 300ms ease;
+}
+
+.plate i {
+  display: block;
+  height: 22px;
+  border: 1px solid rgba(239, 237, 245, .18);
+  border-radius: 2px;
+  background: rgba(239, 237, 245, .05);
+  transition: border-color 300ms ease, background-color 300ms ease;
+}
+
+.plate span {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  padding: 3px 7px;
+  border: 1px solid rgba(239, 237, 245, .35);
+  border-radius: 3px 0 3px 0;
+  background: var(--ink);
+  color: var(--muted);
+  font-size: .75rem;
+  font-weight: 700;
+}
+
+/* The infrastructure layer is described in code: a blueprint outline. */
+.plate[data-described="true"] {
+  border: 1px dashed rgba(171, 162, 255, .7);
+  background: transparent;
+}
+
+.plate[data-described="true"] i {
+  border-color: rgba(171, 162, 255, .35);
+  background: none;
+}
+
+.plate[data-current="true"] {
+  border-color: rgba(255, 189, 116, .85);
+}
+
+.plate[data-current="true"] i {
+  border-color: rgba(255, 189, 116, .55);
+  background: rgba(255, 189, 116, .08);
+}
+
+.plate[data-current="true"] span {
+  border-color: rgba(255, 189, 116, .85);
+  color: var(--acid);
+}
+
+.legend {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legend li {
+  display: grid;
+  grid-template-columns: 2.4em 1fr;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .92rem;
+  line-height: 1.35;
+  transition: color 300ms ease;
+}
+
+.legend b {
+  color: var(--paper);
+  font-size: .8rem;
+  transition: color 300ms ease;
+}
+
+.legend small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.legend li[data-current="true"] {
+  color: var(--paper);
+}
+
+.legend li[data-current="true"] b {
+  color: var(--acid);
+}
+
+/* Wide screens: pinned while the layers separate, are named in turn and
+   close back. Mirrors pinnedQuery in platform-breakdown.tsx. */
+@media (min-width: 1000px) and (min-height: 620px) {
+  .project {
+    --gap: 70px;
+    height: 240svh;
+  }
+
+  .stage {
+    position: sticky;
+    top: 0;
+    grid-template-columns: minmax(0, 26rem) minmax(0, 1fr) minmax(0, 17rem);
+    align-items: center;
+    gap: 32px;
+    height: 100svh;
+    padding: 72px var(--page-gutter) 48px;
+    overflow: hidden;
+  }
+
+  .view {
+    height: 100%;
+  }
+
+  .layers {
+    width: 340px;
+    height: 230px;
+  }
+
+  .plate {
+    gap: 10px;
+    padding: 18px;
+  }
+
+  .plate i {
+    height: 34px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate,
+  .plate i,
+  .legend li,
+  .legend b,
+  .github {
+    transition: none;
+  }
+}

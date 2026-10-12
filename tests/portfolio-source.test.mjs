@@ -180,18 +180,21 @@ test("offer dossier is built on the offer copy and loads its scene lazily", asyn
   assert.match(loop, /"webglcontextlost"/);
 });
 
-test("home preview renders the career stack from the home copy", async () => {
-  const [preview, home, stack] = await Promise.all([
+test("home preview presents the parcours from the home copy without WebGL", async () => {
+  const [preview, home, column, breakdown] = await Promise.all([
     readFile(new URL("app/home-preview/page.tsx", projectRoot), "utf8"),
     readFile(new URL("app/page.tsx", projectRoot), "utf8"),
-    readFile(new URL("app/career/career-stack.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/career/career-column.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/career/platform-breakdown.tsx", projectRoot), "utf8"),
   ]);
 
   // Noindex test route; / keeps the classic layout until the review.
   assert.match(preview, /robots: \{\s+index: false,\s+follow: false,/);
-  assert.ok(preview.includes('<Portfolio layout="stack" />'));
+  assert.ok(preview.includes('<Portfolio layout="parcours" />'));
   assert.ok(home.includes('<Portfolio layout="classic" />'));
-  // Copy comes from the home content; the scene is a lazy chunk.
-  assert.match(stack, /from "\.\.\/home-content"/);
-  assert.match(stack, /import\("\.\/stack-scene"\)/);
+  // Copy comes from the home content; both scenes are CSS 3D, not three.js.
+  for (const source of [column, breakdown]) {
+    assert.match(source, /from "\.\.\/home-content"/);
+    assert.ok(!source.includes("three"));
+  }
 });

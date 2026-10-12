@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Portfolio } from "../portfolio";
 
-// Test route: the full home page with the career stack scene, to review it
-// before it replaces the classic sections on /. Not linked from / or /offer
-// and never indexed.
+// Test route: the full home page with the parcours column and the
+// k8s-platform exploded view, to review before they replace the classic
+// sections on /. Not linked from / or /offer and never indexed.
 export const metadata: Metadata = {
   title: "Parcours — Jacques Maarek",
   robots: {
@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePreviewPage() {
-  return <Portfolio layout="stack" />;
+  return <Portfolio layout="parcours" />;
 }

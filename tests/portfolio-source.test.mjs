@@ -225,6 +225,7 @@ test("trace layout hands the hero topology over to the live system scene", async
   assert.match(liveSystem, /onClick=\{\(\) => scrollToPhase\(index \+ 1\)\}/);
   assert.match(liveSystem, /aria-current=\{phase === index \+ 1 \? "step" : undefined\}/);
   assert.match(liveSystem, /href="#formats"/);
+  assert.match(liveSystem, /<div className=\{styles\.exit\} aria-hidden="true" \/>/);
   // Keyboard users meet the day navigation before the captions' booking link.
   assert.ok(liveSystem.indexOf("<nav") < liveSystem.indexOf("<LiveSystemCaption"));
   // Within a day the route is drawn as one stroke: segments are chained.
@@ -247,6 +248,9 @@ test("live system scene stays readable by assistive technologies", async () => {
   // Hidden phases fade out but stay in the accessibility tree.
   assert.ok(!stageStyles.includes("visibility: hidden"));
   assert.ok(!captionStyles.includes("visibility: hidden"));
+  // The exit into the light bands is a long eased gradient, not a hard cut.
+  assert.match(stageStyles, /\.exit \{\s+position: relative;\s+height: 50svh;/);
+  assert.match(stageStyles, /mask-image: linear-gradient\(180deg, transparent 35%, #000 100%\)/);
   // Labels grow on phones, where the scene is drawn below 1:1.
   assert.match(sceneStyles, /@media \(max-width: 980px\) \{\s+\.labelBody \{\s+transform: scale\(1\.3\)/);
 });

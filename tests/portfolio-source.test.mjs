@@ -157,22 +157,23 @@ test("offer page exposes the commercial diagnostic", async () => {
 });
 
 test("offer dossier is built on the offer copy and loads its scene lazily", async () => {
-  const [dossier, content, scene] = await Promise.all([
+  const [dossier, content, loop, hook] = await Promise.all([
     readFile(new URL("app/offer/dossier/dossier.tsx", projectRoot), "utf8"),
     readFile(new URL("app/offer/dossier/dossier-content.ts", projectRoot), "utf8"),
-    readFile(new URL("app/offer/dossier/dossier-scene.ts", projectRoot), "utf8"),
+    readFile(new URL("app/scene/loop.ts", projectRoot), "utf8"),
+    readFile(new URL("app/scene/use-scroll-scene.ts", projectRoot), "utf8"),
   ]);
 
   // Day copy comes from the offer content, not a second source.
   assert.match(content, /from "\.\.\/offer-content"/);
   assert.match(content, /title: step\(day\)\.title/);
-  // The 3D scene loads after the text and stays out of the accessibility tree.
+  // The 3D scene is its own chunk and stays out of the accessibility tree.
   assert.match(dossier, /import\("\.\/dossier-scene"\)/);
   assert.match(dossier, /data-scene=\{sceneState\} aria-hidden="true"/);
   assert.match(dossier, /placement="offer-dossier"/);
-  // Rendering pauses off-screen and falls back to text if the GPU drops it.
-  assert.match(scene, /setActive\(value\)/);
-  assert.match(scene, /"webglcontextlost"/);
-  // Three.js only loads once the dossier nears the viewport.
-  assert.match(dossier, /const loadScene = \(\) =>/);
+  // The shared scene loads near the viewport, pauses off-screen and falls
+  // back to text if the GPU drops it.
+  assert.match(hook, /rootMargin: "50% 0px"/);
+  assert.match(loop, /setActive\(value: boolean\)/);
+  assert.match(loop, /"webglcontextlost"/);
 });

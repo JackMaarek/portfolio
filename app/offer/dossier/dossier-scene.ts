@@ -18,7 +18,6 @@ import {
   InstancedMesh,
   LineBasicMaterial,
   LineSegments,
-  type Material,
   MathUtils,
   Matrix4,
   Mesh,
@@ -32,14 +31,15 @@ import {
   SphereGeometry,
   TubeGeometry,
   Vector3,
-  WebGLRenderer,
 } from "three";
+import { createFitter, fitBox as box, type FitPoint } from "../../scene/fit";
+import { createLabelPlacer, createLabels, followLabel, type LabelClassNames } from "../../scene/labels";
+import { createLoop } from "../../scene/loop";
+import type { SceneFrame, SceneParts, ScrollScene } from "../../scene/use-scroll-scene";
 import type { NodeKey } from "./dossier-content";
 import { createCluster } from "./scene/cluster";
 import {
-  createLabels,
   createRoute,
-  followLabel,
   layout,
   order,
   palette,
@@ -49,8 +49,6 @@ import {
   type Feature,
   type FrameState,
   type Kit,
-  type LabelClassNames,
-  type LabelSpot,
 } from "./scene/kit";
 import { createMatrix, matrixBounds, matrixCells } from "./scene/matrix";
 import { createPipeline } from "./scene/pipeline";
@@ -73,40 +71,23 @@ const signalPackets = 7;
 
 export type ScenePage = { focus: NodeKey[] };
 
-export type SceneOptions = {
-  canvas: HTMLCanvasElement;
-  labelLayer: HTMLElement;
+export type SceneOptions = SceneParts & {
   pages: ScenePage[];
   nodes: { key: NodeKey; label: string; examples: string }[];
   findings: Partial<Record<NodeKey, string>>;
   quickWins: string;
-  reducedMotion: boolean;
   classNames: LabelClassNames;
-  onContextLost: () => void;
 };
 
-// Free part of the canvas, in CSS pixels: what the dossier sheet, the page
-// index and the top bar leave visible. `band` is the phone/tablet layout.
-export type SceneFrame = { band: boolean; left: number; right: number; top: number };
-
-export type DossierScene = {
-  setProgress: (progress: number) => void;
-  setFrame: (frame: SceneFrame) => void;
-  setActive: (active: boolean) => void;
-  resize: () => void;
-  dispose: () => void;
-};
-
-export function createDossierScene(options: SceneOptions): DossierScene {
+export function createDossierScene(options: SceneOptions): ScrollScene {
   const { canvas, labelLayer, pages, reducedMotion, classNames } = options;
-  const coarse = window.matchMedia("(pointer: coarse)").matches;
-  const detail = (fine: number, rough: number) => (coarse ? rough : fine);
-
-  const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
-  // Pixel ratio starts capped and only ever steps down if frames run long.
-  let pixelRatio = Math.min(window.devicePixelRatio, coarse ? 1.5 : 2);
-  renderer.setPixelRatio(pixelRatio);
-  renderer.setClearColor(palette.ink);
+  const loop = createLoop({
+    canvas,
+    clearColor: palette.ink,
+    reducedMotion,
+    onContextLost: options.onContextLost,
+  });
+  const { renderer, detail } = loop;
 
   const scene = new Scene();
   const fog = new Fog(palette.ink, 24, 56);
@@ -248,8 +229,6 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   let free: SceneFrame = { band: false, left: 0, right: 0, top: 0 };
   // Distance scale per page, fitted to the free part of the canvas.
   const fit = framings.map(() => 1);
-  // The loop only runs once the page reports the scene in view.
-  let active = false;
   const cameraPosition = new Vector3();
   const cameraTarget = new Vector3();
   const desiredPosition = new Vector3();
@@ -261,9 +240,7 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   const dummy = new Object3D();
   const packetTs = new Array<number>(routePackets).fill(0);
   let initialised = false;
-  let dirty = true;
   let signalShown = 0;
-  let settling = false;
 
   // Base framing of a page: target and the direction the camera looks from.
   const baseFraming = (index: number, offset: Vector3, target: Vector3) => {
@@ -284,7 +261,6 @@ export function createDossierScene(options: SceneOptions): DossierScene {
   };
 
   // What each page must show, with the room its label needs in pixels.
-  type FitPoint = { at: Vector3; padX: number; padTop: number; padBottom: number };
   const nodePoints = (keys: NodeKey[]): FitPoint[] =>
     keys.flatMap((nodeKey) => {
       const label = nodeLabels.find((entry) => entry.key === nodeKey)!.label;
@@ -296,12 +272,6 @@ export function createDossierScene(options: SceneOptions): DossierScene {
           : { at: label.anchor, padX: label.width / 2 + 6, padTop: 0, padBottom: room },
       ];
     });
-  const box = (x: number, y: number, z: number, padX = 12, padTop = 12, padBottom = 12): FitPoint => ({
-    at: new Vector3(x, y, z),
-    padX,
-    padTop,
-    padBottom,
-  });
   const { cluster: c, observability: o, registry: r } = layout;
   const mustSee = (index: number): FitPoint[] => {
     switch (index) {
@@ -341,26 +311,9 @@ export function createDossierScene(options: SceneOptions): DossierScene {
 
   // Closest camera distance at which every must-see point and its label
   // fit inside the free part of the frame; recomputed on every resize.
-  const fitScratch = new Vector3();
+  const closestScale = createFitter(camera);
   const fitOffset = new Vector3();
   const fitTarget = new Vector3();
-  const fitsAt = (points: FitPoint[], scale: number, topLimit: number) => {
-    camera.position.copy(fitOffset).multiplyScalar(scale).add(fitTarget);
-    camera.lookAt(fitTarget);
-    camera.updateMatrixWorld();
-    return points.every(({ at, padX, padTop, padBottom }) => {
-      fitScratch.copy(at).project(camera);
-      const x = (fitScratch.x * 0.5 + 0.5) * width;
-      const y = (fitScratch.y * -0.5 + 0.5) * height;
-      return (
-        fitScratch.z < 1 &&
-        x - padX >= free.left + 8 &&
-        x + padX <= width - free.right - 8 &&
-        y - padTop >= topLimit &&
-        y + padBottom <= height - 8
-      );
-    });
-  };
   // Optical centre: the middle of the free part of the frame. On the cover
   // it also sits below the top bar; that shift eases out with the scroll.
   let appliedShift = Number.NaN;
@@ -379,20 +332,16 @@ export function createDossierScene(options: SceneOptions): DossierScene {
       centreOptics(index === 0 ? 1 : 0);
       baseFraming(index, fitOffset, fitTarget);
       // Only the cover shares the first viewport with the top bar.
-      const topLimit = index === 0 ? free.top : 8;
-      const all = mustSee(index);
-      // Closest scale at which `points` fit, or the far limit if none does.
-      const closest = (points: FitPoint[]) => {
-        let low = 0.2;
-        let high = 4;
-        if (!fitsAt(points, high, topLimit)) return high;
-        for (let step = 0; step < 18; step += 1) {
-          const middle = (low + high) / 2;
-          if (fitsAt(points, middle, topLimit)) high = middle;
-          else low = middle;
-        }
-        return high;
+      const bounds = {
+        width,
+        height,
+        left: free.left + 8,
+        right: width - free.right - 8,
+        top: index === 0 ? free.top : 8,
+        bottom: height - 8,
       };
+      const all = mustSee(index);
+      const closest = (points: FitPoint[]) => closestScale(points, fitOffset, fitTarget, bounds);
       // Objects always fit; labels only earn extra distance while it stays
       // modest; past that a few labels give way rather than the scene shrink.
       const core = closest(all.map((point) => ({ ...point, padX: Math.min(point.padX, 28), padBottom: 10 })));
@@ -423,43 +372,12 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     camera.aspect = width / height;
     labels.measure();
     fitFramings();
-    dirty = true;
+    loop.invalidate();
   };
 
   const allLitPage = () => pageIndex === 0 || pageIndex === pages.length - 1;
 
-  // Where a label may go, in its order of preference: its first spot, its
-  // fallback anchor above, then its other spots; only spots that fit.
-  const placeLabel = (label: (typeof labels.labels)[number]) => {
-    const tryAnchor = (anchor: Vector3, side: LabelSpot) => {
-      scratch.copy(anchor).project(camera);
-      const x = (scratch.x * 0.5 + 0.5) * width;
-      const y = (scratch.y * -0.5 + 0.5) * height;
-      const left =
-        side === "right" ? x + 12 : side === "left" ? x - label.width - 12 : x - label.width / 2;
-      const top =
-        side === "above" ? y - label.height : side === "below" ? y : y - label.height / 2;
-      const fits =
-        scratch.z < 1 &&
-        left > free.left + 4 &&
-        left + label.width < width - free.right - 4 &&
-        top > 4 &&
-        top + label.height < height - 4;
-      return fits ? { left, top, key: anchor === label.alt ? "alt" : side } : null;
-    };
-    // Candidate spots in order of preference; the caller keeps the first
-    // one that does not cover a label already placed.
-    const [first, ...rest] = label.spots;
-    return [
-      tryAnchor(label.anchor, first),
-      label.alt ? tryAnchor(label.alt, "above") : null,
-      ...rest.map((side) => tryAnchor(label.anchor, side)),
-    ].filter((spot) => spot !== null);
-  };
-
-  // The spot each label held on the last frame: a label that is showing
-  // keeps it while it still fits, so the idle sway never makes it jump.
-  const heldSpot = new Map<(typeof labels.labels)[number], string>();
+  const placeLabels = createLabelPlacer();
 
   const updateLabels = () => {
     const focusCount = pages[pageIndex]?.focus.length ?? 0;
@@ -477,83 +395,14 @@ export function createDossierScene(options: SceneOptions): DossierScene {
         label.height = label.element.offsetHeight;
       }
     }
-    let changed = false;
     // Place labels by priority; one that would cover a placed label waits.
-    const placed: { left: number; top: number; right: number; bottom: number }[] = [];
-    const ordered = labels.labels
-      .map((label) => ({ label, rank: label.priority + label.alpha + (label.element.dataset.focus === "true" ? 2 : 0) }))
-      .sort((a, b) => b.rank - a.rank);
-    for (const { label } of ordered) {
-      const spots = label.alpha > 0.05 && !(compact && !label.phone) ? placeLabel(label) : [];
-      const held = label.placed ? heldSpot.get(label) : undefined;
-      spots.sort((a, b) => Number(b.key === held) - Number(a.key === held));
-      // A label already showing gets a tighter margin: hysteresis against
-      // flicker when a neighbour drifts a pixel closer.
-      const margin = label.placed ? 1 : 3;
-      let place: (typeof spots)[number] | null = null;
-      for (const spot of spots) {
-        const rect = { left: spot.left - margin, top: spot.top - margin, right: spot.left + label.width + margin, bottom: spot.top + label.height + margin };
-        const collides = placed.some(
-          (other) => rect.left < other.right && rect.right > other.left && rect.top < other.bottom && rect.bottom > other.top,
-        );
-        if (!collides) {
-          place = spot;
-          placed.push({ left: spot.left - 3, top: spot.top - 3, right: spot.left + label.width + 3, bottom: spot.top + label.height + 3 });
-          break;
-        }
-      }
-      changed ||= label.placed !== (place !== null);
-      label.placed = place !== null;
-      if (place) heldSpot.set(label, place.key);
-      // Styles are only written when they change: most labels hold still.
-      const opacity = place ? label.alpha.toFixed(2) : "0";
-      if (opacity !== label.opacity) {
-        label.opacity = opacity;
-        label.element.style.opacity = opacity;
-      }
-      if (place) {
-        const transform = `translate(${place.left.toFixed(1)}px, ${place.top.toFixed(1)}px)`;
-        if (transform !== label.transform) {
-          label.transform = transform;
-          label.element.style.transform = transform;
-        }
-      }
-    }
-    return changed;
-  };
-
-  // Frame budget watch: if frames keep running long, lower the pixel ratio.
-  let slowFrames = 0;
-  let sampledFrames = 0;
-  const watchFrameTime = (delta: number) => {
-    if (reducedMotion || pixelRatio <= 1) return;
-    sampledFrames += 1;
-    if (delta > 1 / 40) slowFrames += 1;
-    if (sampledFrames < 90) return;
-    if (slowFrames > 45) {
-      pixelRatio = Math.max(1, pixelRatio - 0.25);
-      renderer.setPixelRatio(pixelRatio);
-      renderer.setSize(width, height, false);
-    }
-    slowFrames = 0;
-    sampledFrames = 0;
+    return placeLabels(labels.labels, camera, { width, height, left: free.left, right: free.right, compact });
   };
 
   const featureRested = features.map(() => false);
   const state: FrameState = { time: 0, clock: 0, reduced: reducedMotion, compact: false, packets: packetTs };
 
-  // Once the camera has settled only the idle motion is left (packets,
-  // sweep, sway): it renders at half rate to spare the GPU and battery.
-  const idleInterval = 1000 / 30;
-  let settled = false;
-  let lastTime = performance.now();
-  const frame = (time: number) => {
-    if (reducedMotion && !dirty) return;
-    if (settled && !dirty && time - lastTime < idleInterval - 2) return;
-    const delta = Math.min((time - lastTime) / 1000, 0.1);
-    lastTime = time;
-    // Frames spaced by the idle cap are not slow frames.
-    if (initialised && !settled) watchFrameTime(delta);
+  loop.start((time, delta) => {
     // Exponential damping; reduced motion snaps straight to the target.
     const ease = (rate: number) => (reducedMotion || !initialised ? 1 : 1 - Math.exp(-rate * delta));
 
@@ -572,7 +421,9 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     fog.near = distance + 4;
     fog.far = distance + 34;
     initialised = true;
-    settled =
+    // Once the camera has settled only the idle motion is left (packets,
+    // sweep, sway): the loop renders it at half rate.
+    const settled =
       cameraPosition.distanceToSquared(desiredPosition) < 1e-4 &&
       cameraTarget.distanceToSquared(desiredTarget) < 1e-4;
 
@@ -635,23 +486,8 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     });
 
     renderer.render(scene, camera);
-    const placementChanged = updateLabels();
-    // Reduced motion renders on demand: one more pass lets the elements that
-    // follow a label catch up with where it was just placed.
-    dirty = placementChanged && !settling;
-    settling = dirty;
-  };
-
-  // A lost GPU context (memory pressure on phones): stop and let the page
-  // fall back to the text-only dossier.
-  let lost = false;
-  const onContextLost = (event: Event) => {
-    event.preventDefault();
-    lost = true;
-    renderer.setAnimationLoop(null);
-    options.onContextLost();
-  };
-  canvas.addEventListener("webglcontextlost", onContextLost);
+    return { settled, placementChanged: updateLabels() };
+  });
 
   resize();
 
@@ -659,32 +495,16 @@ export function createDossierScene(options: SceneOptions): DossierScene {
     setProgress(value) {
       progress = MathUtils.clamp(value, 0, pages.length - 1);
       pageIndex = Math.round(progress);
-      dirty = true;
+      loop.invalidate();
     },
-    // Rendering stops entirely while the scene is scrolled out of view.
     setFrame(next) {
       free = next;
       resize();
     },
-    setActive(value) {
-      if (value === active || lost) return;
-      active = value;
-      lastTime = performance.now();
-      dirty = true;
-      renderer.setAnimationLoop(active ? frame : null);
-    },
-    resize,
+    // Rendering stops entirely while the scene is scrolled out of view.
+    setActive: loop.setActive,
     dispose() {
-      renderer.setAnimationLoop(null);
-      canvas.removeEventListener("webglcontextlost", onContextLost);
-      scene.traverse((object) => {
-        if (object instanceof Mesh || object instanceof LineSegments || object instanceof InstancedMesh) {
-          object.geometry.dispose();
-          const materials: Material[] = Array.isArray(object.material) ? object.material : [object.material];
-          materials.forEach((material) => material.dispose());
-        }
-      });
-      renderer.dispose();
+      loop.dispose(scene);
       labelLayer.replaceChildren();
     },
   };

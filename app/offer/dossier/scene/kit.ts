@@ -1,6 +1,7 @@
 // Shared vocabulary of the dossier scene: palette, chain layout, the route
-// the changes travel, HTML labels and the contract each day's feature follows.
+// the changes travel and the contract each day's feature follows.
 import { Color, LineCurve3, MathUtils, Vector3, type Scene } from "three";
+import type { Labels } from "../../../scene/labels";
 import type { NodeKey } from "../dossier-content";
 
 export const palette = {
@@ -62,99 +63,9 @@ export function createRoute() {
 
 export type Route = ReturnType<typeof createRoute>;
 
-export type LabelTone = "node" | "tag" | "finding" | "axis";
-
-// Findings first, then the parts a day opens, which name the day's own
-// representation and so outrank even an audited node in focus (raised by
-// 2), then axes and nodes at rest.
-const tonePriority: Record<LabelTone, number> = { finding: 4.5, tag: 3.2, axis: 1.5, node: 1 };
-
-// Where a label sits relative to its anchor.
-export type LabelSpot = "below" | "above" | "right" | "left";
-
-// Nothing is shown unexplained: a secondary element follows its label,
-// easing out while the label has no room and back in once it is placed.
-export const followLabel = (label: SceneLabel, current: number, reduced: boolean) => {
-  const target = label.placed ? 1 : 0;
-  return reduced ? target : current + (target - current) * 0.12;
-};
-
-export type LabelClassNames = Record<LabelTone, string> & { label: string; name: string; meta: string };
-
-export type SceneLabel = {
-  element: HTMLDivElement;
-  anchor: Vector3;
-  // Feature-controlled visibility, multiplied by the in-frame check.
-  alpha: number;
-  // Spots around the anchor in order of preference; the fallback anchor,
-  // when set, is tried (above it) right after the first spot.
-  spots: LabelSpot[];
-  alt?: Vector3;
-  // Whether the last layout found the label a free spot.
-  placed: boolean;
-  // When two labels collide, the higher priority one is kept.
-  priority: number;
-  // Dropped on the phone band, where the frame is too small for it.
-  phone: boolean;
-  width: number;
-  height: number;
-  // Last styles written, so unchanged frames touch no DOM.
-  opacity: string;
-  transform: string;
-};
-
-export function createLabels(layer: HTMLElement, classNames: LabelClassNames) {
-  const labels: SceneLabel[] = [];
-
-  const add = (
-    name: string,
-    options: { meta?: string; tone?: LabelTone; above?: boolean; phone?: boolean; spots?: LabelSpot[] } = {},
-  ) => {
-    const { meta, tone = "node", above = false, phone = true } = options;
-    // Beside the anchor is the last resort when the preferred side is taken.
-    const spots = options.spots ?? [above ? "above" : "below", "right", "left"];
-    const element = document.createElement("div");
-    element.className = `${classNames.label} ${classNames[tone]}`;
-    const nameElement = document.createElement("span");
-    nameElement.className = classNames.name;
-    nameElement.textContent = name;
-    element.append(nameElement);
-    if (meta !== undefined) {
-      const metaElement = document.createElement("span");
-      metaElement.className = classNames.meta;
-      metaElement.textContent = meta;
-      element.append(metaElement);
-    }
-    layer.append(element);
-    const label: SceneLabel = {
-      element,
-      anchor: new Vector3(),
-      alpha: 0,
-      spots,
-      placed: false,
-      phone,
-      width: 0,
-      height: 0,
-      opacity: "",
-      transform: "",
-      priority: tonePriority[tone],
-    };
-    labels.push(label);
-    return label;
-  };
-
-  // Label sizes are read once per layout change, never inside the frame.
-  const measure = () => {
-    for (const label of labels) {
-      label.width = label.element.offsetWidth;
-      label.height = label.element.offsetHeight;
-    }
-  };
-
-  return { labels, add, measure };
-}
-
-export type Labels = ReturnType<typeof createLabels>;
+// Labels are shared with the other scroll scenes; the day modules keep
+// importing them from here.
+export { followLabel, type Labels, type LabelSpot, type SceneLabel } from "../../../scene/labels";
 
 export type FrameState = {
   time: number;

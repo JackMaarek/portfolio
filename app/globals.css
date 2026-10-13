@@ -13,6 +13,7 @@
   --focus-ring: #c9c2ff;
   --page-gutter: clamp(18px, 2.1vw, 30px);
   --touch-target: 44px;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
 * {

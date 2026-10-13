@@ -1,14 +1,16 @@
 "use client";
 
 import { type CSSProperties, useEffect, useRef, useState } from "react";
-import { experiences, parcours, parcoursToProject, results } from "../home-content";
+import { experiences, parcours, parcoursToProject } from "../home-content";
 import styles from "./career-column.module.css";
 
 // Missions in chronological order, around an amber column. On wide screens
 // the section is pinned and the scroll turns the column: the current
 // mission comes to the front as a dossier sheet and its achievements leave
 // it as separate leaves. Elsewhere the missions follow each other in the
-// page. Pure CSS 3D: the scroll only updates --p on the section.
+// page along a rail that fills with the scroll: a cursor rides it at the
+// reading line and lights each mission it reaches. Pure CSS: the scroll
+// only updates custom properties on the section.
 const missions = [...experiences].reverse();
 const year = (period: string) => period.slice(0, 4);
 // Mirrors the media query of the column layout in career-column.module.css.
@@ -28,12 +30,18 @@ const smoothstep = (value: number) => {
 
 export function CareerColumn({ label }: { label: string }) {
   const rootRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const spineRef = useRef<HTMLDivElement>(null);
+  const bridgeRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<HTMLLIElement[]>([]);
   const [active, setActive] = useState(0);
 
   useEffect(() => {
     const root = rootRef.current;
-    if (!root) return;
+    const stage = stageRef.current;
+    const spine = spineRef.current;
+    const bridge = bridgeRef.current;
+    if (!root || !stage || !spine || !bridge) return;
     const column = window.matchMedia(columnQuery);
     let frame = 0;
     let near = false;
@@ -56,11 +64,19 @@ export function CareerColumn({ label }: { label: string }) {
         index = Math.round(progress);
       } else {
         // In the page flow the current mission is the last one whose card
-        // has reached the upper part of the viewport.
+        // has reached the reading line, where the cursor rides the rail.
         const line = window.innerHeight * 0.45;
         cardRefs.current.forEach((card, position) => {
           if (card.getBoundingClientRect().top < line) index = position;
         });
+        // Positions on the stage: the rail fills down to the reading line;
+        // the cursor turns into a chevron along the transition text and
+        // stops just below it, while the rail keeps filling.
+        const rail = Math.min(Math.max(line - stage.getBoundingClientRect().top, spine.offsetTop), stage.offsetHeight);
+        const bridgeEnd = bridge.offsetTop + bridge.offsetHeight;
+        root.style.setProperty("--rail", `${rail.toFixed(1)}px`);
+        root.style.setProperty("--cursor-y", `${Math.min(rail, bridgeEnd + 40).toFixed(1)}px`);
+        root.style.setProperty("--travel", Math.min(Math.max((rail - bridge.offsetTop) / bridge.offsetHeight, 0), 1).toFixed(4));
       }
       if (index !== current) {
         current = index;
@@ -130,7 +146,7 @@ export function CareerColumn({ label }: { label: string }) {
       aria-labelledby="parcours-title"
       style={{ "--count": missions.length } as CSSProperties}
     >
-      <div className={styles.stage}>
+      <div ref={stageRef} className={styles.stage}>
         <div className={styles.head}>
           <p className="section-label">{label}</p>
           <h2 id="parcours-title">
@@ -157,15 +173,14 @@ export function CareerColumn({ label }: { label: string }) {
           </ol>
         </nav>
 
-        <div className={styles.spine} aria-hidden="true" />
+        <div ref={spineRef} className={styles.spine} aria-hidden="true" />
         <div className={styles.cursor} aria-hidden="true">
           <i />
         </div>
 
         <ol className={styles.column}>
           {missions.map((mission, index) => {
-            // The measured results come from the Padok missions.
-            const figures = mission.company === "Padok" ? results : [];
+            const figures = ("figures" in mission && mission.figures) || [];
             return (
               <li
                 key={mission.company}
@@ -174,6 +189,7 @@ export function CareerColumn({ label }: { label: string }) {
                 }}
                 className={styles.card}
                 data-front={active === index}
+                data-reached={index <= active}
                 style={{ "--i": index } as CSSProperties}
               >
                 <article className={styles.face} aria-labelledby={`mission-${index}`} data-face>
@@ -224,9 +240,10 @@ export function CareerColumn({ label }: { label: string }) {
 
         {/* Why the parcours led to k8s-platform: the cursor that followed
             the missions becomes the arrow towards it. */}
-        <div className={styles.bridge}>
+        <div ref={bridgeRef} className={styles.bridge}>
           <p className={styles.statement}>{parcoursToProject.statement}</p>
           <p className={styles.bridgeBody}>{parcoursToProject.body}</p>
+          <p className={styles.closing}>{parcoursToProject.closing}</p>
         </div>
       </div>
     </section>

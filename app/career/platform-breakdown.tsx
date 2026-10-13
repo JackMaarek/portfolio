@@ -6,7 +6,9 @@ import styles from "./platform-breakdown.module.css";
 
 // k8s-platform as an exploded view: its layers separate as the section
 // scrolls by, each one named in turn, then close back on the assembled
-// platform. Pure CSS 3D: the scroll only updates --explode on the section.
+// platform. In the flow the stack docks at the top of the screen and the
+// callouts scroll under it, each lighting its layer as it passes. Pure CSS
+// 3D: the scroll only updates custom properties on the section.
 const layers = project.layers;
 // Mirrors the media query of the pinned layout in platform-breakdown.module.css.
 const pinnedQuery = "(min-width: 1000px) and (min-height: 620px)";
@@ -18,11 +20,17 @@ const smoothstep = (edge0: number, edge1: number, value: number) => {
 
 export function PlatformBreakdown() {
   const rootRef = useRef<HTMLElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
+  const calloutsRef = useRef<HTMLOListElement>(null);
   const [current, setCurrent] = useState(-1);
 
   useEffect(() => {
     const root = rootRef.current;
-    if (!root) return;
+    const copy = copyRef.current;
+    const dock = dockRef.current;
+    const callouts = calloutsRef.current;
+    if (!root || !copy || !dock || !callouts) return;
     const pinned = window.matchMedia(pinnedQuery);
     let frame = 0;
     let near = false;
@@ -30,20 +38,35 @@ export function PlatformBreakdown() {
 
     const update = () => {
       frame = 0;
-      const rect = root.getBoundingClientRect();
-      const viewport = window.innerHeight;
-      // Pinned: progress through the pinned length. In the flow: progress
-      // of the section across the viewport.
-      const progress = pinned.matches
-        ? Math.min(Math.max(-rect.top / Math.max(rect.height - viewport, 1), 0), 1)
-        : Math.min(Math.max((viewport * 0.8 - rect.top) / (rect.height + viewport * 0.2), 0), 1);
-      const explode = smoothstep(0, 0.18, progress) * (1 - smoothstep(0.86, 1, progress));
+      let explode: number;
+      let next = -1;
+      if (pinned.matches) {
+        // Pinned: progress through the pinned length.
+        const rect = root.getBoundingClientRect();
+        const progress = Math.min(Math.max(-rect.top / Math.max(rect.height - window.innerHeight, 1), 0), 1);
+        explode = smoothstep(0, 0.18, progress) * (1 - smoothstep(0.86, 1, progress));
+        if (explode > 0.5) {
+          next = Math.min(Math.floor(((progress - 0.18) / 0.68) * layers.length), layers.length - 1);
+        }
+      } else {
+        // In the flow: the rail beside the copy fills down to the reading
+        // line; the stack opens as the callouts reach the dock's bottom
+        // edge, and the current one is the first still readable below it.
+        const line = window.innerHeight * 0.45;
+        const fill = Math.max(line - copy.getBoundingClientRect().top, 0);
+        root.style.setProperty("--fill", `${fill.toFixed(1)}px`);
+        // The rail ends at the dock (88px above the copy, 24px below it).
+        root.style.setProperty("--dock-lit", fill + 88 >= copy.offsetHeight + 112 ? "1" : "0");
+        const edge = dock.getBoundingClientRect().bottom;
+        const list = callouts.getBoundingClientRect();
+        explode = smoothstep(-0.04, 0.12, (edge - list.top) / list.height);
+        if (explode > 0.5) {
+          const items = Array.from(callouts.children);
+          const below = items.findIndex((item) => item.getBoundingClientRect().top > edge - 20);
+          next = below === -1 ? items.length - 1 : below;
+        }
+      }
       root.style.setProperty("--explode", explode.toFixed(4));
-      const layer =
-        explode > 0.5
-          ? Math.min(Math.floor(((progress - 0.18) / 0.68) * layers.length), layers.length - 1)
-          : -1;
-      const next = Math.max(layer, -1);
       if (next !== shown) {
         shown = next;
         setCurrent(next);
@@ -76,7 +99,7 @@ export function PlatformBreakdown() {
   return (
     <section ref={rootRef} id="projects" className={styles.project} aria-labelledby="project-title">
       <div className={styles.stage}>
-        <div className={styles.copy}>
+        <div ref={copyRef} className={styles.copy}>
           <p className="section-label">{project.label}</p>
           <p className={styles.kicker}>{project.kicker}</p>
           <h2 id="project-title">{project.name}</h2>
@@ -100,49 +123,53 @@ export function PlatformBreakdown() {
           </div>
         </div>
 
-        <div className={styles.view} aria-hidden="true">
-          {/* The parcours column, arriving as the axis the layers separate along. */}
-          <span className={styles.axis} />
-          <div className={styles.layers}>
-            {layers.map((layer, index) => (
-              <div
+        <div className={styles.view}>
+          {/* Docked at the top of the screen in the flow. */}
+          <div ref={dockRef} className={styles.dock} aria-hidden="true">
+            {/* The parcours column, arriving as the axis the layers separate along. */}
+            <span className={styles.axis} />
+            <div className={styles.layers}>
+              {layers.map((layer, index) => (
+                <div
+                  key={layer.name}
+                  className={styles.plate}
+                  data-described={layer.described ?? false}
+                  data-current={current === index}
+                  style={{ "--i": index } as CSSProperties}
+                >
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  {/* One block per component; EKS shows its worker nodes. */}
+                  {Array.from({ length: index === 1 ? 6 : layer.components.length }, (_, cell) => (
+                    <i key={cell} />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Callouts: each one follows its plate as the layers separate. */}
+          <ol ref={calloutsRef} className={styles.callouts} aria-label={`Couches de ${project.name}`}>
+            {[...layers, project.bot].map((layer, index) => (
+              <li
                 key={layer.name}
-                className={styles.plate}
-                data-described={layer.described ?? false}
                 data-current={current === index}
+                data-bot={index === layers.length}
                 style={{ "--i": index } as CSSProperties}
               >
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                {/* Cluster nodes on EKS, components elsewhere. */}
-                {Array.from({ length: index === 1 ? 8 : 4 }, (_, cell) => (
-                  <i key={cell} />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <ol className={styles.legend} aria-label={`Couches de ${project.name}`}>
-          {layers
-            .map((layer, index) => ({ layer, index }))
-            .reverse()
-            .map(({ layer, index }) => (
-              <li key={layer.name} data-current={current === index}>
-                <b aria-hidden="true">{String(index + 1).padStart(2, "0")}</b>
-                <span>
-                  {layer.name}
-                  <small>{layer.note}</small>
-                </span>
+                <b aria-hidden="true">{index === layers.length ? "CLI" : String(index + 1).padStart(2, "0")}</b>
+                <div>
+                  <strong>{layer.name}</strong>
+                  <ul aria-label="Composants">
+                    {layer.components.map((component) => (
+                      <li key={component}>{component}</li>
+                    ))}
+                  </ul>
+                  {"detail" in layer && layer.detail && <p>{layer.detail}</p>}
+                </div>
               </li>
             ))}
-          <li>
-            <b aria-hidden="true">CLI</b>
-            <span>
-              {project.bot.name}
-              <small>{project.bot.note}</small>
-            </span>
-          </li>
-        </ol>
+          </ol>
+        </div>
       </div>
     </section>
   );

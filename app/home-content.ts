@@ -13,10 +13,17 @@ export const about = {
     "Expérience acquise dans des contextes où l’indisponibilité, la fuite d’un secret ou une dérive de coûts ne sont pas des détails.",
 };
 
+// Measured on the Theodo (ex Padok) missions; the classic home shows them
+// in their own section, the parcours on that mission (see experiences).
+export const results = [
+  { figure: "−50%", body: "de coûts d’infrastructure et Kubernetes sur une mission bancaire." },
+  { figure: "≈150", body: "équipes accompagnées au quotidien sur leurs processus de delivery." },
+];
+
 export const experiences = [
   {
     period: "2025 — aujourd’hui",
-    role: "Consultant technique",
+    role: "Platform Engineer",
     company: "PerspeQtive",
     sector: "R&D appliquée · Imagerie SAR",
     summary:
@@ -31,7 +38,7 @@ export const experiences = [
   {
     period: "2023 — 2024",
     role: "Platform Engineer",
-    company: "MIRAGE",
+    company: "Mirage",
     sector: "Plateforme · Delivery",
     summary:
       "Construction de la fondation d’infrastructure, de la toolchain de delivery et de l’observabilité d’une plateforme Kubernetes.",
@@ -45,8 +52,8 @@ export const experiences = [
   {
     period: "2021 — 2023",
     role: "Platform Engineer",
-    company: "Padok",
-    sector: "Banque · Santé · Cybersécurité",
+    company: "Theodo (ex Padok)",
+    sector: "Banque · Santé · Medtech",
     summary:
       "Missions de plateforme sur des environnements réglementés : sécurité automatisée, DevEx, FinOps, multi-comptes AWS et delivery à grande échelle.",
     points: [
@@ -55,11 +62,12 @@ export const experiences = [
       "Migration AWS multi-comptes et automatisations nécessaires à la certification HDS.",
     ],
     tech: ["AWS", "Terraform", "Kubernetes", "ArgoCD", "GitLab CI", "Datadog"],
+    figures: results,
   },
   {
     period: "2019 — 2021",
     role: "Back-end Developer / DevOps",
-    company: "Risk&Me",
+    company: "Harmonie-Technologie",
     sector: "Cybersécurité",
     summary:
       "Développement d’une plateforme de sensibilisation à la cybersécurité et transformation progressive de son architecture.",
@@ -69,6 +77,10 @@ export const experiences = [
       "Création de l’IaC Terraform et des clusters Kubernetes de production.",
     ],
     tech: ["Go", "Symfony", "AWS", "Terraform", "Kubernetes", "MySQL"],
+    figures: [
+      { figure: "15 000+", body: "lignes de code refactorisées." },
+      { figure: "13", body: "entreprises ont intégré la plateforme à leurs processus internes." },
+    ],
   },
   {
     period: "2018 — 2019",
@@ -114,12 +126,12 @@ export const parcours = {
     "De 2018 à aujourd’hui, du développement back-end aux enjeux de plateforme, dans des secteurs où la rigueur compte.",
 };
 
-// PLACEHOLDER until Jack writes the transition copy: lorem ipsum, shown on
-// the noindex /home-preview only. Replace before the parcours layout ships
-// on /.
+// Why the parcours led to k8s-platform, between the two sections.
 export const parcoursToProject = {
-  statement: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
-  body: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse.",
+  statement:
+    "Au fil de mes expériences, transformer les défis récurrents de l’infra en une plateforme modulaire et standardisée m’a semblé évident.",
+  body: "Reconstruire les mêmes briques d’observabilité, de provisioning et de sécurité à chaque mission m’a poussé à condenser les bonnes pratiques du métier dans une architecture Kubernetes modulaire et clé en main.",
+  closing: "Une plateforme pensée pour les devs, faite par un dev.",
 };
 
 export const project = {
@@ -134,18 +146,36 @@ export const project = {
   repository: "https://github.com/PodYourLife/k8s-platform",
   cli: "CLI Go · platform-bot",
   // The platform's layers, bottom to top, as the exploded view shows them.
+  // `components` reuse the names of the copy above; `detail` only where
+  // real copy exists.
   layers: [
-    { name: "AWS · Terraform · OIDC", note: "Infrastructure décrite en code", described: true },
-    { name: "EKS", note: "Kubernetes" },
-    { name: "ArgoCD · Helm", note: "Déploiements reproductibles" },
-    { name: "Istio mTLS · Kyverno · External Secrets Operator", note: "mTLS strict, politiques d’admission, secrets externalisés" },
-    { name: "Prometheus · Grafana · Loki", note: "Observabilité" },
+    {
+      name: "Infrastructure décrite en code",
+      components: ["AWS", "Terraform", "OIDC"],
+      described: true,
+    },
+    {
+      name: "Kubernetes",
+      components: ["EKS"],
+    },
+    {
+      name: "Déploiements reproductibles",
+      components: ["ArgoCD", "Helm"],
+    },
+    {
+      name: "Sécurité",
+      components: ["Istio mTLS", "Kyverno", "External Secrets Operator"],
+      detail: "mTLS strict, politiques d’admission, secrets externalisés.",
+    },
+    {
+      name: "Observabilité",
+      components: ["Prometheus", "Grafana", "Loki"],
+    },
   ],
-  bot: { name: "platform-bot", note: "Prépare et configure les environnements" },
+  bot: {
+    name: "platform-bot",
+    components: ["CLI Go"],
+    detail: "Prépare et configure les environnements.",
+  },
 };
 
-// Measured on the Padok missions (see experiences).
-export const results = [
-  { figure: "−50%", body: "de coûts d’infrastructure et Kubernetes sur une mission bancaire." },
-  { figure: "≈150", body: "équipes accompagnées au quotidien sur leurs processus de delivery." },
-];

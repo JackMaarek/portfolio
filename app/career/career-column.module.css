@@ -9,6 +9,11 @@
   --front: 0;
   --front-height: 0px;
   --s: 1;
+  /* In the flow: the rail's fill and the cursor, in px from the stage's
+     top, and the cursor's turn into a chevron (0 to 1). */
+  --rail: 100000px;
+  --cursor-y: 0px;
+  --travel: 0;
   --sheet: #d8d6e3;
   --sheet-ink: #111014;
   --sheet-muted: #4f4c59;
@@ -105,14 +110,16 @@
   color: var(--acid);
 }
 
-/* The amber route the missions follow. */
+/* The amber route the missions follow; it runs to the section's end,
+   where the k8s-platform rail takes over on the same x. In the flow it
+   fills down to the cursor (200px: its own top on the stage). */
 .spine {
   position: absolute;
   top: 200px;
-  bottom: 72px;
+  bottom: 0;
   left: calc(var(--page-gutter) + 7px);
   width: 2px;
-  background: linear-gradient(to bottom, transparent, rgba(255, 189, 116, .7) 12%, rgba(255, 189, 116, .7) 88%, transparent);
+  background: linear-gradient(to bottom, rgba(255, 189, 116, .85) calc(var(--rail) - 200px), rgba(255, 189, 116, .22) calc(var(--rail) - 200px));
 }
 
 .column {
@@ -141,31 +148,41 @@
   transition: border-color 300ms ease;
 }
 
-.card[data-front="true"]::before {
+.card[data-reached="true"]::before {
   border-color: var(--acid);
 }
 
+/* The cursor rides the rail at the reading line, then turns into a
+   chevron along the transition text and stays just below it. */
 .cursor {
-  display: none;
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: calc(var(--page-gutter) + 8px);
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  transform: translateY(var(--cursor-y));
 }
 
-/* Why the parcours led to the project; the rail ends in an arrow below it. */
+.cursor i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--acid);
+  border-top-color: rgba(255, 189, 116, calc(1 - var(--travel)));
+  border-left-color: rgba(255, 189, 116, calc(1 - var(--travel)));
+  border-radius: calc((1 - var(--travel)) * 50%);
+  /* Hollow once a chevron, so the line runs through it. */
+  background: rgba(11, 11, 13, calc(1 - var(--travel)));
+  transform: rotate(calc(var(--travel) * 45deg));
+}
+
+/* Why the parcours led to the project. */
 .bridge {
   position: relative;
   margin: 56px 0 0;
   padding-left: 26px;
-}
-
-.bridge::after {
-  position: absolute;
-  bottom: -10px;
-  left: 2px;
-  width: 12px;
-  height: 12px;
-  border-right: 2px solid var(--acid);
-  border-bottom: 2px solid var(--acid);
-  content: "";
-  transform: rotate(45deg);
 }
 
 .statement {
@@ -182,6 +199,13 @@
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.5;
+}
+
+.closing {
+  margin: 18px 0 0;
+  color: var(--acid);
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .face {
@@ -396,30 +420,26 @@
     color: var(--acid);
   }
 
+  /* One continuous line: once the transition starts, its lower half
+     stays lit down to the bottom edge, where the k8s-platform axis takes
+     over on the same x. */
   .spine {
+    --lit: calc(.15 + .7 * var(--t));
     top: -10%;
     bottom: -10%;
     left: 56%;
-    background: linear-gradient(to bottom, transparent, rgba(255, 189, 116, .15) 15%, rgba(255, 189, 116, .85) 50%, rgba(255, 189, 116, .15) 85%, transparent);
-    /* Once the cursor is an arrow, the column stops at its tip. */
-    /* Same pace as the cursor; its end point sits at 68% of the column. */
-    --tip: calc(100% - min(var(--t) * 1.6, 1) * 32%);
-    -webkit-mask-image: linear-gradient(to bottom, #000 var(--tip), transparent calc(var(--tip) + 1px));
-    mask-image: linear-gradient(to bottom, #000 var(--tip), transparent calc(var(--tip) + 1px));
+    /* Centred on the axis, like the cursor and the project axis. */
+    margin-left: -1px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 189, 116, .15) 15%, rgba(255, 189, 116, .85) 50%, rgba(255, 189, 116, var(--lit)) 85%, rgba(255, 189, 116, calc(var(--t) * .85)));
   }
 
   /* The cursor rides the column just above the front sheet, then drops
-     below the transition text and turns into an arrowhead. */
+     and turns into a chevron on the line, pointing to the project. */
   .cursor {
     --front-y: calc((var(--front) - var(--p)) * 175px * var(--s) - var(--front-height) * var(--s) / 2 - 24px);
-    position: absolute;
     z-index: 3;
     top: 50%;
     left: 56%;
-    display: block;
-    width: 18px;
-    height: 18px;
-    margin: -9px 0 0 -9px;
     /* The cursor travels in the first part of the transition, so the text
        only appears once it has passed. */
     --travel: min(var(--t) * 1.6, 1);
@@ -427,35 +447,20 @@
     transition: transform 300ms cubic-bezier(.16, 1, .3, 1);
   }
 
-  .cursor i {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: 2px solid var(--acid);
-    border-top-color: rgba(255, 189, 116, calc(1 - var(--travel)));
-    border-left-color: rgba(255, 189, 116, calc(1 - var(--travel)));
-    border-radius: calc((1 - var(--travel)) * 50%);
-    background: var(--ink);
-    transform: rotate(calc(var(--travel) * 45deg));
-  }
-
-  .card::before,
-  .bridge::after {
+  .card::before {
     display: none;
   }
 
+  /* Beside the line rather than over it, so the column never breaks. */
   .bridge {
     position: absolute;
     z-index: 2;
     top: 50%;
-    left: 56%;
-    width: min(34rem, 42vw);
+    left: calc(56% + 56px);
+    width: min(30rem, 34vw);
     margin: 0;
-    padding: 28px 32px;
-    /* The block masks the column early; its text follows the cursor. */
-    background: rgba(11, 11, 13, min(var(--t) * 4, 1));
-    text-align: center;
-    transform: translate(-50%, -60%);
+    padding: 0;
+    transform: translateY(-50%);
   }
 
   .bridge > p {
@@ -557,10 +562,53 @@
   }
 }
 
+/* In the flow: the missions the cursor has not reached yet, and those it
+   has passed, are glass; the current one is the dossier sheet. Its
+   achievements leave the rail one by one once it is reached. */
+@media (max-width: 999px), (max-height: 619px) {
+  .card:not([data-front="true"]) .face {
+    --sheet-violet: var(--violet);
+    --sheet-muted: var(--muted);
+    --sheet-rule: var(--line);
+    border: 1px solid rgba(239, 237, 245, .16);
+    background: linear-gradient(160deg, rgba(239, 237, 245, .1), rgba(239, 237, 245, .03) 60%), rgba(18, 17, 22, .86);
+    color: var(--paper);
+  }
+
+  .face {
+    border: 1px solid transparent;
+    transition: background-color 500ms ease, color 500ms ease, border-color 500ms ease;
+  }
+
+  .leaves li {
+    transition: opacity 400ms ease, transform 700ms cubic-bezier(.16, 1, .3, 1);
+  }
+
+  .card:not([data-reached="true"]) .leaves li {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+
+  .card[data-reached="true"] .leaves li:nth-child(2) {
+    transition-delay: 90ms;
+  }
+
+  .card[data-reached="true"] .leaves li:nth-child(3) {
+    transition-delay: 180ms;
+  }
+}
+
 /* Shorter laptop screens: the column is drawn a little smaller. */
 @media (min-width: 1000px) and (min-height: 620px) and (max-height: 820px) {
   .parcours {
     --s: .86;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 999px), (prefers-reduced-motion: reduce) and (max-height: 619px) {
+  .card:not([data-reached="true"]) .leaves li {
+    opacity: 1;
+    transform: none;
   }
 }
 

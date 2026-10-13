@@ -87,7 +87,22 @@ function TopologyCanvas() {
     const segmentDuration = 820;
     const routeHoldDuration = 1500;
 
+    const summary = interactionSurface?.querySelector<HTMLElement>(".hero-summary");
+    const besideCopy = window.matchMedia("(min-width: 901px)");
+
     const resize = () => {
+      // Beside the copy, the network ends above the summary so no node or
+      // label runs under it; below 900px the CSS dims it behind the text.
+      canvas.style.height = "";
+      if (besideCopy.matches && summary && interactionSurface) {
+        // Layout offsets, not client rects: the summary may still be
+        // translated by its reveal.
+        let summaryTop = 0;
+        for (let node: HTMLElement | null = summary; node && node !== interactionSurface; node = node.offsetParent as HTMLElement | null) {
+          summaryTop += node.offsetTop;
+        }
+        canvas.style.height = `${Math.max(summaryTop - 32 - canvas.offsetTop, 240)}px`;
+      }
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
       width = canvas.clientWidth;
       height = canvas.clientHeight;

@@ -25,7 +25,7 @@ test("portfolio exposes its core positioning", async () => {
   assert.ok(!`${portfolio}${header}`.includes("#projets"));
 });
 
-test("shared navigation and experience tabs expose accessible interactions", async () => {
+test("shared navigation and technology tags expose accessible interactions", async () => {
   const [portfolio, header, styles] = await Promise.all([
     readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
@@ -37,15 +37,8 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(header, /event\.key !== "Escape"/);
   assert.match(header, /closeOnOutsidePointer/);
   assert.match(header, /min-width: 1121px/);
-  assert.match(portfolio, /tabIndex=\{activeExperience === index \? 0 : -1\}/);
-  assert.match(portfolio, /event\.key === "ArrowRight"/);
-  assert.match(portfolio, /aria-orientation="vertical"/);
-  assert.match(portfolio, /aria-labelledby=\{`experience-tab-/);
   assert.match(portfolio, /function TechnologyTags/);
   assert.ok(!portfolio.includes("data-status="));
-  assert.match(portfolio, /Stack mobilisée/);
-  assert.match(portfolio, /labelledBy=\{`experience-tech-/);
-  assert.match(portfolio, /className="project-visual"[\s\S]*?aria-hidden="true"/);
   assert.match(styles, /@media \(max-width: 1120px\)/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(styles, /--offer-violet: #4c40af/);
@@ -187,7 +180,8 @@ test("home presents the parcours from the home copy without WebGL", async () => 
     readFile(new URL("app/career/platform-breakdown.tsx", projectRoot), "utf8"),
   ]);
 
-  assert.ok(home.includes('<Portfolio layout="parcours" />'));
+  assert.ok(home.includes("<Portfolio />"));
+  assert.match(column, /Stack mobilisée/);
   // Copy comes from the home content; both scenes are CSS 3D, not three.js.
   for (const source of [column, breakdown]) {
     assert.match(source, /from "\.\.\/home-content"/);

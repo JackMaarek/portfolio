@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
   StringMagnetic,
   StringProgress,
@@ -11,7 +11,7 @@ import { Accent } from "./accent";
 import { BookingLink } from "./booking-link";
 import { CareerColumn } from "./career/career-column";
 import { PlatformBreakdown } from "./career/platform-breakdown";
-import { about, capabilities, experiences, parcours, project, results } from "./home-content";
+import { about, capabilities } from "./home-content";
 import { SiteHeader } from "./site-header";
 
 const tune = (value: string, attributes: Record<string, string> = {}) =>
@@ -19,17 +19,12 @@ const tune = (value: string, attributes: Record<string, string> = {}) =>
 
 type TechnologyTagsProps = {
   items: string[];
-  label?: string;
-  labelledBy?: string;
+  label: string;
 };
 
-function TechnologyTags({ items, label, labelledBy }: TechnologyTagsProps) {
+function TechnologyTags({ items, label }: TechnologyTagsProps) {
   return (
-    <ul
-      className="technology-tags"
-      aria-label={label}
-      aria-labelledby={labelledBy}
-    >
+    <ul className="technology-tags" aria-label={label}>
       {items.map((item) => (
         <li className="technology-tag" key={item}>
           <span>{item}</span>
@@ -313,20 +308,7 @@ function TopologyCanvas() {
   return <canvas ref={canvasRef} className="topology" aria-hidden="true" />;
 }
 
-// "classic" is the current home; "parcours" (noindex preview) presents the
-// missions around a column and k8s-platform as an exploded view, with the
-// impact figures on the mission they come from.
-export type HomeLayout = "classic" | "parcours";
-
-const sectionNumbers: Record<HomeLayout, { bridge: string; contact: string }> = {
-  classic: { bridge: "06", contact: "07" },
-  parcours: { bridge: "05", contact: "06" },
-};
-
-export function Portfolio({ layout }: { layout: HomeLayout }) {
-  const number = sectionNumbers[layout];
-  const [activeExperience, setActiveExperience] = useState(0);
-  const experienceTabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+export function Portfolio() {
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -391,13 +373,6 @@ export function Portfolio({ layout }: { layout: HomeLayout }) {
       stringTune.destroy();
     };
   }, []);
-
-  const selectExperience = (index: number, moveFocus = false) => {
-    setActiveExperience(index);
-    if (moveFocus) {
-      window.requestAnimationFrame(() => experienceTabRefs.current[index]?.focus());
-    }
-  };
 
   return (
     <div className="site-shell">
@@ -485,155 +460,12 @@ export function Portfolio({ layout }: { layout: HomeLayout }) {
           </div>
         </section>
 
-      {layout === "classic" ? (
-        <>
-        <section id="experience" className="experience">
-          <div className="section-heading experience-heading" data-reveal>
-            <p className="section-label">03 / Parcours</p>
-            <h2>
-              {parcours.title}<br />
-              {parcours.accent}
-            </h2>
-            <p className="experience-intro">{parcours.intro}</p>
-          </div>
-          <div className="experience-panel" data-reveal>
-            <div
-              className="experience-tabs"
-              role="tablist"
-              aria-label="Expériences"
-              aria-orientation="vertical"
-            >
-              {experiences.map((item, index) => (
-                <button
-                  key={item.company}
-                  ref={(element) => { experienceTabRefs.current[index] = element; }}
-                  id={`experience-tab-${index}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeExperience === index}
-                  aria-controls={`experience-${index}`}
-                  tabIndex={activeExperience === index ? 0 : -1}
-                  onClick={() => selectExperience(index)}
-                  onKeyDown={(event) => {
-                    const lastIndex = experiences.length - 1;
-                    let nextIndex: number | null = null;
-
-                    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-                      nextIndex = index === lastIndex ? 0 : index + 1;
-                    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-                      nextIndex = index === 0 ? lastIndex : index - 1;
-                    } else if (event.key === "Home") {
-                      nextIndex = 0;
-                    } else if (event.key === "End") {
-                      nextIndex = lastIndex;
-                    }
-
-                    if (nextIndex !== null) {
-                      event.preventDefault();
-                      selectExperience(nextIndex, true);
-                    }
-                  }}
-                >
-                  <span>{item.period}</span>
-                  <strong>{item.company}</strong>
-                  <i aria-hidden="true">↗</i>
-                </button>
-              ))}
-            </div>
-            {experiences.map((item, index) => (
-              <article
-                key={`${item.company}-panel`}
-                id={`experience-${index}`}
-                className={activeExperience === index ? "experience-detail active" : "experience-detail"}
-                role="tabpanel"
-                aria-labelledby={`experience-tab-${index}`}
-                tabIndex={0}
-                hidden={activeExperience !== index}
-              >
-                <p className="detail-sector">{item.sector}</p>
-                <h3>{item.role}</h3>
-                <p className="detail-summary">{item.summary}</p>
-                <ul className="detail-points">
-                  {item.points.map((point) => <li key={point}>{point}</li>)}
-                </ul>
-                <div className="tech-stack">
-                  <p className="tech-stack-label" id={`experience-tech-${index}`}>
-                    Stack mobilisée
-                  </p>
-                  <TechnologyTags
-                    items={item.tech}
-                    labelledBy={`experience-tech-${index}`}
-                  />
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section id="projects" className="projects scroll-scene" data-scroll-scene>
-          <div
-            className="project-visual"
-            aria-hidden="true"
-            {...tune("progress", {"string-key": "--project-progress"})}
-          >
-            <div className="orbit orbit-one" />
-            <div className="orbit orbit-two" />
-            <div className="core">
-              <span>GitOps</span>
-              <strong>Desired<br />State</strong>
-            </div>
-            <span className="orbit-label label-one">EKS</span>
-            <span className="orbit-label label-two">ArgoCD</span>
-            <span className="orbit-label label-three">Terraform</span>
-            <span className="orbit-label label-four">Policy</span>
-          </div>
-          <article className="project-copy" data-reveal>
-            <p className="section-label">{project.label}</p>
-            <p className="project-kicker">{project.kicker}</p>
-            <h2>{project.name}</h2>
-            <p className="project-lead">{project.lead}</p>
-            <div className="project-columns">
-              {project.columns.map((column) => (
-                <p key={column}>{column}</p>
-              ))}
-            </div>
-            <div className="project-actions">
-              <a
-                href={project.repository}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Voir k8s-platform sur GitHub (nouvel onglet)"
-                {...tune("magnetic")}
-              >
-                Voir sur GitHub <span aria-hidden="true">↗</span>
-              </a>
-              <span>{project.cli}</span>
-            </div>
-          </article>
-        </section>
-
-        <section className="results scroll-scene" data-scroll-scene>
-          <p className="section-label">05 / Impact mesurable</p>
-          <div className="result-grid">
-            {results.map((result) => (
-              <article data-reveal key={result.figure}>
-                <strong>{result.figure}</strong>
-                <p>{result.body}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-        </>
-      ) : (
-        <>
-          <CareerColumn label="03 / Parcours" />
-          <PlatformBreakdown />
-        </>
-      )}
+        <CareerColumn label="03 / Parcours" />
+        <PlatformBreakdown />
 
       <section id="offer-bridge" className="offer-bridge" aria-labelledby="offer-bridge-title">
         <div className="offer-bridge-heading" data-reveal>
-          <p className="section-label">{`${number.bridge} / Diagnostic CI/CD & Observabilité`}</p>
+          <p className="section-label">05 / Diagnostic CI/CD & Observabilité</p>
           <h2 id="offer-bridge-title">
             Une intervention courte pour rendre votre delivery
             <span> lisible et actionnable.</span>
@@ -659,7 +491,7 @@ export function Portfolio({ layout }: { layout: HomeLayout }) {
 
       <footer id="contact" className="contact">
         <div className="contact-top">
-          <p className="section-label">{`${number.contact} / Contact`}</p>
+          <p className="section-label">06 / Contact</p>
           <p>Un besoin plateforme, cloud<br />ou automatisation ?</p>
         </div>
         <BookingLink

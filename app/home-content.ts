@@ -1,5 +1,4 @@
-// Home page copy shared by its layouts: the classic sections and the
-// career stack preview read the same source.
+// Home page copy, read by the home sections and the parcours column.
 
 export const about = {
   label: "01 / À propos",
@@ -13,8 +12,8 @@ export const about = {
     "Expérience acquise dans des contextes où l’indisponibilité, la fuite d’un secret ou une dérive de coûts ne sont pas des détails.",
 };
 
-// Measured on the Theodo (ex Padok) missions; the classic home shows them
-// in their own section, the parcours on that mission (see experiences).
+// Measured on the Theodo (ex Padok) missions, shown on that mission (see
+// experiences).
 export const results = [
   { figure: "−50%", body: "de coûts d’infrastructure et Kubernetes sur une mission bancaire." },
   { figure: "≈150", body: "équipes accompagnées au quotidien sur leurs processus de delivery." },

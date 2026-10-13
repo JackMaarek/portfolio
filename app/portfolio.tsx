@@ -1,125 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
   StringMagnetic,
   StringProgress,
   StringTune,
 } from "@fiddle-digital/string-tune";
+import { Accent } from "./accent";
 import { BookingLink } from "./booking-link";
+import { CareerColumn } from "./career/career-column";
+import { PlatformBreakdown } from "./career/platform-breakdown";
+import { about, capabilities } from "./home-content";
 import { SiteHeader } from "./site-header";
-
-const experiences = [
-  {
-    period: "2025 — aujourd’hui",
-    role: "Consultant technique",
-    company: "PerspeQtive",
-    sector: "R&D appliquée · Imagerie SAR",
-    summary:
-      "Conception de la plateforme d’exécution d’un algorithme quantum-inspired appliqué à l’imagerie SAR : workloads GPU sur AWS, orchestration event-driven et déploiements Kubernetes pilotés par GitOps.",
-    points: [
-      "Architecture de la chaîne d’exécution sur EKS avec S3, ArgoCD et Helm.",
-      "Orchestration event-driven des traitements SAR sur instances GPU AWS.",
-      "Adaptation de mon socle Kubernetes/GitOps personnel aux contraintes du projet.",
-    ],
-    tech: ["EKS", "ArgoCD", "Helm", "S3", "GPU", "SAR"],
-  },
-  {
-    period: "2023 — 2024",
-    role: "Platform Engineer",
-    company: "MIRAGE",
-    sector: "Plateforme · Delivery",
-    summary:
-      "Construction de la fondation d’infrastructure, de la toolchain de delivery et de l’observabilité d’une plateforme Kubernetes.",
-    points: [
-      "Repository Terraform et provisioning automatisé des applications.",
-      "Pipelines CI/CD, analyse statique et templatisation de la toolchain.",
-      "Dashboards Prometheus/Grafana et documentation des services.",
-    ],
-    tech: ["Terraform", "Kubernetes", "GitLab CI", "Go", "Prometheus", "Grafana"],
-  },
-  {
-    period: "2021 — 2023",
-    role: "Platform Engineer",
-    company: "Padok",
-    sector: "Banque · Santé · Cybersécurité",
-    summary:
-      "Missions de plateforme sur des environnements réglementés : sécurité automatisée, DevEx, FinOps, multi-comptes AWS et delivery à grande échelle.",
-    points: [
-      "Réduction de moitié des coûts d’infrastructure et du cluster Kubernetes.",
-      "Support delivery et amélioration de la DevEx pour environ 150 équipes.",
-      "Migration AWS multi-comptes et automatisations nécessaires à la certification HDS.",
-    ],
-    tech: ["AWS", "Terraform", "Kubernetes", "ArgoCD", "GitLab CI", "Datadog"],
-  },
-  {
-    period: "2019 — 2021",
-    role: "Back-end Developer / DevOps",
-    company: "Risk&Me",
-    sector: "Cybersécurité",
-    summary:
-      "Développement d’une plateforme de sensibilisation à la cybersécurité et transformation progressive de son architecture.",
-    points: [
-      "Migration d’un monolithe Symfony vers des microservices Go.",
-      "Migration de Windows Server vers AWS.",
-      "Création de l’IaC Terraform et des clusters Kubernetes de production.",
-    ],
-    tech: ["Go", "Symfony", "AWS", "Terraform", "Kubernetes", "MySQL"],
-  },
-  {
-    period: "2018 — 2019",
-    role: "Back-end Developer / DevOps",
-    company: "Les Amis d’Hubert · Sauvel Natal",
-    sector: "Services · E-commerce",
-    summary:
-      "Premières expériences back-end autour d’outils métier, d’e-commerce, de facturation et de migrations vers AWS.",
-    points: [
-      "Back-office de gestion de contenu, comptabilité et facturation.",
-      "Gestion de stocks et numérisation des caisses via RFID.",
-      "Mise en place et migration d’infrastructures AWS.",
-    ],
-    tech: ["PHP", "Symfony", "MySQL", "Docker", "AWS", "Terraform"],
-  },
-];
-
-const capabilities = [
-  {
-    index: "01",
-    title: "Platform Engineering",
-    body: "Des plateformes pensées comme des produits : standards clairs, self-service, automatisation et expérience développeur.",
-    tags: ["Kubernetes", "EKS", "ArgoCD", "Helm"],
-  },
-  {
-    index: "02",
-    title: "Infrastructure as Code",
-    body: "Des infrastructures AWS reproductibles, structurées par domaine et livrées sans credentials statiques.",
-    tags: ["Terraform", "AWS", "GitHub Actions", "OIDC"],
-  },
-  {
-    index: "03",
-    title: "Sécurité & fiabilité",
-    body: "La sécurité intégrée à la plateforme : mTLS, politiques d’admission, secrets externalisés et observabilité.",
-    tags: ["Istio", "Kyverno", "ESO", "Prometheus"],
-  },
-];
 
 const tune = (value: string, attributes: Record<string, string> = {}) =>
   ({ string: value, ...attributes }) as Record<string, string>;
 
 type TechnologyTagsProps = {
   items: string[];
-  label?: string;
-  labelledBy?: string;
+  label: string;
 };
 
-function TechnologyTags({ items, label, labelledBy }: TechnologyTagsProps) {
+function TechnologyTags({ items, label }: TechnologyTagsProps) {
   return (
-    <ul
-      className="technology-tags"
-      aria-label={label}
-      aria-labelledby={labelledBy}
-    >
+    <ul className="technology-tags" aria-label={label}>
       {items.map((item) => (
         <li className="technology-tag" key={item}>
           <span>{item}</span>
@@ -404,8 +309,6 @@ function TopologyCanvas() {
 }
 
 export function Portfolio() {
-  const [activeExperience, setActiveExperience] = useState(0);
-  const experienceTabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -471,13 +374,6 @@ export function Portfolio() {
     };
   }, []);
 
-  const selectExperience = (index: number, moveFocus = false) => {
-    setActiveExperience(index);
-    if (moveFocus) {
-      window.requestAnimationFrame(() => experienceTabRefs.current[index]?.focus());
-    }
-  };
-
   return (
     <div className="site-shell">
       <a className="skip-link" href="#portfolio-main">Aller au contenu</a>
@@ -525,202 +421,51 @@ export function Portfolio() {
         </div>
         </section>
 
-      <section
-        id="main-content"
-        className="manifesto scroll-scene"
-        data-scroll-scene
-      >
-        <p className="section-label">01 / À propos</p>
-        <div className="manifesto-copy" data-reveal>
-          <p>
-            Du <span>back-end</span> au multi-cluster.
-          </p>
-          <p>
-            J’automatise l’infrastructure, sécurise les flux et fiabilise
-            <span> chaque mise en production.</span>
-          </p>
-        </div>
-        <aside data-reveal>
-          Expérience acquise dans des contextes où l’indisponibilité, la fuite
-          d’un secret ou une dérive de coûts ne sont pas des détails.
-        </aside>
-      </section>
+        <section
+          id="main-content"
+          className="manifesto scroll-scene"
+          data-scroll-scene
+        >
+          <p className="section-label">{about.label}</p>
+          <div className="manifesto-copy" data-reveal>
+            <p>
+              <Accent {...about.headline} />
+            </p>
+            <p>
+              <Accent {...about.statement} />
+            </p>
+          </div>
+          <aside data-reveal>{about.aside}</aside>
+        </section>
 
-      <section id="expertise" className="capabilities">
-        <div className="section-heading" data-reveal>
-          <p className="section-label">02 / Expertise</p>
-          <h2>Ce que je<br />construis.</h2>
-        </div>
-        <div className="capability-list">
-          {capabilities.map((capability) => (
-            <article className="capability" key={capability.index} data-reveal>
-              <span className="capability-index">{capability.index}</span>
-              <div>
-                <h3>{capability.title}</h3>
-                <p>{capability.body}</p>
-              </div>
-              <TechnologyTags
-                items={capability.tags}
-                label={`Technologies : ${capability.title}`}
-              />
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="experience" className="experience">
-        <div className="section-heading experience-heading" data-reveal>
-          <p className="section-label">03 / Parcours</p>
-          <h2>
-            Du back-end aux plateformes<br />
-            cloud industrialisées.
-          </h2>
-          <p className="experience-intro">
-            De 2018 à aujourd’hui, du développement back-end aux enjeux de
-            plateforme, dans des secteurs où la rigueur compte.
-          </p>
-        </div>
-        <div className="experience-panel" data-reveal>
-          <div
-            className="experience-tabs"
-            role="tablist"
-            aria-label="Expériences"
-            aria-orientation="vertical"
-          >
-            {experiences.map((item, index) => (
-              <button
-                key={item.company}
-                ref={(element) => { experienceTabRefs.current[index] = element; }}
-                id={`experience-tab-${index}`}
-                type="button"
-                role="tab"
-                aria-selected={activeExperience === index}
-                aria-controls={`experience-${index}`}
-                tabIndex={activeExperience === index ? 0 : -1}
-                onClick={() => selectExperience(index)}
-                onKeyDown={(event) => {
-                  const lastIndex = experiences.length - 1;
-                  let nextIndex: number | null = null;
-
-                  if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-                    nextIndex = index === lastIndex ? 0 : index + 1;
-                  } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-                    nextIndex = index === 0 ? lastIndex : index - 1;
-                  } else if (event.key === "Home") {
-                    nextIndex = 0;
-                  } else if (event.key === "End") {
-                    nextIndex = lastIndex;
-                  }
-
-                  if (nextIndex !== null) {
-                    event.preventDefault();
-                    selectExperience(nextIndex, true);
-                  }
-                }}
-              >
-                <span>{item.period}</span>
-                <strong>{item.company}</strong>
-                <i aria-hidden="true">↗</i>
-              </button>
+        <section id="expertise" className="capabilities">
+          <div className="section-heading" data-reveal>
+            <p className="section-label">02 / Expertise</p>
+            <h2>Ce que je<br />construis.</h2>
+          </div>
+          <div className="capability-list">
+            {capabilities.map((capability) => (
+              <article className="capability" key={capability.index} data-reveal>
+                <span className="capability-index">{capability.index}</span>
+                <div>
+                  <h3>{capability.title}</h3>
+                  <p>{capability.body}</p>
+                </div>
+                <TechnologyTags
+                  items={capability.tags}
+                  label={`Technologies : ${capability.title}`}
+                />
+              </article>
             ))}
           </div>
-          {experiences.map((item, index) => (
-            <article
-              key={`${item.company}-panel`}
-              id={`experience-${index}`}
-              className={activeExperience === index ? "experience-detail active" : "experience-detail"}
-              role="tabpanel"
-              aria-labelledby={`experience-tab-${index}`}
-              tabIndex={0}
-              hidden={activeExperience !== index}
-            >
-              <p className="detail-sector">{item.sector}</p>
-              <h3>{item.role}</h3>
-              <p className="detail-summary">{item.summary}</p>
-              <ul className="detail-points">
-                {item.points.map((point) => <li key={point}>{point}</li>)}
-              </ul>
-              <div className="tech-stack">
-                <p className="tech-stack-label" id={`experience-tech-${index}`}>
-                  Stack mobilisée
-                </p>
-                <TechnologyTags
-                  items={item.tech}
-                  labelledBy={`experience-tech-${index}`}
-                />
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+        </section>
 
-      <section id="projects" className="projects scroll-scene" data-scroll-scene>
-        <div
-          className="project-visual"
-          aria-hidden="true"
-          {...tune("progress", {"string-key": "--project-progress"})}
-        >
-          <div className="orbit orbit-one" />
-          <div className="orbit orbit-two" />
-          <div className="core">
-            <span>GitOps</span>
-            <strong>Desired<br />State</strong>
-          </div>
-          <span className="orbit-label label-one">EKS</span>
-          <span className="orbit-label label-two">ArgoCD</span>
-          <span className="orbit-label label-three">Terraform</span>
-          <span className="orbit-label label-four">Policy</span>
-        </div>
-        <article className="project-copy" data-reveal>
-          <p className="section-label">04 / Projet personnel</p>
-          <p className="project-kicker">PodYourLife présente</p>
-          <h2>k8s-platform</h2>
-          <p className="project-lead">
-            Du service applicatif au workload ML/GPU : un socle Kubernetes et
-            GitOps pour déployer simplement sur AWS, piloté par une CLI interne.
-          </p>
-          <div className="project-columns">
-            <p>
-              platform-bot prépare et configure les environnements. ArgoCD,
-              Helm et Terraform assurent des déploiements reproductibles.
-            </p>
-            <p>
-              Istio mTLS strict, Kyverno, External Secrets Operator, OIDC et
-              observabilité Prometheus, Grafana et Loki.
-            </p>
-          </div>
-          <div className="project-actions">
-            <a
-              href="https://github.com/PodYourLife/k8s-platform"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Voir k8s-platform sur GitHub (nouvel onglet)"
-              {...tune("magnetic")}
-            >
-              Voir sur GitHub <span aria-hidden="true">↗</span>
-            </a>
-            <span>CLI Go · platform-bot</span>
-          </div>
-        </article>
-      </section>
+        <CareerColumn label="03 / Parcours" />
+        <PlatformBreakdown />
 
-      <section className="results scroll-scene" data-scroll-scene>
-        <p className="section-label">05 / Impact mesurable</p>
-        <div className="result-grid">
-          <article data-reveal>
-            <strong>−50%</strong>
-            <p>de coûts d’infrastructure et Kubernetes sur une mission bancaire.</p>
-          </article>
-          <article data-reveal>
-            <strong>≈150</strong>
-            <p>équipes accompagnées au quotidien sur leurs processus de delivery.</p>
-          </article>
-        </div>
-      </section>
-
-      <section className="offer-bridge" aria-labelledby="offer-bridge-title">
+      <section id="offer-bridge" className="offer-bridge" aria-labelledby="offer-bridge-title">
         <div className="offer-bridge-heading" data-reveal>
-          <p className="section-label">06 / Diagnostic CI/CD & Observabilité</p>
+          <p className="section-label">05 / Diagnostic CI/CD & Observabilité</p>
           <h2 id="offer-bridge-title">
             Une intervention courte pour rendre votre delivery
             <span> lisible et actionnable.</span>
@@ -746,7 +491,7 @@ export function Portfolio() {
 
       <footer id="contact" className="contact">
         <div className="contact-top">
-          <p className="section-label">07 / Contact</p>
+          <p className="section-label">06 / Contact</p>
           <p>Un besoin plateforme, cloud<br />ou automatisation ?</p>
         </div>
         <BookingLink

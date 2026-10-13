@@ -1,0 +1,624 @@
+/* Parcours: missions around an amber column. Phones and tablets read the
+   missions in the page flow; wide screens pin the column and turn it with
+   the scroll (see .parcours in the media query below). */
+.parcours {
+  --p: 0;
+  /* Transition to the project, 0 to 1, eased. */
+  --t: 0;
+  /* Front mission, its open sheet height and the column scale. */
+  --front: 0;
+  --front-height: 0px;
+  --s: 1;
+  /* In the flow: the rail's fill and the cursor, in px from the stage's
+     top, and the cursor's turn into a chevron (0 to 1). */
+  --rail: 100000px;
+  --cursor-y: 0px;
+  --travel: 0;
+  --sheet: #d8d6e3;
+  --sheet-ink: #111014;
+  --sheet-muted: #4f4c59;
+  --sheet-rule: rgba(17, 16, 20, .2);
+  --sheet-violet: #4c40af;
+  position: relative;
+  background:
+    linear-gradient(rgba(239, 237, 245, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(239, 237, 245, .045) 1px, transparent 1px),
+    var(--ink);
+  background-size: 64px 64px;
+  color: var(--paper);
+}
+
+.stage {
+  position: relative;
+  padding: 96px var(--page-gutter) 72px;
+}
+
+.head h2 {
+  margin: 14px 0 0;
+  max-width: 14em;
+  font-size: clamp(1.9rem, 2.6vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: -.04em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.head h2 span {
+  color: var(--violet);
+}
+
+/* Years: sticky chips in the flow, a list at the bottom left on the column. */
+.years {
+  position: sticky;
+  z-index: 3;
+  top: 0;
+  margin: 24px calc(-1 * var(--page-gutter)) 0;
+  padding: 10px var(--page-gutter);
+  background: rgba(11, 11, 13, .92);
+}
+
+.years > p {
+  display: none;
+}
+
+.years ol {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.years button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch-target);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: .86rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.years button span {
+  display: none;
+}
+
+.years button strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.years button:hover,
+.years button:focus-visible {
+  color: var(--paper);
+}
+
+.years button[aria-current="step"] {
+  border-color: var(--acid);
+  color: var(--paper);
+}
+
+.years button[aria-current="step"] strong {
+  color: var(--acid);
+}
+
+/* The amber route the missions follow; it runs to the section's end,
+   where the k8s-platform rail takes over on the same x. In the flow it
+   fills down to the cursor (200px: its own top on the stage). */
+.spine {
+  position: absolute;
+  top: 200px;
+  bottom: 0;
+  left: calc(var(--page-gutter) + 7px);
+  width: 2px;
+  background: linear-gradient(to bottom, rgba(255, 189, 116, .85) calc(var(--rail) - 200px), rgba(255, 189, 116, .22) calc(var(--rail) - 200px));
+}
+
+.column {
+  display: grid;
+  gap: 40px;
+  margin: 32px 0 0;
+  padding: 0 0 0 26px;
+  list-style: none;
+}
+
+.card {
+  position: relative;
+}
+
+/* In the flow, each mission is a stop on the rail; the current one is lit. */
+.card::before {
+  position: absolute;
+  top: 30px;
+  left: -25px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(239, 237, 245, .35);
+  border-radius: 50%;
+  background: var(--ink);
+  content: "";
+  transition: border-color 300ms ease;
+}
+
+.card[data-reached="true"]::before {
+  border-color: var(--acid);
+}
+
+/* The cursor rides the rail at the reading line, then turns into a
+   chevron along the transition text and stays just below it. */
+.cursor {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: calc(var(--page-gutter) + 8px);
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  transform: translateY(var(--cursor-y));
+}
+
+.cursor i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--acid);
+  border-top-color: rgba(255, 189, 116, calc(1 - var(--travel)));
+  border-left-color: rgba(255, 189, 116, calc(1 - var(--travel)));
+  border-radius: calc((1 - var(--travel)) * 50%);
+  /* Hollow once a chevron, so the line runs through it. */
+  background: rgba(11, 11, 13, calc(1 - var(--travel)));
+  transform: rotate(calc(var(--travel) * 45deg));
+}
+
+/* Why the parcours led to the project. */
+.bridge {
+  position: relative;
+  margin: 56px 0 0;
+  padding-left: 26px;
+}
+
+.statement {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -.03em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.bridgeBody {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.closing {
+  margin: 18px 0 0;
+  color: var(--acid);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.face {
+  padding: 22px 20px;
+  border-radius: 6px;
+  background: var(--sheet);
+  color: var(--sheet-ink);
+  box-shadow: 0 30px 60px -24px rgba(0, 0, 0, .8);
+}
+
+.year {
+  margin: 0;
+  color: var(--sheet-violet);
+  font-size: clamp(2.1rem, 3vw, 2.6rem);
+  font-weight: 500;
+  letter-spacing: -.05em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.face h3 {
+  margin: 10px 0 0;
+  font-size: 1.4rem;
+  font-weight: 500;
+  letter-spacing: -.03em;
+  line-height: 1.08;
+}
+
+.role {
+  margin: 8px 0 0;
+  color: var(--sheet-muted);
+  font-size: .84rem;
+  font-weight: 700;
+}
+
+/* Collapsible block: open in the flow and on the front sheet. */
+.detail {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.detail > div {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.summary {
+  margin: 16px 0 0;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--sheet-rule);
+}
+
+.figures dt {
+  color: var(--sheet-violet);
+  font-size: 1.9rem;
+  font-weight: 500;
+  letter-spacing: -.04em;
+  line-height: 1;
+}
+
+.figures dd {
+  margin: 6px 0 0;
+  color: var(--sheet-muted);
+  font-size: .84rem;
+  line-height: 1.38;
+}
+
+.stackLabel {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--sheet-rule);
+  color: var(--sheet-muted);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips li {
+  padding: 4px 8px;
+  border: 1px solid rgba(76, 64, 175, .35);
+  border-radius: 3px;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+/* Achievements: separate leaves under the sheet in the flow. */
+.leaves {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.leaves li {
+  padding: 14px 16px;
+  border-radius: 4px;
+  background: rgba(216, 214, 227, .94);
+  color: var(--sheet-ink);
+  font-size: .92rem;
+  line-height: 1.42;
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, .9);
+}
+
+.leaves li span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--sheet-violet);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+/* Wide screens: the section is pinned and the scroll turns the column.
+   Each card sits a step around and along it, from its distance to the
+   scroll position --p; only --p changes while scrolling. Mirrors
+   columnQuery in career-column.tsx. */
+@media (min-width: 1000px) and (min-height: 620px) {
+  .parcours {
+    height: calc(100svh + (var(--count) - 1) * 70svh + 110svh);
+  }
+
+  .stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    padding: 0;
+    overflow: hidden;
+    perspective: 1800px;
+    perspective-origin: 56% 50%;
+  }
+
+  .head,
+  .years {
+    opacity: calc(1 - min(var(--t) * 3, 1));
+  }
+
+  .head {
+    position: absolute;
+    z-index: 2;
+    top: 96px;
+    left: var(--page-gutter);
+    max-width: 24rem;
+  }
+
+  .years {
+    position: absolute;
+    top: auto;
+    bottom: 56px;
+    left: var(--page-gutter);
+    margin: 0;
+    padding: 0;
+    background: none;
+  }
+
+  .years > p {
+    display: block;
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .years ol {
+    display: grid;
+    gap: 0;
+    overflow: visible;
+  }
+
+  .years button {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    font-size: .92rem;
+  }
+
+  .years button::before {
+    color: var(--line);
+    content: "→";
+    transition: color 200ms ease;
+  }
+
+  .years button span {
+    display: inline;
+  }
+
+  .years button strong {
+    min-width: 3.2em;
+  }
+
+  .years button[aria-current="step"]::before {
+    color: var(--acid);
+  }
+
+  /* One continuous line: once the transition starts, its lower half
+     stays lit down to the bottom edge, where the k8s-platform axis takes
+     over on the same x. */
+  .spine {
+    --lit: calc(.15 + .7 * var(--t));
+    top: -10%;
+    bottom: -10%;
+    left: 56%;
+    /* Centred on the axis, like the cursor and the project axis. */
+    margin-left: -1px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 189, 116, .15) 15%, rgba(255, 189, 116, .85) 50%, rgba(255, 189, 116, var(--lit)) 85%, rgba(255, 189, 116, calc(var(--t) * .85)));
+  }
+
+  /* The cursor rides the column just above the front sheet, then drops
+     and turns into a chevron on the line, pointing to the project. */
+  .cursor {
+    --front-y: calc((var(--front) - var(--p)) * 175px * var(--s) - var(--front-height) * var(--s) / 2 - 24px);
+    z-index: 3;
+    top: 50%;
+    left: 56%;
+    /* The cursor travels in the first part of the transition, so the text
+       only appears once it has passed. */
+    --travel: min(var(--t) * 1.6, 1);
+    transform: translateY(calc(var(--front-y) * (1 - var(--travel)) + 22svh * var(--travel)));
+    transition: transform 300ms cubic-bezier(.16, 1, .3, 1);
+  }
+
+  .card::before {
+    display: none;
+  }
+
+  /* Beside the line rather than over it, so the column never breaks. */
+  .bridge {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: calc(56% + 56px);
+    width: min(30rem, 34vw);
+    margin: 0;
+    padding: 0;
+    transform: translateY(-50%);
+  }
+
+  .bridge > p {
+    opacity: clamp(0, calc((var(--t) - .62) * 3.5), 1);
+    transform: translateY(calc((1 - var(--t)) * 5svh));
+  }
+
+  /* The column's axis; the front card sits at depth 0 (scale 1). */
+  .column {
+    position: absolute;
+    top: 50%;
+    left: 56%;
+    margin: 0;
+    padding: 0;
+    transform: translateZ(-330px) scale(var(--s));
+    transform-style: preserve-3d;
+  }
+
+  .card {
+    --k: calc(var(--i) - var(--p));
+    --distance: max(var(--k), calc(-1 * var(--k)));
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: min(420px, 30vw);
+    transform:
+      translateY(calc(var(--t) * -30svh))
+      translate(-50%, -50%)
+      translateY(calc(var(--k) * 175px))
+      rotateY(calc(var(--k) * 58deg))
+      translateZ(330px)
+      rotateY(calc(var(--k) * -43.5deg));
+    transform-style: preserve-3d;
+    opacity: calc(clamp(0, calc(1 - var(--distance) * .42), 1) * (1 - min(var(--t) * 2.5, 1)));
+  }
+
+  /* The sheets behind are glass: name and year only. */
+  .face {
+    padding: clamp(20px, 1.9vw, 28px);
+    border: 1px solid rgba(239, 237, 245, .16);
+    background: linear-gradient(160deg, rgba(239, 237, 245, .1), rgba(239, 237, 245, .03) 60%), rgba(18, 17, 22, .86);
+    color: var(--paper);
+    transition: background-color 500ms ease, color 500ms ease, border-color 500ms ease;
+  }
+
+  .card:not([data-front="true"]) .year {
+    color: var(--violet);
+  }
+
+  .card:not([data-front="true"]) .role {
+    color: var(--muted);
+  }
+
+  .detail {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 600ms cubic-bezier(.16, 1, .3, 1), opacity 400ms ease;
+  }
+
+  /* The front card becomes a dossier sheet. */
+  .card[data-front="true"] .face {
+    border-color: transparent;
+    background: var(--sheet);
+    color: var(--sheet-ink);
+  }
+
+  .card[data-front="true"] .detail {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .leaves {
+    position: absolute;
+    top: 18px;
+    left: calc(100% + 24px);
+    width: min(250px, 17vw);
+    margin: 0;
+    transform-style: preserve-3d;
+  }
+
+  .leaves li {
+    font-size: .88rem;
+    opacity: 0;
+    transform: translate3d(-60px, 0, -40px) rotateY(-14deg);
+    transition: opacity 400ms ease, transform 800ms cubic-bezier(.16, 1, .3, 1);
+  }
+
+  .card[data-front="true"] .leaves li {
+    opacity: 1;
+    transform: translate3d(0, 0, 40px) rotateY(-14deg);
+  }
+
+  .card[data-front="true"] .leaves li:nth-child(2) {
+    transition-delay: 70ms;
+  }
+
+  .card[data-front="true"] .leaves li:nth-child(3) {
+    transition-delay: 140ms;
+  }
+}
+
+/* In the flow: the missions the cursor has not reached yet, and those it
+   has passed, are glass; the current one is the dossier sheet. Its
+   achievements leave the rail one by one once it is reached. */
+@media (max-width: 999px), (max-height: 619px) {
+  .card:not([data-front="true"]) .face {
+    --sheet-violet: var(--violet);
+    --sheet-muted: var(--muted);
+    --sheet-rule: var(--line);
+    border: 1px solid rgba(239, 237, 245, .16);
+    background: linear-gradient(160deg, rgba(239, 237, 245, .1), rgba(239, 237, 245, .03) 60%), rgba(18, 17, 22, .86);
+    color: var(--paper);
+  }
+
+  .face {
+    border: 1px solid transparent;
+    transition: background-color 500ms ease, color 500ms ease, border-color 500ms ease;
+  }
+
+  .leaves li {
+    transition: opacity 400ms ease, transform 700ms cubic-bezier(.16, 1, .3, 1);
+  }
+
+  .card:not([data-reached="true"]) .leaves li {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+
+  .card[data-reached="true"] .leaves li:nth-child(2) {
+    transition-delay: 90ms;
+  }
+
+  .card[data-reached="true"] .leaves li:nth-child(3) {
+    transition-delay: 180ms;
+  }
+}
+
+/* Shorter laptop screens: the column is drawn a little smaller. */
+@media (min-width: 1000px) and (min-height: 620px) and (max-height: 820px) {
+  .parcours {
+    --s: .86;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 999px), (prefers-reduced-motion: reduce) and (max-height: 619px) {
+  .card:not([data-reached="true"]) .leaves li {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .face,
+  .detail,
+  .leaves li,
+  .years button,
+  .card::before,
+  .cursor {
+    transition: none;
+  }
+}

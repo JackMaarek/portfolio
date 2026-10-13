@@ -5,10 +5,12 @@ import test from "node:test";
 const projectRoot = new URL("../", import.meta.url);
 
 test("portfolio exposes its core positioning", async () => {
-  const [portfolio, header] = await Promise.all([
+  const [component, content, header] = await Promise.all([
     readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/home-content.ts", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
   ]);
+  const portfolio = `${component}${content}`;
 
   assert.match(portfolio, /Platform Engineer spécialisé Kubernetes/);
   assert.match(portfolio, /Le cloud, prêt pour la production/);
@@ -23,7 +25,7 @@ test("portfolio exposes its core positioning", async () => {
   assert.ok(!`${portfolio}${header}`.includes("#projets"));
 });
 
-test("shared navigation and experience tabs expose accessible interactions", async () => {
+test("shared navigation and technology tags expose accessible interactions", async () => {
   const [portfolio, header, styles] = await Promise.all([
     readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
     readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
@@ -35,15 +37,8 @@ test("shared navigation and experience tabs expose accessible interactions", asy
   assert.match(header, /event\.key !== "Escape"/);
   assert.match(header, /closeOnOutsidePointer/);
   assert.match(header, /min-width: 1121px/);
-  assert.match(portfolio, /tabIndex=\{activeExperience === index \? 0 : -1\}/);
-  assert.match(portfolio, /event\.key === "ArrowRight"/);
-  assert.match(portfolio, /aria-orientation="vertical"/);
-  assert.match(portfolio, /aria-labelledby=\{`experience-tab-/);
   assert.match(portfolio, /function TechnologyTags/);
   assert.ok(!portfolio.includes("data-status="));
-  assert.match(portfolio, /Stack mobilisée/);
-  assert.match(portfolio, /labelledBy=\{`experience-tech-/);
-  assert.match(portfolio, /className="project-visual"[\s\S]*?aria-hidden="true"/);
   assert.match(styles, /@media \(max-width: 1120px\)/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(styles, /--offer-violet: #4c40af/);
@@ -157,22 +152,39 @@ test("offer page exposes the commercial diagnostic", async () => {
 });
 
 test("offer dossier is built on the offer copy and loads its scene lazily", async () => {
-  const [dossier, content, scene] = await Promise.all([
+  const [dossier, content, loop, hook] = await Promise.all([
     readFile(new URL("app/offer/dossier/dossier.tsx", projectRoot), "utf8"),
     readFile(new URL("app/offer/dossier/dossier-content.ts", projectRoot), "utf8"),
-    readFile(new URL("app/offer/dossier/dossier-scene.ts", projectRoot), "utf8"),
+    readFile(new URL("app/scene/loop.ts", projectRoot), "utf8"),
+    readFile(new URL("app/scene/use-scroll-scene.ts", projectRoot), "utf8"),
   ]);
 
   // Day copy comes from the offer content, not a second source.
   assert.match(content, /from "\.\.\/offer-content"/);
   assert.match(content, /title: step\(day\)\.title/);
-  // The 3D scene loads after the text and stays out of the accessibility tree.
+  // The 3D scene is its own chunk and stays out of the accessibility tree.
   assert.match(dossier, /import\("\.\/dossier-scene"\)/);
   assert.match(dossier, /data-scene=\{sceneState\} aria-hidden="true"/);
   assert.match(dossier, /placement="offer-dossier"/);
-  // Rendering pauses off-screen and falls back to text if the GPU drops it.
-  assert.match(scene, /setActive\(value\)/);
-  assert.match(scene, /"webglcontextlost"/);
-  // Three.js only loads once the dossier nears the viewport.
-  assert.match(dossier, /const loadScene = \(\) =>/);
+  // The shared scene loads near the viewport, pauses off-screen and falls
+  // back to text if the GPU drops it.
+  assert.match(hook, /rootMargin: "50% 0px"/);
+  assert.match(loop, /setActive\(value: boolean\)/);
+  assert.match(loop, /"webglcontextlost"/);
+});
+
+test("home presents the parcours from the home copy without WebGL", async () => {
+  const [home, column, breakdown] = await Promise.all([
+    readFile(new URL("app/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/career/career-column.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/career/platform-breakdown.tsx", projectRoot), "utf8"),
+  ]);
+
+  assert.ok(home.includes("<Portfolio />"));
+  assert.match(column, /Stack mobilisée/);
+  // Copy comes from the home content; both scenes are CSS 3D, not three.js.
+  for (const source of [column, breakdown]) {
+    assert.match(source, /from "\.\.\/home-content"/);
+    assert.ok(!source.includes("three"));
+  }
 });

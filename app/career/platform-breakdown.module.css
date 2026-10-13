@@ -1,0 +1,423 @@
+/* k8s-platform exploded view: isometric layers that separate by
+   var(--explode) (0 assembled, 1 exploded). In the flow on phones and
+   tablets the stack docks at the top of the screen over the callouts;
+   pinned with the copy and the callouts on wide screens. */
+.project {
+  --explode: 0;
+  --gap: 30px;
+  /* In the flow: the rail's fill from the copy's top, and the dock's line
+     once the rail has reached it (0 or 1). */
+  --fill: 100000px;
+  --dock-lit: 1;
+  --rail-on: rgba(255, 189, 116, .85);
+  --rail-off: rgba(255, 189, 116, .22);
+  position: relative;
+  background:
+    linear-gradient(rgba(239, 237, 245, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(239, 237, 245, .045) 1px, transparent 1px),
+    var(--ink);
+  background-size: 64px 64px;
+  color: var(--paper);
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  gap: 24px;
+  padding: 88px var(--page-gutter) 72px;
+}
+
+/* In the flow, the parcours rail carries on beside the copy, on the
+   parcours' x, down to the stack. */
+.copy {
+  position: relative;
+  padding-left: 26px;
+}
+
+.copy::before {
+  position: absolute;
+  top: -88px;
+  bottom: -24px;
+  left: 7px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--rail-on) calc(var(--fill) + 88px), var(--rail-off) calc(var(--fill) + 88px));
+  content: "";
+}
+
+.kicker {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: .86rem;
+  font-weight: 700;
+}
+
+.copy h2 {
+  margin: 8px 0 0;
+  font-size: clamp(2.4rem, 3.4vw, 3.4rem);
+  font-weight: 500;
+  letter-spacing: -.05em;
+  line-height: 1;
+}
+
+.lead {
+  margin: 18px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.body {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: .94rem;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: .84rem;
+  font-weight: 700;
+}
+
+.github {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 3px;
+  background: var(--acid);
+  color: var(--acid-readable);
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform 180ms ease;
+}
+
+.github:active {
+  transform: scale(.985);
+}
+
+.github:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+
+/* Isometric view: each plate rises by its index times the gap. */
+.view {
+  position: relative;
+}
+
+/* In the flow the stack docks at the top of the screen; the callouts
+   scroll under it and its bottom edge is the reading line. */
+.dock {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  height: clamp(280px, 40svh, 340px);
+  margin: 0 calc(-1 * var(--page-gutter));
+  /* Opaque, with a short fade so the callouts slide under its edge. */
+  background: linear-gradient(var(--ink) calc(100% - 20px), rgba(11, 11, 13, 0));
+  perspective: 2400px;
+}
+
+/* The parcours column, coming down into the stack's centre: hidden by
+   the opaque plates, it shows in the gaps as they separate. In the flow
+   it turns in from the rail beside the copy. */
+.axis {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  width: 2px;
+  height: calc(62% - 22px);
+  margin-left: -1px;
+  background: rgba(255, 189, 116, calc(.22 + .63 * var(--dock-lit)));
+  transition: background-color 300ms ease;
+}
+
+.axis::before {
+  position: absolute;
+  top: -22px;
+  right: 100%;
+  width: calc(50vw - var(--page-gutter) - 8px);
+  height: 24px;
+  border-bottom: 2px solid rgba(255, 189, 116, calc(.22 + .63 * var(--dock-lit)));
+  border-left: 2px solid rgba(255, 189, 116, calc(.22 + .63 * var(--dock-lit)));
+  border-bottom-left-radius: 10px;
+  content: "";
+  transition: border-color 300ms ease;
+}
+
+.layers {
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  width: 180px;
+  height: 124px;
+  transform: translate(-50%, -50%) rotateX(58deg) rotateZ(-38deg);
+  transform-style: preserve-3d;
+}
+
+.plate {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-content: center;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid rgba(239, 237, 245, .35);
+  border-radius: 4px;
+  background: rgba(24, 23, 29, .92);
+  transform: translateZ(calc(var(--i) * (6px + var(--explode) * var(--gap))));
+  transition: border-color 300ms ease;
+}
+
+.plate i {
+  display: block;
+  height: 22px;
+  border: 1px solid rgba(239, 237, 245, .18);
+  border-radius: 2px;
+  background: rgba(239, 237, 245, .05);
+  transition: border-color 300ms ease, background-color 300ms ease;
+}
+
+.plate span {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  padding: 3px 7px;
+  border: 1px solid rgba(239, 237, 245, .35);
+  border-radius: 3px 0 3px 0;
+  background: var(--ink);
+  color: var(--muted);
+  font-size: .75rem;
+  font-weight: 700;
+}
+
+/* The infrastructure layer is described in code: a blueprint outline. */
+.plate[data-described="true"] {
+  border: 1px dashed rgba(171, 162, 255, .7);
+  background: transparent;
+}
+
+.plate[data-described="true"] i {
+  border-color: rgba(171, 162, 255, .35);
+  background: none;
+}
+
+.plate[data-current="true"] {
+  border-color: rgba(255, 189, 116, .85);
+}
+
+.plate[data-current="true"] i {
+  border-color: rgba(255, 189, 116, .55);
+  background: rgba(255, 189, 116, .08);
+}
+
+.plate[data-current="true"] span {
+  border-color: rgba(255, 189, 116, .85);
+  color: var(--acid);
+}
+
+/* Callouts: a list under the stack in the flow; on wide screens each
+   one rides beside its plate. */
+.callouts {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* In the flow each callout gets a stretch of scroll under the dock. */
+.callouts > li {
+  display: grid;
+  grid-template-columns: 2.6em 1fr;
+  align-content: start;
+  gap: 6px;
+  min-height: 16svh;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .82rem;
+  line-height: 1.38;
+  transition: color 300ms ease;
+}
+
+.callouts b {
+  color: var(--paper);
+  font-size: .8rem;
+  transition: color 300ms ease;
+}
+
+.callouts strong {
+  display: block;
+  color: var(--paper);
+  font-size: .92rem;
+  font-weight: 500;
+}
+
+.callouts ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 .45em;
+  margin: 3px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.callouts ul li + li::before {
+  margin-right: .45em;
+  content: "·";
+}
+
+.callouts p {
+  margin: 6px 0 0;
+}
+
+.callouts > li[data-current="true"] {
+  color: var(--paper);
+}
+
+.callouts > li[data-current="true"] b {
+  color: var(--acid);
+}
+
+/* Wide screens: pinned while the layers separate, are named in turn and
+   close back. Mirrors pinnedQuery in platform-breakdown.tsx. */
+@media (min-width: 1000px) and (min-height: 620px) {
+  .project {
+    --gap: 70px;
+    height: 240svh;
+  }
+
+  .stage {
+    position: sticky;
+    top: 0;
+    grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+    align-items: center;
+    gap: 32px;
+    height: 100svh;
+    padding: 72px var(--page-gutter) 48px;
+    overflow: hidden;
+  }
+
+  /* The view covers the stage and its parts sit on the parcours column's
+     x (56%), so the line coming from the parcours never shifts. */
+  .view,
+  .dock {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .dock {
+    height: auto;
+    margin: 0;
+    background: none;
+    perspective-origin: 56% 50%;
+  }
+
+  .copy {
+    padding-left: 0;
+  }
+
+  .copy::before,
+  .axis::before {
+    display: none;
+  }
+
+  .axis {
+    top: 0;
+    bottom: 50%;
+    left: 56%;
+    height: auto;
+    background: var(--rail-on);
+  }
+
+  .layers {
+    top: 50%;
+    left: 56%;
+    width: clamp(240px, 24vw, 340px);
+    height: auto;
+    aspect-ratio: 34 / 23;
+  }
+
+  /* Each callout sits at the height of its plate (sin 58deg ≈ .85 of its
+     rise); the CLI sits one step above the stack. Shown while exploded. */
+  .callouts {
+    position: absolute;
+    top: 50%;
+    left: calc(56% + clamp(170px, 16vw, 240px));
+    right: var(--page-gutter);
+    opacity: clamp(0, calc((var(--explode) - .4) * 2.5), 1);
+  }
+
+  .callouts > li {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    transform: translateY(calc(-50% - var(--i) * (6px + var(--explode) * var(--gap)) * .85));
+  }
+
+  .callouts > li::before {
+    position: absolute;
+    top: .55em;
+    right: calc(100% + 10px);
+    width: 28px;
+    border-top: 1px solid var(--line);
+    content: "";
+    transition: border-color 300ms ease;
+  }
+
+  .callouts > li[data-current="true"]::before {
+    border-color: var(--acid);
+  }
+
+  /* The detail opens on the current layer only, so the callouts never
+     overlap at the gap between two plates. */
+  .callouts p {
+    display: none;
+  }
+
+  .callouts > li[data-current="true"] p {
+    display: block;
+  }
+
+  .plate {
+    gap: 10px;
+    padding: 18px;
+  }
+
+  .plate i {
+    height: 34px;
+  }
+}
+
+/* Shorter laptop screens: a smaller gap keeps the CLI callout clear of
+   the top edge. */
+@media (min-width: 1000px) and (min-height: 620px) and (max-height: 820px) {
+  .project {
+    --gap: 58px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate,
+  .plate i,
+  .axis,
+  .axis::before,
+  .callouts > li,
+  .callouts > li::before,
+  .callouts b,
+  .github {
+    transition: none;
+  }
+}

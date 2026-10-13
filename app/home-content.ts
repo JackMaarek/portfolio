@@ -113,7 +113,7 @@ export const capabilities = [
   {
     index: "03",
     title: "Sécurité & fiabilité",
-    body: "La sécurité intégrée à la plateforme : mTLS, politiques d’admission, secrets externalisés et observabilité.",
+    body: "La sécurité intégrée à la plateforme : mTLS, admission policies, secrets externalisés et observabilité.",
     tags: ["Istio", "Kyverno", "ESO", "Prometheus"],
   },
 ];
@@ -149,7 +149,7 @@ export const project = {
   // real copy exists.
   layers: [
     {
-      name: "Infrastructure décrite en code",
+      name: "Infrastructure as Code",
       components: ["AWS", "Terraform", "OIDC"],
       described: true,
     },
@@ -164,7 +164,7 @@ export const project = {
     {
       name: "Sécurité",
       components: ["Istio mTLS", "Kyverno", "External Secrets Operator"],
-      detail: "mTLS strict, politiques d’admission, secrets externalisés.",
+      detail: "mTLS strict, admission policies, secrets externalisés.",
     },
     {
       name: "Observabilité",

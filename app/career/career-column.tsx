@@ -31,7 +31,7 @@ const smoothstep = (value: number) => {
 export function CareerColumn({ label }: { label: string }) {
   const rootRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const spineRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLOListElement>(null);
   const bridgeRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<HTMLLIElement[]>([]);
   const [active, setActive] = useState(0);
@@ -39,9 +39,9 @@ export function CareerColumn({ label }: { label: string }) {
   useEffect(() => {
     const root = rootRef.current;
     const stage = stageRef.current;
-    const spine = spineRef.current;
     const bridge = bridgeRef.current;
-    if (!root || !stage || !spine || !bridge) return;
+    const list = listRef.current;
+    if (!root || !stage || !bridge || !list) return;
     const column = window.matchMedia(columnQuery);
     let frame = 0;
     let near = false;
@@ -69,10 +69,14 @@ export function CareerColumn({ label }: { label: string }) {
         cardRefs.current.forEach((card, position) => {
           if (card.getBoundingClientRect().top < line) index = position;
         });
-        // Positions on the stage: the rail fills down to the reading line;
-        // the cursor turns into a chevron along the transition text and
-        // stops just below it, while the rail keeps filling.
-        const rail = Math.min(Math.max(line - stage.getBoundingClientRect().top, spine.offsetTop), stage.offsetHeight);
+        // Positions on the stage: the rail starts just below the years,
+        // whose height depends on how the title and the years wrap, and
+        // fills down to the reading line; the cursor turns into a chevron
+        // along the transition text and stops just below it, while the
+        // rail keeps filling.
+        const spineTop = list.offsetTop - 16;
+        const rail = Math.min(Math.max(line - stage.getBoundingClientRect().top, spineTop), stage.offsetHeight);
+        root.style.setProperty("--spine-top", `${spineTop}px`);
         const bridgeEnd = bridge.offsetTop + bridge.offsetHeight;
         root.style.setProperty("--rail", `${rail.toFixed(1)}px`);
         root.style.setProperty("--cursor-y", `${Math.min(rail, bridgeEnd + 40).toFixed(1)}px`);
@@ -173,12 +177,12 @@ export function CareerColumn({ label }: { label: string }) {
           </ol>
         </nav>
 
-        <div ref={spineRef} className={styles.spine} aria-hidden="true" />
+        <div className={styles.spine} aria-hidden="true" />
         <div className={styles.cursor} aria-hidden="true">
           <i />
         </div>
 
-        <ol className={styles.column}>
+        <ol ref={listRef} className={styles.column}>
           {missions.map((mission, index) => {
             const figures = ("figures" in mission && mission.figures) || [];
             return (

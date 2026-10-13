@@ -398,13 +398,6 @@ export function Portfolio() {
             <span className="statement-line"><i>prêt pour</i></span>
             <span className="statement-line accent-line"><i>la production.</i></span>
           </div>
-          <div className="hero-summary" data-reveal>
-            <p>
-              J’industrialise l’infrastructure. Vos équipes déploient plus vite,
-              avec moins de risques.
-            </p>
-            <span>Kubernetes · AWS · Terraform · ArgoCD</span>
-          </div>
         </div>
         <div className="hero-foot">
           <div className="hero-actions">

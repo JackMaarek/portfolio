@@ -151,7 +151,7 @@ export const dossierPages: DossierPage[] = [
       },
       {
         title: "Sécurité de base",
-        body: "RBAC, Pod Security Standards et politiques d’admission, confrontés aux contrôles du CIS Kubernetes Benchmark.",
+        body: "RBAC, Pod Security Standards et admission policies, confrontés aux contrôles du CIS Kubernetes Benchmark.",
       },
     ],
     ["Environnements divergents"],

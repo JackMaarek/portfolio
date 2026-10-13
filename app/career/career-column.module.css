@@ -12,7 +12,8 @@
   /* In the flow: the rail's fill and the cursor, in px from the stage's
      top, and the cursor's turn into a chevron (0 to 1). */
   --rail: 100000px;
-  --cursor-y: 0px;
+  --spine-top: 200px;
+  --cursor-y: var(--spine-top);
   --travel: 0;
   --sheet: #d8d6e3;
   --sheet-ink: #111014;
@@ -112,14 +113,15 @@
 
 /* The amber route the missions follow; it runs to the section's end,
    where the k8s-platform rail takes over on the same x. In the flow it
-   fills down to the cursor (200px: its own top on the stage). */
+   starts below the years (--spine-top, measured) and fills down to the
+   cursor. */
 .spine {
   position: absolute;
-  top: 200px;
+  top: var(--spine-top);
   bottom: 0;
   left: calc(var(--page-gutter) + 7px);
   width: 2px;
-  background: linear-gradient(to bottom, rgba(255, 189, 116, .85) calc(var(--rail) - 200px), rgba(255, 189, 116, .22) calc(var(--rail) - 200px));
+  background: linear-gradient(to bottom, rgba(255, 189, 116, .85) calc(var(--rail) - var(--spine-top)), rgba(255, 189, 116, .22) calc(var(--rail) - var(--spine-top)));
 }
 
 .column {

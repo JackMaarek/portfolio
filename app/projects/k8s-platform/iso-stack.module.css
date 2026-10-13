@@ -1,0 +1,372 @@
+/* Isometric stack. Sizes inside the SVG are in viewBox units; every colour
+   comes from the site tokens. */
+.stage {
+  --face: var(--paper);
+  --accent: var(--acid);
+  position: relative;
+  min-width: 0;
+}
+
+.frame {
+  overflow: hidden;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Plates */
+.plateTop {
+  fill: color-mix(in srgb, var(--face) 7%, var(--ink));
+  fill-opacity: .86;
+  stroke: color-mix(in srgb, var(--face) 16%, transparent);
+}
+
+.plateLeft,
+.plateRight {
+  stroke: color-mix(in srgb, var(--face) 9%, transparent);
+}
+
+.plateLeft {
+  fill: color-mix(in srgb, var(--face) 3%, var(--ink));
+}
+
+.plateRight {
+  fill: color-mix(in srgb, var(--face) 1.5%, var(--ink));
+}
+
+/* Blocks */
+.box polygon {
+  stroke-width: .8;
+}
+
+.faceTop {
+  fill: color-mix(in srgb, var(--face) 15%, var(--ink));
+  stroke: color-mix(in srgb, var(--face) 20%, transparent);
+}
+
+.faceLeft {
+  fill: color-mix(in srgb, var(--face) 9%, var(--ink));
+  stroke: color-mix(in srgb, var(--face) 12%, transparent);
+}
+
+.faceRight {
+  fill: color-mix(in srgb, var(--face) 6%, var(--ink));
+  stroke: color-mix(in srgb, var(--face) 12%, transparent);
+}
+
+.box[data-accent="true"] .faceTop {
+  fill: var(--accent);
+  stroke: color-mix(in srgb, var(--accent) 60%, var(--face));
+}
+
+.box[data-accent="true"] .faceLeft {
+  fill: color-mix(in srgb, var(--accent) 72%, var(--ink));
+  stroke: color-mix(in srgb, var(--accent) 86%, var(--ink));
+}
+
+.box[data-accent="true"] .faceRight {
+  fill: color-mix(in srgb, var(--accent) 52%, var(--ink));
+  stroke: color-mix(in srgb, var(--accent) 72%, var(--ink));
+}
+
+.box[data-kind="tile"] .faceTop {
+  fill: color-mix(in srgb, var(--face) 4.5%, transparent);
+  stroke: color-mix(in srgb, var(--face) 18%, transparent);
+}
+
+.box[data-kind="tile"] .faceLeft,
+.box[data-kind="tile"] .faceRight {
+  fill: color-mix(in srgb, var(--face) 3%, transparent);
+  stroke: color-mix(in srgb, var(--face) 10%, transparent);
+}
+
+.box[data-kind="tile"][data-accent="true"] .faceTop {
+  fill: color-mix(in srgb, var(--accent) 14%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.outline {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 50%, transparent);
+  stroke-dasharray: .25 .18;
+  stroke-width: .05;
+}
+
+.floorText {
+  fill: var(--muted);
+  font-family: var(--font-mono);
+  font-size: .42px;
+}
+
+.floorText[data-tone="strong"] {
+  fill: var(--paper);
+}
+
+.floorText[data-tone="accent"] {
+  fill: var(--accent);
+}
+
+.tag rect {
+  fill: var(--ink);
+  stroke: color-mix(in srgb, var(--face) 35%, transparent);
+  stroke-width: .04;
+}
+
+.tag text {
+  fill: var(--paper);
+  font-family: var(--font-mono);
+  font-size: .4px;
+  font-weight: 700;
+}
+
+.link {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+.link[data-dashed="true"] {
+  stroke: color-mix(in srgb, var(--accent) 70%, transparent);
+  stroke-dasharray: 3 3;
+}
+
+/* Hover: the layer lifts, the others step back. */
+.layer,
+.branch,
+.legend {
+  transition:
+    opacity 300ms cubic-bezier(.2, .8, .2, 1),
+    transform 350ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.branch,
+.legend {
+  cursor: default;
+}
+
+.svg[data-active="true"] .layer:not([data-on="true"]) {
+  opacity: .22;
+}
+
+.svg[data-active="true"] .branch:not([data-on="true"]) {
+  opacity: .3;
+}
+
+.svg[data-active="true"] .legend:not([data-on="true"]) {
+  opacity: .35;
+}
+
+.layer[data-on="true"] {
+  transform: translateY(-12px);
+}
+
+.layer[data-on="true"] .plateTop {
+  stroke: color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.layer[data-on="true"] .tag rect {
+  stroke: var(--accent);
+}
+
+/* platform-bot and its rail */
+.bot rect {
+  fill: color-mix(in srgb, var(--face) 3%, var(--ink));
+  stroke: var(--accent);
+  stroke-width: 1.2;
+}
+
+.botName {
+  fill: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.prompt {
+  fill: var(--accent);
+}
+
+.botDetail {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.railLine {
+  stroke: var(--accent);
+  stroke-width: 1.4;
+}
+
+.pulse {
+  fill: var(--accent);
+  animation: pulse-travel 3.6s linear infinite;
+}
+
+@keyframes pulse-travel {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  15%,
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(var(--travel));
+  }
+}
+
+.branch line {
+  stroke: color-mix(in srgb, var(--accent) 45%, transparent);
+  stroke-width: 1;
+}
+
+.branch circle {
+  fill: var(--ink);
+  stroke: var(--accent);
+  stroke-width: 1.4;
+}
+
+.branch[data-on="true"] line {
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+.principle {
+  fill: var(--paper);
+  font-size: 13.5px;
+}
+
+.why {
+  fill: var(--muted);
+  font-size: 11.5px;
+}
+
+/* Legend */
+.legend line {
+  stroke: color-mix(in srgb, var(--face) 25%, transparent);
+}
+
+.legendNumber {
+  fill: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.legendTitle {
+  fill: var(--paper);
+  font-size: 15px;
+}
+
+.legendDetail {
+  fill: var(--muted);
+  font-size: 12.5px;
+}
+
+.legend[data-on="true"] line {
+  stroke: var(--accent);
+}
+
+.legend[data-on="true"] .legendNumber {
+  fill: var(--accent);
+}
+
+.hint {
+  margin: 6px 0 0 4px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: .72rem;
+}
+
+/* Text version: read by assistive tech on wide screens, shown on phones. */
+.list {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.list li {
+  display: grid;
+  grid-template-columns: 2.4em 1fr;
+  gap: 2px 10px;
+  padding-block: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.listNumber {
+  grid-row: span 3;
+  padding-top: 3px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: .75rem;
+}
+
+.listTitle {
+  font-size: 1rem;
+}
+
+.listDetail {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.listPrinciple {
+  font-size: .86rem;
+}
+
+.listPrinciple::before {
+  color: var(--accent);
+  content: "› ";
+}
+
+/* Phones: crop to the stack; the rail and the legend move into the list. */
+@media (max-width: 900px) {
+  .svg {
+    width: calc(var(--crop-scale) * 100%);
+    margin-left: calc(var(--crop-offset) * -100%);
+  }
+
+  .rail,
+  .legendGroup,
+  .hint {
+    display: none;
+  }
+
+  .list {
+    position: static;
+    display: flex;
+    width: auto;
+    height: auto;
+    margin: 8px 0 0;
+    flex-direction: column;
+    overflow: visible;
+    border-top: 1px solid var(--line);
+    clip-path: none;
+    white-space: normal;
+    list-style: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer,
+  .branch,
+  .legend {
+    transition: none;
+  }
+
+  .pulse {
+    display: none;
+  }
+}

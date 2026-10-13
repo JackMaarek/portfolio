@@ -1,0 +1,99 @@
+/* Drawn in currentColor on --diagram-surface; accent from --diagram-accent
+   (fills from --diagram-highlight), entry points in --diagram-structure. Sizes are viewBox units. */
+.figure {
+  margin: 0;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  max-width: 470px;
+  height: auto;
+  margin-inline: auto;
+}
+
+.ring {
+  fill: none;
+  stroke: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+[data-ring="2"] .ring {
+  fill: color-mix(in srgb, currentColor 3%, transparent);
+}
+
+[data-ring="3"] .ring {
+  fill: color-mix(in srgb, var(--diagram-highlight, var(--diagram-accent)) 24%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-accent) 60%, transparent);
+}
+
+.ringLabel {
+  fill: color-mix(in srgb, currentColor 58%, transparent);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-anchor: middle;
+}
+
+.ringLabel[data-domain="true"] {
+  fill: var(--diagram-accent);
+}
+
+.core {
+  font-family: var(--font-mono);
+  text-anchor: middle;
+}
+
+.coreName {
+  fill: var(--diagram-accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.coreType {
+  fill: color-mix(in srgb, currentColor 80%, transparent);
+  font-size: 9.5px;
+}
+
+.chip rect {
+  fill: var(--diagram-surface);
+  stroke: color-mix(in srgb, currentColor 26%, transparent);
+}
+
+.chip text {
+  fill: color-mix(in srgb, currentColor 86%, transparent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-anchor: middle;
+}
+
+.chip[data-layer="orchestration"] rect {
+  fill: color-mix(in srgb, currentColor 8%, var(--diagram-surface));
+  stroke: color-mix(in srgb, currentColor 36%, transparent);
+}
+
+.chip[data-layer="entry"] rect {
+  stroke: color-mix(in srgb, var(--diagram-structure) 60%, transparent);
+}
+
+.chip[data-layer="entry"] text {
+  fill: var(--diagram-structure);
+}
+
+.dependency {
+  fill: none;
+  stroke: var(--diagram-accent);
+  stroke-dasharray: 4 3;
+  stroke-width: 1.2;
+}
+
+.arrowHead {
+  fill: var(--diagram-accent);
+}
+
+.caption {
+  margin: 8px 0 0;
+  color: color-mix(in srgb, currentColor 66%, transparent);
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  text-align: center;
+}

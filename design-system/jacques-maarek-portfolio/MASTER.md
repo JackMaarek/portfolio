@@ -65,6 +65,7 @@ expresses structure, selected state, proof metrics and the offer’s primary hie
 ## Typography
 
 - Font stack: `Arial, Helvetica, sans-serif` for predictable metrics and zero extra transfer.
+- Code, commands and file names: `--font-mono` (`ui-monospace, "SF Mono", Menlo, Consolas, monospace`), the system monospace stack, still with zero extra transfer.
 - Body: `16px` minimum, `1.45–1.55` line height.
 - Long-form measure: `55–75ch`.
 - Display headings: tight tracking (`-0.04em` to `-0.075em`) with mobile clamps.
@@ -95,11 +96,11 @@ Required verification widths:
 
 ### Header
 
-- One shared component across `/` and `/offer`.
+- One shared component across `/`, `/offer` and the project pages (`/projects/*`).
 - Desktop shows logo, availability and the five primary destinations.
 - At `1120px` and below, use a disclosure menu with `aria-expanded`, Escape-to-close
   and at least `52px` menu rows.
-- The active offer link uses `aria-current="page"` plus a visible underline.
+- The current page's link (Offre on `/offer`, Projets on `/projects/*`) uses `aria-current="page"` plus a visible underline.
 
 ### Calls to action
 
@@ -141,6 +142,8 @@ Required verification widths:
 - Canvas labels remain stable and limited to the primary infrastructure path; animation must not cycle unrelated labels through the copy area.
 - At mobile widths, hide offer topologies that cross actions and reduce homepage topology opacity below competing-text level.
 - Linear flows use semantic ordered lists and reflow vertically instead of clipping.
+- Interactive SVG diagrams (`/projects/k8s-platform`) carry `role="img"` and a label, repeat their content as text, draw in `currentColor` and `--diagram-*` properties so they work on the dark and the light band, and only a wide diagram may scroll horizontally in its own container.
+- Template syntaxes keep two signals: `__SNAKE_CASE__` (resolved by platform-bot) in orange with a dashed outline, `{{.camelCase}}` (evaluated by ArgoCD) in lavender, solid.
 
 ### Final conversion surfaces
 

@@ -143,6 +143,7 @@ export const project = {
     "Istio mTLS strict, Kyverno, External Secrets Operator, OIDC et observabilité Prometheus, Grafana et Loki.",
   ],
   repository: "https://github.com/PodYourLife/k8s-platform",
+  page: "/projects/k8s-platform",
   cli: "CLI Go · platform-bot",
   // The platform's layers, bottom to top, as the exploded view shows them.
   // `components` reuse the names of the copy above; `detail` only where

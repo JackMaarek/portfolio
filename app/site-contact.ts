@@ -3,6 +3,7 @@ export const CONTACT_BOOKING_URL = "https://cal.com/jack-maarek-zmdq16/30min";
 
 export type BookingPlacement =
   | "home-contact"
+  | "project-contact"
   | "offer-hero"
   | "offer-short"
   | "offer-full"

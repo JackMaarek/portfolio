@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { project } from "../home-content";
 import styles from "./platform-breakdown.module.css";
@@ -110,8 +111,11 @@ export function PlatformBreakdown() {
             </p>
           ))}
           <div className={styles.actions}>
+            <Link className={styles.primary} href={project.page}>
+              Voir le projet <span aria-hidden="true">→</span>
+            </Link>
             <a
-              className={styles.github}
+              className={styles.secondary}
               href={project.repository}
               target="_blank"
               rel="noreferrer"

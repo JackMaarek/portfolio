@@ -188,3 +188,36 @@ test("home presents the parcours from the home copy without WebGL", async () => 
     assert.ok(!source.includes("three"));
   }
 });
+
+test("k8s-platform project page is built from typed data and linked from the home", async () => {
+  const [page, body, content, flow, header, breakdown, homeContent, styles] = await Promise.all([
+    readFile(new URL("app/projects/k8s-platform/page.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/projects/k8s-platform/project-page-body.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/projects/k8s-platform/k8s-platform-content.ts", projectRoot), "utf8"),
+    readFile(new URL("app/projects/k8s-platform/commit-to-cluster-flow.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/career/platform-breakdown.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/home-content.ts", projectRoot), "utf8"),
+    readFile(new URL("app/globals.css", projectRoot), "utf8"),
+  ]);
+
+  assert.match(page, /canonical: `\$\{origin\}\/projects\/k8s-platform`/);
+  assert.match(page, /openGraph:/);
+  assert.match(page, /twitter:/);
+  assert.match(body, /<SiteHeader page="project" \/>/);
+  assert.match(body, /placement="project-contact"/);
+  assert.match(header, /page === "project" \? "Projets"/);
+  // The home's k8s-platform section links to the page and keeps GitHub.
+  assert.match(homeContent, /page: "\/projects\/k8s-platform"/);
+  assert.match(breakdown, /href=\{project\.page\}/);
+  assert.match(breakdown, /href=\{project\.repository\}/);
+  // Sensitive values stay masked.
+  assert.ok(!content.includes("351457945908"));
+  assert.match(content, /https:\/\/••••••\.gr7\.eu-west-3\.eks\.amazonaws\.com/);
+  assert.match(content, /github\.com\/PodYourLife\/platform-botV2/);
+  // The sequence never runs under reduced motion; timers and observer are cleaned up.
+  assert.match(flow, /prefers-reduced-motion: reduce/);
+  assert.match(flow, /observer\.disconnect\(\)/);
+  assert.match(flow, /pending\.forEach\(clearTimeout\)/);
+  assert.match(styles, /--font-mono: ui-monospace/);
+});

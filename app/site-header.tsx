@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 type SiteHeaderProps = {
-  page: "portfolio" | "offer";
+  page: "portfolio" | "offer" | "project";
 };
 
 const navigation = [
@@ -20,7 +20,9 @@ export function SiteHeader({ page }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const isOffer = page === "offer";
+  // The offer and project pages link back to the home's sections.
+  const linksHome = page !== "portfolio";
+  const currentLabel = page === "offer" ? "Offre" : page === "project" ? "Projets" : null;
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -54,12 +56,12 @@ export function SiteHeader({ page }: SiteHeaderProps) {
   return (
     <header
       ref={headerRef}
-      className={isOffer ? "topbar offer-topbar" : "topbar"}
+      className={linksHome ? "topbar offer-topbar" : "topbar"}
     >
       <Link
         className="monogram"
-        href={isOffer ? "/" : "#top"}
-        aria-label={isOffer ? "Retour au portfolio" : "Retour en haut"}
+        href={linksHome ? "/" : "#top"}
+        aria-label={linksHome ? "Retour au portfolio" : "Retour en haut"}
       >
         <Image
           src="/logo-jm-header.png"
@@ -89,12 +91,12 @@ export function SiteHeader({ page }: SiteHeaderProps) {
 
       <nav
         id="main-nav"
-        className={`${isOffer ? "nav offer-nav" : "nav"}${menuOpen ? " open" : ""}`}
+        className={`${linksHome ? "nav offer-nav" : "nav"}${menuOpen ? " open" : ""}`}
         aria-label="Navigation principale"
       >
         {navigation.map((item) => {
-          const href = isOffer ? item.offerHref : item.portfolioHref;
-          const isCurrent = isOffer && item.label === "Offre";
+          const href = linksHome ? item.offerHref : item.portfolioHref;
+          const isCurrent = item.label === currentLabel;
 
           return (
             <Link

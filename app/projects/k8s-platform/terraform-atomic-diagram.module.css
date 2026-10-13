@@ -1,0 +1,165 @@
+/* Drawn in currentColor on --diagram-surface; accent from --diagram-accent.
+   Sizes are viewBox units. The only part of the page that may scroll
+   horizontally. */
+.scroll {
+  margin-inline: -6px;
+  padding-inline: 6px;
+  overflow-x: auto;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  min-width: 640px;
+  height: auto;
+}
+
+.column {
+  fill: color-mix(in srgb, currentColor 58%, transparent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+}
+
+.accentText {
+  fill: var(--diagram-accent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+.wire {
+  fill: none;
+  stroke: color-mix(in srgb, currentColor 18%, transparent);
+  stroke-width: 1.2;
+  transition:
+    stroke 250ms ease,
+    opacity 250ms ease;
+}
+
+.atom rect {
+  fill: var(--diagram-surface);
+  stroke: color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.atom text {
+  fill: color-mix(in srgb, currentColor 84%, transparent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.small text {
+  font-size: 10px;
+}
+
+.atom,
+.molecule {
+  transition: opacity 250ms ease;
+}
+
+.group {
+  fill: none;
+  stroke: color-mix(in srgb, currentColor 22%, transparent);
+  stroke-dasharray: 3 3;
+}
+
+.groupLabel {
+  fill: color-mix(in srgb, currentColor 58%, transparent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.molecule {
+  cursor: default;
+}
+
+.molecule rect {
+  fill: color-mix(in srgb, currentColor 7%, var(--diagram-surface));
+  stroke: color-mix(in srgb, currentColor 26%, transparent);
+}
+
+.moleculeTitle {
+  fill: currentColor;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.moleculeBody {
+  fill: color-mix(in srgb, currentColor 66%, transparent);
+  font-size: 11.5px;
+}
+
+.moleculeState {
+  fill: color-mix(in srgb, currentColor 58%, transparent);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+}
+
+.remote {
+  fill: none;
+  stroke: var(--diagram-accent);
+  stroke-dasharray: 3 3;
+  stroke-width: 1.2;
+}
+
+.remoteLabel {
+  fill: var(--diagram-accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.back {
+  fill: color-mix(in srgb, currentColor 3%, var(--diagram-surface));
+  stroke: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.front {
+  fill: color-mix(in srgb, currentColor 7%, var(--diagram-surface));
+  stroke: var(--diagram-accent);
+}
+
+.organismTitle {
+  fill: currentColor;
+  font-size: 14px;
+}
+
+.organismRoot {
+  fill: color-mix(in srgb, currentColor 66%, transparent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+.goal rect {
+  fill: none;
+  stroke: color-mix(in srgb, var(--diagram-accent) 60%, transparent);
+  stroke-dasharray: 4 4;
+}
+
+.goalTitle {
+  fill: var(--diagram-accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* Hover on a molecule: its atoms and wires stay, the rest steps back. */
+.svg[data-active="true"] .atom:not([data-on="true"]),
+.svg[data-active="true"] .molecule:not([data-on="true"]),
+.svg[data-active="true"] .wire:not([data-on="true"]) {
+  opacity: .25;
+}
+
+.wire[data-on="true"] {
+  stroke: var(--diagram-accent);
+}
+
+.atom[data-on="true"] rect,
+.molecule[data-on="true"] rect {
+  stroke: var(--diagram-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wire,
+  .atom,
+  .molecule {
+    transition: none;
+  }
+}

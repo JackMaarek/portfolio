@@ -83,25 +83,45 @@
   font-weight: 700;
 }
 
-.github {
+.primary,
+.secondary {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   min-height: 48px;
   padding: 0 20px;
+  border: 1px solid var(--acid);
   border-radius: 3px;
-  background: var(--acid);
-  color: var(--acid-readable);
   font-size: 1rem;
   text-decoration: none;
-  transition: transform 180ms ease;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 
-.github:active {
+.primary {
+  background: var(--acid);
+  color: var(--acid-readable);
+}
+
+.secondary {
+  border-color: var(--line);
+  color: var(--paper);
+}
+
+.secondary:hover {
+  border-color: var(--violet);
+  color: var(--violet);
+}
+
+.primary:active,
+.secondary:active {
   transform: scale(.985);
 }
 
-.github:focus-visible {
+.primary:focus-visible,
+.secondary:focus-visible {
   outline: 2px solid var(--paper);
   outline-offset: 3px;
 }
@@ -417,7 +437,8 @@
   .callouts > li,
   .callouts > li::before,
   .callouts b,
-  .github {
+  .primary,
+  .secondary {
     transition: none;
   }
 }

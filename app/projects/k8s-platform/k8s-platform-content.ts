@@ -8,7 +8,7 @@ export const projectPage = {
   kicker: project.kicker,
   name: project.name,
   lead: project.lead,
-  body: "platform-bot prépare chaque environnement de bout en bout : Terraform, branches GitOps, bootstrap du cluster. Chaque brique (maillage, secrets, politiques, observabilité) est un module : on l’ajoute ou on le retire sans toucher au reste.",
+  body: "platform-bot prépare chaque environnement de bout en bout : Terraform, branches GitOps, bootstrap du cluster. Chaque brique (service mesh, secrets, policies, observabilité) est un module : on l’ajoute ou on le retire sans toucher au reste.",
   facts: [
     { value: "3", label: "environnements", detail: "dev · staging · prod" },
     { value: "7", label: "modules", detail: "indépendants" },
@@ -49,7 +49,7 @@ export type IsoLayer = {
 export const isoLayers: IsoLayer[] = [
   {
     number: "01",
-    title: "Infrastructure décrite en code",
+    title: "Infrastructure as Code",
     components: "AWS · Terraform · GitHub OIDC",
     principle: "Tout est déclaré",
     why: "Modules atomiques, composés par domaine",
@@ -233,10 +233,10 @@ export const terminalLines = (env: EnvName): TerminalLine[] => [
 
 export const syncWaves = [
   { name: "Namespaces", detail: "socle" },
-  { name: "Istio", detail: "maillage mTLS" },
+  { name: "Istio", detail: "service mesh mTLS" },
   { name: "External Secrets", detail: "secrets" },
   { name: "Observabilité", detail: "métriques · logs" },
-  { name: "Kyverno", detail: "politiques" },
+  { name: "Kyverno", detail: "policies" },
   { name: "OpenCost", detail: "coûts" },
   { name: "cert-manager", detail: "certificats" },
 ];
@@ -285,12 +285,12 @@ export const architecture = {
     title: "Terraform",
     accent: "Atomic design",
     tag: "k8s-platform/terraform",
-    body: "Les modules sont des atomes sans logique d’environnement. Chaque racine Terraform les assemble pour un rôle précis, avec son propre state. Un environnement complet est la somme de ces racines.",
-    label: "Modules Terraform atomiques assemblés en racines puis en environnements",
+    body: "Les modules sont des atoms sans logique d’environnement. Chaque root module Terraform les assemble pour un rôle précis, avec son propre state. Un environnement complet est la somme de ces root modules.",
+    label: "Modules Terraform atomiques assemblés en root modules puis en environnements",
     principles: [
-      { term: "atome", body: "Une ressource AWS, une responsabilité, réutilisable dans toutes les racines." },
-      { term: "molécule", body: "Une racine Terraform avec son state, appliquée indépendamment des autres." },
-      { term: "organisme", body: "Un environnement : organization, socle partagé et domaine platform, répliqué pour dev, staging et prod." },
+      { term: "atom", body: "Une ressource AWS, une responsabilité, réutilisable dans tous les root modules." },
+      { term: "molecule", body: "Un root module Terraform avec son state, appliqué indépendamment des autres." },
+      { term: "organism", body: "Un environnement : organization, socle partagé et domaine platform, répliqué pour dev, staging et prod." },
       { term: "dépendance", body: "Les domaines lisent le socle via remote state, jamais l’inverse. Aucun environnement ne lit le state d’un autre." },
       { term: "objectif", body: "Une nouvelle équipe = un nouveau dossier domains/, généré par le bot, sans toucher au reste.", goal: true, code: ["domains/"] },
     ] satisfies Principle[],
@@ -305,7 +305,7 @@ export const architecture = {
     principles: [
       { term: "domain/", body: "Types purs, zéro import, partagés par toutes les couches." },
       { term: "orchestration", body: "envsetup et bootstrap enchaînent les cas d’usage.", code: ["envsetup", "bootstrap"] },
-      { term: "adaptateurs", body: "Un package par outil : terraform-exec, go-git, Helm, Kind, API GitHub." },
+      { term: "adapters", body: "Un package par outil : terraform-exec, go-git, Helm, Kind, API GitHub." },
       { term: "cmd/", body: "Câblage Cobra uniquement, 50 lignes max par fichier." },
       { term: "objectif", body: "Des ports séparés par responsabilité (Git, hydratation, secrets) plutôt qu’une interface fourre-tout.", goal: true },
     ] satisfies Principle[],
@@ -335,9 +335,9 @@ export const terraformMolecules: Record<MoleculeKey, { y: number; h: number; tit
 };
 
 export const terraformColumns = [
-  { title: "ATOMES", detail: "_core/modules/aws" },
-  { title: "MOLÉCULES", detail: "racines" },
-  { title: "ORGANISME", detail: "environnement" },
+  { title: "ATOMS", detail: "_core/modules/aws" },
+  { title: "MOLECULES", detail: "root modules" },
+  { title: "ORGANISM", detail: "environnement" },
 ];
 
 export const terraformOrganism = {
@@ -350,10 +350,10 @@ export const terraformOrganism = {
 
 // platform-bot rings, outer to inner, in viewBox units (520 × 520).
 export const botRings = [
-  { label: "ENTRÉES", radius: 252 },
-  { label: "ADAPTATEURS", radius: 200 },
+  { label: "ENTRYPOINTS", radius: 252 },
+  { label: "ADAPTERS", radius: 200 },
   { label: "ORCHESTRATION", radius: 136 },
-  { label: "DOMAINE", radius: 72 },
+  { label: "DOMAIN", radius: 72 },
 ];
 
 export const botDomain = { name: "domain/", types: ["PlaceholderValues", "PlanSummary", "ApplyOutcome"] };

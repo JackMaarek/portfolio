@@ -278,26 +278,6 @@ button {
   to { transform: translateY(0); }
 }
 
-.hero-summary {
-  align-self: end;
-  max-width: 390px;
-  padding-bottom: 1.2vw;
-}
-
-.hero-summary p {
-  margin: 0 0 22px;
-  font-size: clamp(1.05rem, 1.4vw, 1.35rem);
-  line-height: 1.35;
-  letter-spacing: -.025em;
-}
-
-.hero-summary span {
-  color: var(--muted);
-  font-size: .69rem;
-  text-transform: uppercase;
-  letter-spacing: .11em;
-}
-
 .hero-foot {
   align-items: flex-end;
 }
@@ -1900,11 +1880,6 @@ summary:focus-visible,
     font-size: clamp(3.8rem, 13vw, 7rem);
   }
 
-  .hero-summary {
-    max-width: 520px;
-    margin: 0;
-  }
-
   .offer-hero-copy {
     max-width: 620px;
   }
@@ -2024,10 +1999,6 @@ summary:focus-visible,
   .hero-statement {
     font-size: clamp(3.25rem, 16.2vw, 5.2rem);
     line-height: .86;
-  }
-
-  .hero-summary p {
-    font-size: 1.12rem;
   }
 
   .topology {

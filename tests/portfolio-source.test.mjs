@@ -180,18 +180,14 @@ test("offer dossier is built on the offer copy and loads its scene lazily", asyn
   assert.match(loop, /"webglcontextlost"/);
 });
 
-test("home preview presents the parcours from the home copy without WebGL", async () => {
-  const [preview, home, column, breakdown] = await Promise.all([
-    readFile(new URL("app/home-preview/page.tsx", projectRoot), "utf8"),
+test("home presents the parcours from the home copy without WebGL", async () => {
+  const [home, column, breakdown] = await Promise.all([
     readFile(new URL("app/page.tsx", projectRoot), "utf8"),
     readFile(new URL("app/career/career-column.tsx", projectRoot), "utf8"),
     readFile(new URL("app/career/platform-breakdown.tsx", projectRoot), "utf8"),
   ]);
 
-  // Noindex test route; / keeps the classic layout until the review.
-  assert.match(preview, /robots: \{\s+index: false,\s+follow: false,/);
-  assert.ok(preview.includes('<Portfolio layout="parcours" />'));
-  assert.ok(home.includes('<Portfolio layout="classic" />'));
+  assert.ok(home.includes('<Portfolio layout="parcours" />'));
   // Copy comes from the home content; both scenes are CSS 3D, not three.js.
   for (const source of [column, breakdown]) {
     assert.match(source, /from "\.\.\/home-content"/);

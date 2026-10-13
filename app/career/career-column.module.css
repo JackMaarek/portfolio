@@ -3,6 +3,12 @@
    the scroll (see .parcours in the media query below). */
 .parcours {
   --p: 0;
+  /* Transition to the project, 0 to 1, eased. */
+  --t: 0;
+  /* Front mission, its open sheet height and the column scale. */
+  --front: 0;
+  --front-height: 0px;
+  --s: 1;
   --sheet: #d8d6e3;
   --sheet-ink: #111014;
   --sheet-muted: #4f4c59;
@@ -119,6 +125,63 @@
 
 .card {
   position: relative;
+}
+
+/* In the flow, each mission is a stop on the rail; the current one is lit. */
+.card::before {
+  position: absolute;
+  top: 30px;
+  left: -25px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(239, 237, 245, .35);
+  border-radius: 50%;
+  background: var(--ink);
+  content: "";
+  transition: border-color 300ms ease;
+}
+
+.card[data-front="true"]::before {
+  border-color: var(--acid);
+}
+
+.cursor {
+  display: none;
+}
+
+/* Why the parcours led to the project; the rail ends in an arrow below it. */
+.bridge {
+  position: relative;
+  margin: 56px 0 0;
+  padding-left: 26px;
+}
+
+.bridge::after {
+  position: absolute;
+  bottom: -10px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid var(--acid);
+  border-bottom: 2px solid var(--acid);
+  content: "";
+  transform: rotate(45deg);
+}
+
+.statement {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -.03em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.bridgeBody {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .face {
@@ -256,7 +319,7 @@
    columnQuery in career-column.tsx. */
 @media (min-width: 1000px) and (min-height: 620px) {
   .parcours {
-    height: calc(100svh + (var(--count) - 1) * 70svh);
+    height: calc(100svh + (var(--count) - 1) * 70svh + 110svh);
   }
 
   .stage {
@@ -267,6 +330,11 @@
     overflow: hidden;
     perspective: 1800px;
     perspective-origin: 56% 50%;
+  }
+
+  .head,
+  .years {
+    opacity: calc(1 - min(var(--t) * 3, 1));
   }
 
   .head {
@@ -333,6 +401,66 @@
     bottom: -10%;
     left: 56%;
     background: linear-gradient(to bottom, transparent, rgba(255, 189, 116, .15) 15%, rgba(255, 189, 116, .85) 50%, rgba(255, 189, 116, .15) 85%, transparent);
+    /* Once the cursor is an arrow, the column stops at its tip. */
+    /* Same pace as the cursor; its end point sits at 68% of the column. */
+    --tip: calc(100% - min(var(--t) * 1.6, 1) * 32%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 var(--tip), transparent calc(var(--tip) + 1px));
+    mask-image: linear-gradient(to bottom, #000 var(--tip), transparent calc(var(--tip) + 1px));
+  }
+
+  /* The cursor rides the column just above the front sheet, then drops
+     below the transition text and turns into an arrowhead. */
+  .cursor {
+    --front-y: calc((var(--front) - var(--p)) * 175px * var(--s) - var(--front-height) * var(--s) / 2 - 24px);
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 56%;
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    /* The cursor travels in the first part of the transition, so the text
+       only appears once it has passed. */
+    --travel: min(var(--t) * 1.6, 1);
+    transform: translateY(calc(var(--front-y) * (1 - var(--travel)) + 22svh * var(--travel)));
+    transition: transform 300ms cubic-bezier(.16, 1, .3, 1);
+  }
+
+  .cursor i {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--acid);
+    border-top-color: rgba(255, 189, 116, calc(1 - var(--travel)));
+    border-left-color: rgba(255, 189, 116, calc(1 - var(--travel)));
+    border-radius: calc((1 - var(--travel)) * 50%);
+    background: var(--ink);
+    transform: rotate(calc(var(--travel) * 45deg));
+  }
+
+  .card::before,
+  .bridge::after {
+    display: none;
+  }
+
+  .bridge {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 56%;
+    width: min(34rem, 42vw);
+    margin: 0;
+    padding: 28px 32px;
+    /* The block masks the column early; its text follows the cursor. */
+    background: rgba(11, 11, 13, min(var(--t) * 4, 1));
+    text-align: center;
+    transform: translate(-50%, -60%);
+  }
+
+  .bridge > p {
+    opacity: clamp(0, calc((var(--t) - .62) * 3.5), 1);
+    transform: translateY(calc((1 - var(--t)) * 5svh));
   }
 
   /* The column's axis; the front card sits at depth 0 (scale 1). */
@@ -342,7 +470,7 @@
     left: 56%;
     margin: 0;
     padding: 0;
-    transform: translateZ(-330px);
+    transform: translateZ(-330px) scale(var(--s));
     transform-style: preserve-3d;
   }
 
@@ -354,13 +482,14 @@
     left: 0;
     width: min(420px, 30vw);
     transform:
+      translateY(calc(var(--t) * -30svh))
       translate(-50%, -50%)
       translateY(calc(var(--k) * 175px))
       rotateY(calc(var(--k) * 58deg))
       translateZ(330px)
       rotateY(calc(var(--k) * -43.5deg));
     transform-style: preserve-3d;
-    opacity: clamp(0, calc(1 - var(--distance) * .42), 1);
+    opacity: calc(clamp(0, calc(1 - var(--distance) * .42), 1) * (1 - min(var(--t) * 2.5, 1)));
   }
 
   /* The sheets behind are glass: name and year only. */
@@ -430,8 +559,8 @@
 
 /* Shorter laptop screens: the column is drawn a little smaller. */
 @media (min-width: 1000px) and (min-height: 620px) and (max-height: 820px) {
-  .column {
-    transform: translateZ(-330px) scale(.86);
+  .parcours {
+    --s: .86;
   }
 }
 
@@ -439,7 +568,9 @@
   .face,
   .detail,
   .leaves li,
-  .years button {
+  .years button,
+  .card::before,
+  .cursor {
     transition: none;
   }
 }

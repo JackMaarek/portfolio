@@ -1,7 +1,7 @@
 "use client";
 
 import { type CSSProperties, useEffect, useRef, useState } from "react";
-import { experiences, parcours, results } from "../home-content";
+import { experiences, parcours, parcoursToProject, results } from "../home-content";
 import styles from "./career-column.module.css";
 
 // Missions in chronological order, around an amber column. On wide screens
@@ -13,6 +13,18 @@ const missions = [...experiences].reverse();
 const year = (period: string) => period.slice(0, 4);
 // Mirrors the media query of the column layout in career-column.module.css.
 const columnQuery = "(min-width: 1000px) and (min-height: 620px)";
+
+// Pinned length, in viewport heights, of a step between two missions and of
+// the transition to the project that closes the parcours (mirrors the
+// section height in career-column.module.css).
+const missionStep = 0.7;
+const transitionLength = 1.1;
+const missionsShare = ((missions.length - 1) * missionStep) / ((missions.length - 1) * missionStep + transitionLength);
+
+const smoothstep = (value: number) => {
+  const t = Math.min(Math.max(value, 0), 1);
+  return t * t * (3 - 2 * t);
+};
 
 export function CareerColumn({ label }: { label: string }) {
   const rootRef = useRef<HTMLElement>(null);
@@ -33,8 +45,14 @@ export function CareerColumn({ label }: { label: string }) {
       if (column.matches) {
         const rect = root.getBoundingClientRect();
         const travel = Math.max(rect.height - window.innerHeight, 1);
-        const progress = Math.min(Math.max(-rect.top / travel, 0), 1) * (missions.length - 1);
+        const scrolled = Math.min(Math.max(-rect.top, 0), travel);
+        const missionsTravel = travel * missionsShare;
+        const progress = Math.min(scrolled / missionsTravel, 1) * (missions.length - 1);
+        // Then the transition: the missions leave, the text arrives and the
+        // cursor becomes the arrow towards the project.
+        const transition = smoothstep((scrolled - missionsTravel) / (travel - missionsTravel));
         root.style.setProperty("--p", progress.toFixed(4));
+        root.style.setProperty("--t", transition.toFixed(4));
         index = Math.round(progress);
       } else {
         // In the page flow the current mission is the last one whose card
@@ -74,6 +92,23 @@ export function CareerColumn({ label }: { label: string }) {
     };
   }, []);
 
+  // The cursor sits on the column just above the front sheet: its height is
+  // read once per change of mission, at its open size.
+  useEffect(() => {
+    const root = rootRef.current;
+    const face = cardRefs.current[active]?.querySelector<HTMLElement>("[data-face]");
+    const detail = face?.querySelector<HTMLElement>("[data-detail]");
+    if (!root || !face || !detail?.firstElementChild) return;
+    const inner = detail.firstElementChild;
+    const measure = () => {
+      root.style.setProperty("--front", String(active));
+      root.style.setProperty("--front-height", `${face.offsetHeight - detail.offsetHeight + inner.scrollHeight}px`);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [active]);
+
   const goTo = (index: number) => {
     const root = rootRef.current;
     const card = cardRefs.current[index];
@@ -82,7 +117,7 @@ export function CareerColumn({ label }: { label: string }) {
     const top = window.matchMedia(columnQuery).matches
       ? root.getBoundingClientRect().top +
         window.scrollY +
-        (index / (missions.length - 1)) * (root.offsetHeight - window.innerHeight)
+        (index / (missions.length - 1)) * (root.offsetHeight - window.innerHeight) * missionsShare
       : card.getBoundingClientRect().top + window.scrollY - 72;
     window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
   };
@@ -123,6 +158,9 @@ export function CareerColumn({ label }: { label: string }) {
         </nav>
 
         <div className={styles.spine} aria-hidden="true" />
+        <div className={styles.cursor} aria-hidden="true">
+          <i />
+        </div>
 
         <ol className={styles.column}>
           {missions.map((mission, index) => {
@@ -138,7 +176,7 @@ export function CareerColumn({ label }: { label: string }) {
                 data-front={active === index}
                 style={{ "--i": index } as CSSProperties}
               >
-                <article className={styles.face} aria-labelledby={`mission-${index}`}>
+                <article className={styles.face} aria-labelledby={`mission-${index}`} data-face>
                   <p className={styles.year} aria-hidden="true">
                     {year(mission.period)}
                   </p>
@@ -147,7 +185,7 @@ export function CareerColumn({ label }: { label: string }) {
                     {mission.period} · {mission.role} · {mission.sector}
                   </p>
                   {/* Collapsed on the sheets behind, still read by assistive tech. */}
-                  <div className={styles.detail}>
+                  <div className={styles.detail} data-detail>
                     <div>
                       <p className={styles.summary}>{mission.summary}</p>
                       {figures.length > 0 && (
@@ -183,6 +221,13 @@ export function CareerColumn({ label }: { label: string }) {
             );
           })}
         </ol>
+
+        {/* Why the parcours led to k8s-platform: the cursor that followed
+            the missions becomes the arrow towards it. */}
+        <div className={styles.bridge}>
+          <p className={styles.statement}>{parcoursToProject.statement}</p>
+          <p className={styles.bridgeBody}>{parcoursToProject.body}</p>
+        </div>
       </div>
     </section>
   );

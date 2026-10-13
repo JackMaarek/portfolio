@@ -114,6 +114,14 @@ export const parcours = {
     "De 2018 à aujourd’hui, du développement back-end aux enjeux de plateforme, dans des secteurs où la rigueur compte.",
 };
 
+// PLACEHOLDER until Jack writes the transition copy: lorem ipsum, shown on
+// the noindex /home-preview only. Replace before the parcours layout ships
+// on /.
+export const parcoursToProject = {
+  statement: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
+  body: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse.",
+};
+
 export const project = {
   label: "04 / Projet personnel",
   kicker: "PodYourLife présente",

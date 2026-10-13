@@ -83,10 +83,22 @@
 
 /* Isometric view: each plate rises by its index times the gap. */
 .view {
+  position: relative;
   display: grid;
   place-items: center;
   height: 400px;
   perspective: 2400px;
+}
+
+/* Hidden by the opaque plates, it shows in the gaps as they separate. */
+.axis {
+  position: absolute;
+  top: 0;
+  bottom: 50%;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: linear-gradient(to bottom, rgba(255, 189, 116, .15), rgba(255, 189, 116, .85));
 }
 
 .layers {

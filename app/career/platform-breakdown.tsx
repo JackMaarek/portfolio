@@ -101,6 +101,8 @@ export function PlatformBreakdown() {
         </div>
 
         <div className={styles.view} aria-hidden="true">
+          {/* The parcours column, arriving as the axis the layers separate along. */}
+          <span className={styles.axis} />
           <div className={styles.layers}>
             {layers.map((layer, index) => (
               <div

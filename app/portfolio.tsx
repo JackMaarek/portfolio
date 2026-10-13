@@ -8,10 +8,10 @@ import {
   StringTune,
 } from "@fiddle-digital/string-tune";
 import { Accent } from "./accent";
-import { BookingLink } from "./booking-link";
 import { CareerColumn } from "./career/career-column";
 import { PlatformBreakdown } from "./career/platform-breakdown";
 import { about, capabilities } from "./home-content";
+import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 
 const tune = (value: string, attributes: Record<string, string> = {}) =>
@@ -482,33 +482,7 @@ export function Portfolio() {
       </section>
       </main>
 
-      <footer id="contact" className="contact">
-        <div className="contact-top">
-          <p className="section-label">06 / Contact</p>
-          <p>Un besoin plateforme, cloud<br />ou automatisation ?</p>
-        </div>
-        <BookingLink
-          className="contact-mail"
-          placement="home-contact"
-          label="Parlons-en"
-          {...tune("magnetic")}
-        >
-          Parlons-en<span aria-hidden="true">↗</span>
-        </BookingLink>
-        <div className="footer-meta">
-          <span>Jacques Maarek · Platform Engineer</span>
-          <a
-            href="https://github.com/JackMaarek"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="GitHub de Jacques Maarek (nouvel onglet)"
-          >
-            GitHub ↗
-          </a>
-          <a href="#top">Retour en haut ↑</a>
-          <span>Paris · 2026</span>
-        </div>
-      </footer>
+      <SiteFooter label="06 / Contact" placement="home-contact" />
     </div>
   );
 }

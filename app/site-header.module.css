@@ -1,0 +1,546 @@
+/* Shared navigation: the route of stations, the thumb rail on phones and
+   the lavender index sheet. Colours come from the site tokens; the sheet
+   reuses the offer's mineral values. */
+
+.header {
+  --rail-more: 64px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- Top bar ---------- */
+
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  width: 100%;
+  min-height: 84px;
+  padding: 18px 30px;
+  border-bottom: 1px solid var(--line);
+  transition:
+    transform 320ms var(--ease-out),
+    background 220ms ease;
+}
+
+/* Over the hero the bar stays on the page's ground; once the page moves it
+   takes a solid ink ground so copy never runs under the links. */
+.header[data-scrolled] .bar {
+  background: var(--ink);
+}
+
+.header[data-folded] .bar:not(:focus-within) {
+  transform: translateY(-100%);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+}
+
+.monogram {
+  display: block;
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.monogram img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.route ol {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.route li {
+  display: flex;
+  align-items: center;
+}
+
+/* The connector from the previous station; amber up to the current page. */
+.route li + li::before {
+  width: 44px;
+  height: 1px;
+  background: var(--line);
+  content: "";
+}
+
+.route li[data-traced]::before {
+  height: 2px;
+  background: var(--acid);
+  transform-origin: left center;
+  animation: trace 420ms var(--ease-out) both;
+}
+
+.route li[data-traced]:nth-child(3)::before {
+  animation-delay: 160ms;
+}
+
+@keyframes trace {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.station {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  gap: 10px;
+  padding-inline: 14px;
+  color: var(--paper);
+  font-size: 0.875rem;
+  transition: color 180ms ease;
+}
+
+.station:hover,
+.station:focus-visible {
+  color: var(--violet);
+}
+
+.node {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--muted);
+  border-radius: 50%;
+  background: var(--ink);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.number {
+  color: var(--muted);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.station[aria-current="page"],
+.railStation[aria-current="page"] {
+  color: var(--acid);
+}
+
+.station[aria-current="page"] .node,
+.railStation[aria-current="page"] .node {
+  border-color: var(--acid);
+  background: var(--acid);
+  outline: 1px solid rgba(255, 189, 116, 0.45);
+  outline-offset: 3px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+/* The route runs on from the last station and ends on the booking pill. */
+.actions::before {
+  flex: 1;
+  height: 1px;
+  margin-left: -24px;
+  background: var(--line);
+  content: "";
+}
+
+.availability {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  overflow: hidden;
+  color: #cac6d3;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.availability::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--acid);
+  content: "";
+}
+
+.cta {
+  display: inline-flex;
+  min-height: var(--touch-target);
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--acid);
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 150ms ease;
+}
+
+.cta:hover,
+.cta:focus-visible {
+  background: #ffc98c;
+  box-shadow: 0 10px 24px -14px rgba(255, 189, 116, 0.9);
+}
+
+.cta:active {
+  transform: translateY(1px);
+}
+
+.ctaShort {
+  display: none;
+}
+
+/* ---------- Thumb rail (phones) ---------- */
+
+.rail {
+  position: fixed;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  left: 12px;
+  z-index: 20;
+  display: none;
+  grid-template-columns: 1fr var(--rail-more);
+  height: 64px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--ink);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.8);
+  transition: transform 320ms var(--ease-out);
+}
+
+.header[data-folded] .rail:not(:focus-within) {
+  transform: translateY(calc(100% + 24px + env(safe-area-inset-bottom, 0px)));
+}
+
+/* The route line runs from the first station's node to the last one's. */
+.rail::before,
+.railTrace {
+  position: absolute;
+  top: 20.5px;
+  left: calc((100% - var(--rail-more)) / 6);
+  height: 1px;
+  content: "";
+}
+
+.rail::before {
+  width: calc((100% - var(--rail-more)) * 2 / 3);
+  background: var(--line);
+}
+
+.railTrace {
+  display: none;
+  width: calc((100% - var(--rail-more)) / 3 * var(--current));
+  height: 2px;
+  background: var(--acid);
+  transform-origin: left center;
+  animation: trace 420ms var(--ease-out) both;
+}
+
+.railTrace[data-on] {
+  display: block;
+}
+
+.rail ol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.railStation {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  color: #cac6d3;
+  font-size: 0.75rem;
+}
+
+.more {
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-radius: 0 12px 12px 0;
+  color: var(--paper);
+  background: transparent;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.rail :focus-visible {
+  outline-offset: -4px;
+}
+
+/* ---------- Index sheet ---------- */
+
+.sheet {
+  --sheet-ink: #111014;
+  --sheet-muted: #595663;
+  --sheet-rule: #c3c0d0;
+  --sheet-violet: #4c40af;
+
+  width: 100%;
+  max-width: none;
+  max-height: 88svh;
+  margin: auto 0 0;
+  padding: 20px 22px calc(22px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  border: 0;
+  border-radius: 16px 16px 0 0;
+  color: var(--sheet-ink);
+  background: #d8d6e3;
+  overscroll-behavior: contain;
+}
+
+.sheet[open] {
+  animation: rise 380ms var(--ease-out);
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.sheet::backdrop {
+  background: rgba(11, 11, 13, 0.62);
+}
+
+.sheet :focus-visible {
+  outline-color: var(--sheet-violet);
+}
+
+.sheetHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.sheetTitle {
+  margin: 0;
+  font-size: 1.375rem;
+  letter-spacing: -0.03em;
+}
+
+.close {
+  min-height: var(--touch-target);
+  padding: 0 16px;
+  border: 1px solid rgba(17, 16, 20, 0.3);
+  border-radius: 999px;
+  color: var(--sheet-ink);
+  background: transparent;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.sheetAvailability {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 10px 0 0;
+  color: var(--sheet-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sheetAvailability::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--acid-readable);
+  content: "";
+}
+
+/* One vertical axis carries every row's node: each row draws the segment
+   down to the next row's node. */
+.index {
+  margin: 14px 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.index li {
+  position: relative;
+}
+
+.index li:not(:last-child)::before {
+  position: absolute;
+  top: 26px;
+  bottom: -26px;
+  left: 5px;
+  width: 1px;
+  background: #a7a3b8;
+  content: "";
+}
+
+.index a {
+  display: grid;
+  grid-template-columns: 12px 26px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--sheet-rule);
+  color: var(--sheet-ink);
+}
+
+.index a:hover {
+  background: rgba(76, 64, 175, 0.06);
+}
+
+.indexNode {
+  position: relative;
+  width: 11px;
+  height: 11px;
+  margin-top: 5px;
+  border: 1.5px solid var(--sheet-muted);
+  border-radius: 50%;
+  background: #d8d6e3;
+}
+
+.index .number {
+  padding-top: 4px;
+  color: var(--sheet-muted);
+}
+
+.indexText {
+  display: grid;
+  gap: 4px;
+  color: var(--sheet-muted);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.indexText strong {
+  color: var(--sheet-ink);
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.index a[aria-current="page"] .indexNode {
+  border-color: var(--sheet-violet);
+  background: var(--sheet-violet);
+}
+
+.index a[aria-current="page"] .number,
+.index a[aria-current="page"] strong {
+  color: var(--sheet-violet);
+}
+
+.sheetCta {
+  display: flex;
+  min-height: 52px;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--sheet-violet);
+  font-weight: 700;
+  transition: background 180ms ease;
+}
+
+.sheetCta:hover,
+.sheetCta:focus-visible {
+  background: #3d3296;
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (min-width: 1320px) {
+  .availability {
+    display: flex;
+  }
+}
+
+@media (max-width: 1023px) {
+  .bar .number {
+    display: none;
+  }
+
+  .route li + li::before {
+    width: 24px;
+  }
+}
+
+@media (max-width: 759px) {
+  .bar {
+    grid-template-columns: 1fr auto;
+    min-height: 64px;
+    padding: 10px 18px;
+  }
+
+  .actions::before {
+    display: none;
+  }
+
+  .monogram {
+    width: 44px;
+    height: 44px;
+  }
+
+  .route,
+  .ctaWide {
+    display: none;
+  }
+
+  .ctaShort {
+    display: inline-flex;
+  }
+
+  .rail {
+    display: grid;
+  }
+
+  /* Room under the last section for the rail. */
+  :global(.site-shell):has(.rail) {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route li[data-traced]::before,
+  .railTrace,
+  .sheet[open] {
+    animation: none;
+  }
+
+  .bar,
+  .rail {
+    transition: none;
+  }
+}

@@ -2,115 +2,214 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { ArrowIcon } from "./arrow-icon";
+import { BookingLink } from "./booking-link";
+import { project } from "./home-content";
+import styles from "./site-header.module.css";
 
+// The header shared by every page: `page` lights its station on the route.
 type SiteHeaderProps = {
   page: "portfolio" | "offer" | "project";
 };
 
-const navigation = [
-  { label: "Expertise", portfolioHref: "#expertise", offerHref: "/#expertise" },
-  { label: "Expérience", portfolioHref: "#experience", offerHref: "/#experience" },
-  { label: "Offre", portfolioHref: "/offer", offerHref: "/offer" },
-  { label: "Projets", portfolioHref: "#projects", offerHref: "/#projects" },
-  { label: "Contact", portfolioHref: "#contact", offerHref: "#contact" },
-];
+// The route: one station per page, in a fixed order; `page` is the page
+// that lights it.
+const stations = [
+  {
+    number: "01",
+    label: "Accueil",
+    description: "Mon parcours et ce qui l’a construit",
+    path: "/",
+    page: "portfolio",
+  },
+  {
+    number: "02",
+    label: "Projets",
+    description: `${project.name} · ${project.bot.name}`,
+    path: project.page,
+    page: "project",
+  },
+  {
+    number: "03",
+    label: "Offre",
+    description: "Comment j’audite une chaîne de delivery",
+    path: "/offer",
+    page: "offer",
+  },
+] as const;
+
+const availability = "Disponible pour missions freelance";
 
 export function SiteHeader({ page }: SiteHeaderProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-  // The offer and project pages link back to the home's sections.
-  const linksHome = page !== "portfolio";
-  const currentLabel = page === "offer" ? "Offre" : page === "project" ? "Projets" : null;
+  const [folded, setFolded] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const sheetRef = useRef<HTMLDialogElement>(null);
+  const current = stations.findIndex((station) => station.page === page);
+  const onHome = page === "portfolio";
+  const homeHref = onHome ? "#top" : "/";
 
+  const hrefFor = (path: string) => (path === "/" ? homeHref : path);
+
+  // The bar and the rail fold away while reading down and come back, with
+  // the booking action, on the way up.
   useEffect(() => {
-    if (!menuOpen) return;
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setMenuOpen(false);
-      menuButtonRef.current?.focus();
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let lastY = window.scrollY;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      setScrolled(y > 8);
+      if (reduceMotion || Math.abs(y - lastY) < 8) return;
+      setFolded(y > lastY && y > 160);
+      lastY = y;
+    };
+    update();
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
     };
 
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!(event.target instanceof Node)) return;
-      if (!headerRef.current?.contains(event.target)) setMenuOpen(false);
-    };
-
-    const desktopQuery = window.matchMedia("(min-width: 1121px)");
-    const closeOnDesktop = (event: MediaQueryListEvent) => {
-      if (event.matches) setMenuOpen(false);
-    };
-
-    window.addEventListener("keydown", closeOnEscape);
-    document.addEventListener("pointerdown", closeOnOutsidePointer);
-    desktopQuery.addEventListener("change", closeOnDesktop);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
-      window.removeEventListener("keydown", closeOnEscape);
-      document.removeEventListener("pointerdown", closeOnOutsidePointer);
-      desktopQuery.removeEventListener("change", closeOnDesktop);
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(frame);
     };
-  }, [menuOpen]);
+  }, []);
+
+  const openSheet = () => sheetRef.current?.showModal();
+  const closeSheet = () => sheetRef.current?.close();
+
+  const routeStyle = { "--current": Math.max(current, 0) } as CSSProperties;
 
   return (
     <header
-      ref={headerRef}
-      className={linksHome ? "topbar offer-topbar" : "topbar"}
+      className={styles.header}
+      data-folded={folded ? "" : undefined}
+      data-scrolled={scrolled ? "" : undefined}
     >
-      <Link
-        className="monogram"
-        href={linksHome ? "/" : "#top"}
-        aria-label={linksHome ? "Retour au portfolio" : "Retour en haut"}
-      >
-        <Image
-          src="/logo-jm-header.png"
-          alt=""
-          width={48}
-          height={48}
-          priority
-          unoptimized
-        />
-      </Link>
+      <div className={styles.bar}>
+        <div className={styles.identity}>
+          <Link
+            className={styles.monogram}
+            href={homeHref}
+            aria-label={onHome ? "Retour en haut" : "Retour à l’accueil"}
+          >
+            <Image src="/logo-jm-header.png" alt="" width={48} height={48} priority unoptimized />
+          </Link>
+          <p className={styles.availability}>{availability}</p>
+        </div>
 
-      <div className="status">
-        <span className="status-dot" aria-hidden="true" />
-        Disponible pour missions freelance
+        <nav className={styles.route} aria-label="Navigation principale">
+          <ol>
+            {stations.map((station, index) => (
+              <li key={station.label} data-traced={current >= index && index > 0 ? "" : undefined}>
+                <Link
+                  className={styles.station}
+                  href={hrefFor(station.path)}
+                  aria-current={index === current ? "page" : undefined}
+                >
+                  <span className={styles.node} aria-hidden="true" />
+                  <span className={styles.number}>{station.number}</span>
+                  {station.label}
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </nav>
+
+        <div className={styles.actions}>
+          <BookingLink className={`${styles.cta} ${styles.ctaWide}`} placement="header" label="Planifier un échange">
+            Planifier un échange
+            <ArrowIcon />
+          </BookingLink>
+          <BookingLink className={`${styles.cta} ${styles.ctaShort}`} placement="header" label="Contact">
+            Contact
+          </BookingLink>
+        </div>
       </div>
 
-      <button
-        ref={menuButtonRef}
-        className="menu-toggle"
-        type="button"
-        aria-expanded={menuOpen}
-        aria-controls="main-nav"
-        onClick={() => setMenuOpen((value) => !value)}
-      >
-        {menuOpen ? "Fermer" : "Menu"}
-      </button>
-
       <nav
-        id="main-nav"
-        className={`${linksHome ? "nav offer-nav" : "nav"}${menuOpen ? " open" : ""}`}
+        className={styles.rail}
+        style={routeStyle}
         aria-label="Navigation principale"
       >
-        {navigation.map((item) => {
-          const href = linksHome ? item.offerHref : item.portfolioHref;
-          const isCurrent = item.label === currentLabel;
-
-          return (
-            <Link
-              key={item.label}
-              className={isCurrent ? "offer-nav-active" : undefined}
-              href={href}
-              aria-current={isCurrent ? "page" : undefined}
-              onClick={() => setMenuOpen(false)}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
+        <span className={styles.railTrace} data-on={current > 0 ? "" : undefined} aria-hidden="true" />
+        <ol>
+          {stations.map((station, index) => (
+            <li key={station.label}>
+              <Link
+                className={styles.railStation}
+                href={hrefFor(station.path)}
+                aria-current={index === current ? "page" : undefined}
+              >
+                <span className={styles.node} aria-hidden="true" />
+                {station.label}
+              </Link>
+            </li>
+          ))}
+        </ol>
+        <button
+          className={styles.more}
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="site-index"
+          onClick={openSheet}
+        >
+          Plus
+        </button>
       </nav>
+
+      <dialog
+        id="site-index"
+        ref={sheetRef}
+        className={styles.sheet}
+        aria-labelledby="site-index-title"
+        // A tap on the backdrop lands on the dialog element itself.
+        onClick={(event) => {
+          if (event.target === event.currentTarget) closeSheet();
+        }}
+      >
+        <div className={styles.sheetHead}>
+          <h2 id="site-index-title" className={styles.sheetTitle}>
+            Sommaire
+          </h2>
+          <button className={styles.close} type="button" onClick={closeSheet}>
+            Fermer
+          </button>
+        </div>
+        <p className={styles.sheetAvailability}>{availability}</p>
+        <ol className={styles.index}>
+          {stations.map((entry) => (
+            <li key={entry.label}>
+              <Link
+                href={hrefFor(entry.path)}
+                aria-current={entry.page === page ? "page" : undefined}
+                onClick={closeSheet}
+              >
+                <span className={styles.indexNode} aria-hidden="true" />
+                <span className={styles.number}>{entry.number}</span>
+                <span className={styles.indexText}>
+                  <strong>{entry.label}</strong>
+                  <span>
+                    {/* The project name never breaks at its hyphen. */}
+                    {entry.description.split(project.name).map((part, index) => (
+                      <span key={index}>
+                        {index > 0 && <span className={styles.nowrap}>{project.name}</span>}
+                        {part}
+                      </span>
+                    ))}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+        <BookingLink className={styles.sheetCta} placement="header" label="Planifier un échange">
+          Planifier un échange
+            <ArrowIcon />
+        </BookingLink>
+      </dialog>
     </header>
   );
 }

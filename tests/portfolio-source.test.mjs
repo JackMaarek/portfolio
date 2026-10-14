@@ -20,7 +20,7 @@ test("portfolio exposes its core positioning", async () => {
   assert.match(portfolio, /Découvrir l’offre/);
   assert.match(portfolio, /Diagnostic CI\/CD & Observabilité/);
   assert.ok(portfolio.includes('href="/offer"'));
-  assert.ok(header.includes('portfolioHref: "#projects"'));
+  assert.match(header, /path: project\.page/);
   assert.ok(!`${portfolio}${header}`.includes('href="/offre"'));
   assert.ok(!`${portfolio}${header}`.includes("#projets"));
 });
@@ -32,17 +32,15 @@ test("shared navigation and technology tags expose accessible interactions", asy
     readFile(new URL("app/globals.css", projectRoot), "utf8"),
   ]);
 
-  assert.match(header, /aria-expanded/);
-  assert.match(header, /aria-controls="main-nav"/);
-  assert.match(header, /event\.key !== "Escape"/);
-  assert.match(header, /closeOnOutsidePointer/);
-  assert.match(header, /min-width: 1121px/);
+  // The index sheet is a native modal dialog: focus trap and Escape for free.
+  assert.match(header, /aria-haspopup="dialog"/);
+  assert.match(header, /aria-controls="site-index"/);
+  assert.match(header, /showModal\(\)/);
   assert.match(portfolio, /function TechnologyTags/);
   assert.ok(!portfolio.includes("data-status="));
-  assert.match(styles, /@media \(max-width: 1120px\)/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(styles, /--offer-violet: #4c40af/);
-  assert.match(styles, /\.nav a,[\s\S]*?min-height: var\(--touch-target\)/);
+  assert.match(styles, /\.footer-meta a \{[\s\S]*?min-height: var\(--touch-target\)/);
   assert.match(styles, /@media \(hover: hover\) and \(pointer: fine\)/);
   assert.match(styles, /\.technology-tag:hover::before/);
   assert.match(styles, /background: var\(--violet-readable\)/);
@@ -106,7 +104,7 @@ test("contact CTAs book through Cal.com only", async () => {
   for (const placement of ["offer-hero", "offer-short", "offer-full", "offer-contact"]) {
     assert.ok(offer.includes(`"${placement}"`), placement);
   }
-  assert.ok(header.includes('offerHref: "#contact"'));
+  assert.match(header, /placement="header"/);
 });
 
 test("offer page exposes the commercial diagnostic", async () => {
@@ -145,8 +143,8 @@ test("offer page exposes the commercial diagnostic", async () => {
   assert.ok(motion.includes("prefers-reduced-motion: reduce"));
   assert.ok(offer.includes('<main id="offer-main"'));
   assert.ok(offer.includes('href="#offer-main"'));
-  assert.ok(header.includes('offerHref: "/offer"'));
-  assert.ok(header.includes('offerHref: "/#projects"'));
+  assert.ok(header.includes('path: "/offer"'));
+  assert.match(header, /path: project\.page/);
   assert.ok(!`${offer}${header}`.includes('href="/offre"'));
   assert.ok(!offer.includes("offre-content"));
 });
@@ -206,7 +204,7 @@ test("k8s-platform project page is built from typed data and linked from the hom
   assert.match(page, /twitter:/);
   assert.match(body, /<SiteHeader page="project" \/>/);
   assert.match(body, /placement="project-contact"/);
-  assert.match(header, /page === "project" \? "Projets"/);
+  assert.match(header, /label: "Projets"[\s\S]*?page: "project"/);
   // The home's k8s-platform section links to the page and keeps GitHub.
   assert.match(homeContent, /page: "\/projects\/k8s-platform"/);
   assert.match(breakdown, /href=\{project\.page\}/);
@@ -220,4 +218,35 @@ test("k8s-platform project page is built from typed data and linked from the hom
   assert.match(flow, /observer\.disconnect\(\)/);
   assert.match(flow, /pending\.forEach\(clearTimeout\)/);
   assert.match(styles, /--font-mono: ui-monospace/);
+});
+
+test("shared header routes one station per page and books through Cal.com", async () => {
+  const [header, styles, arrow, contact, ...bodies] = await Promise.all([
+    readFile(new URL("app/site-header.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/site-header.module.css", projectRoot), "utf8"),
+    readFile(new URL("app/arrow-icon.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/site-contact.ts", projectRoot), "utf8"),
+    readFile(new URL("app/portfolio.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
+    readFile(new URL("app/projects/k8s-platform/project-page-body.tsx", projectRoot), "utf8"),
+  ]);
+
+  // Every page renders the same component, lighting its own station.
+  for (const [body, page] of bodies.map((body, index) => [body, ["portfolio", "offer", "project"][index]])) {
+    assert.ok(body.includes(`<SiteHeader page="${page}" />`), page);
+  }
+  // Accueil, Projets, Offre in order; Projets opens the k8s-platform page.
+  assert.match(header, /label: "Accueil"[\s\S]*label: "Projets"[\s\S]*label: "Offre"/);
+  assert.ok(!header.includes("#experience"));
+  assert.ok(!header.includes('label: "Expertise"'));
+  // Booking goes through the shared link, tagged with its own placement.
+  assert.match(contact, /\| "header"/);
+  assert.equal((header.match(/placement="header"/g) ?? []).length, 3);
+  assert.match(header, /label="Contact"/);
+  // Drawn arrow, current page and a reduced-motion path.
+  assert.match(arrow, /stroke="currentColor"/);
+  assert.match(header, /<ArrowIcon \/>/);
+  assert.match(header, /aria-current=\{index === current \? "page" : undefined\}/);
+  assert.match(header, /prefers-reduced-motion: reduce/);
+  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
 });

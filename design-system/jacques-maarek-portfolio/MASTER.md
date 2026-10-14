@@ -96,11 +96,11 @@ Required verification widths:
 
 ### Header
 
-- One shared component across `/`, `/offer` and the project pages (`/projects/*`).
-- Desktop shows logo, availability and the five primary destinations.
-- At `1120px` and below, use a disclosure menu with `aria-expanded`, Escape-to-close
-  and at least `52px` menu rows.
-- The current page's link (Offre on `/offer`, Projets on `/projects/*`) uses `aria-current="page"` plus a visible underline.
+- One shared component (`app/site-header.tsx`, `<SiteHeader page>`) across `/`, `/offer` and the project pages (`/projects/*`).
+- The navigation is a route with one station per page, in a fixed order: 01 Accueil · 02 Projets · 03 Offre. Each station is a topology node; the current page's node is filled amber with `aria-current="page"`, and an amber segment traces the route up to it. A grey hairline runs on from the last station to the booking pill.
+- The booking action is always reachable: the amber pill "Planifier un échange" on desktop, "Contact" on phones, both through `BookingLink` with the `header` placement.
+- The bar is fixed: transparent over the hero, ink once the page scrolls; it folds away while scrolling down and returns on scroll up (never under reduced motion). Availability sits beside the logo from `1320px`.
+- Below `760px`, the stations move to a rail fixed above the bottom edge (thumb zone) that folds with the bar; "Plus" opens the index sheet, a native modal `<dialog>` on the lavender surface listing each page with a one-line description and the violet booking action.
 
 ### Calls to action
 
@@ -109,6 +109,7 @@ Required verification widths:
 - Labels state the destination or next action: “Découvrir l’offre”, “Planifier un échange”.
 - Primary and secondary links provide distinct hover, keyboard-focus and press feedback.
 - Never use an unlabeled arrow as the only conversion control.
+- Arrows are drawn, not typed: `ArrowIcon` (`app/arrow-icon.tsx`) strokes in `currentColor` so it follows the label and can be animated. The header uses it; the remaining `→` glyphs migrate in a later pass.
 
 ### Cards and proof rows
 

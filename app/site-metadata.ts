@@ -1,16 +1,8 @@
-import { headers } from "next/headers";
-
 export const siteName = "Jacques Maarek — Platform Engineer";
 
-export async function getSiteOrigin() {
-  const requestHeaders = await headers();
-  const host =
-    requestHeaders.get("x-forwarded-host") ??
-    requestHeaders.get("host") ??
-    "localhost:3000";
-  const protocol =
-    requestHeaders.get("x-forwarded-proto") ??
-    (host.startsWith("localhost") ? "http" : "https");
+// Canonical origin is a constant on purpose: deriving it from request headers
+// (Host, X-Forwarded-Host) lets any client inject an arbitrary domain into
+// canonical and og:url, and makes non-canonical hosts self-canonicalize.
+export const siteOrigin = "https://jacques.podyourlife.fr";
 
-  return `${protocol}://${host}`;
-}
+export const siteHostname = new URL(siteOrigin).hostname;

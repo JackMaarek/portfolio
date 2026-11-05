@@ -76,7 +76,12 @@ test("document metadata describes the portfolio", async () => {
   ]);
 
   assert.match(sharedMetadata, /Jacques Maarek — Platform Engineer/);
-  assert.match(sharedMetadata, /x-forwarded-host/);
+  // Canonical origin must never be derived from client-controlled headers.
+  assert.match(sharedMetadata, /siteOrigin = "https:\/\/jacques\.podyourlife\.fr"/);
+  assert.doesNotMatch(sharedMetadata, /from "next\/headers"|\.get\("(x-forwarded-host|host)"\)/);
+  for (const source of [layout, offer]) {
+    assert.doesNotMatch(source, /getSiteOrigin/);
+  }
   assert.match(layout, /Infrastructure as Code/);
   assert.match(layout, /alternates: \{ canonical:/);
   assert.match(layout, /<html lang="fr">/);

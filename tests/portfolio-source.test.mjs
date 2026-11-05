@@ -226,3 +226,28 @@ test("k8s-platform project page is built from typed data and linked from the hom
   assert.match(flow, /pending\.forEach\(clearTimeout\)/);
   assert.match(styles, /--font-mono: ui-monospace/);
 });
+
+test("SEO foundations stay consistent with the offer", async () => {
+  const [structured, offerBody, robots, sitemap, jsonLd] = await Promise.all([
+    readFile(new URL("app/structured-data.ts", projectRoot), "utf8"),
+    readFile(new URL("app/offer/offer-page-body.tsx", projectRoot), "utf8"),
+    readFile(new URL("public/robots.txt", projectRoot), "utf8"),
+    readFile(new URL("public/sitemap.xml", projectRoot), "utf8"),
+    readFile(new URL("app/json-ld.tsx", projectRoot), "utf8"),
+  ]);
+
+  // Structured prices must match the displayed "À partir de … € HT" plans.
+  for (const [displayed, numeric] of [["1 560", "1560"], ["2 600", "2600"]]) {
+    assert.match(offerBody, new RegExp(`À partir de ${displayed} € HT`));
+    assert.match(structured, new RegExp(`minPriceEur: ${numeric}`));
+  }
+  assert.match(structured, /valueAddedTaxIncluded: false/);
+
+  assert.match(robots, /Sitemap: https:\/\/jacques\.podyourlife\.fr\/sitemap\.xml/);
+  for (const path of ["/", "/offer", "/projects/k8s-platform"]) {
+    assert.match(sitemap, new RegExp(`<loc>https://jacques\\.podyourlife\\.fr${path}</loc>`));
+  }
+
+  // JSON-LD must escape markup before reaching dangerouslySetInnerHTML.
+  assert.match(jsonLd, /\\\\u003c/);
+});

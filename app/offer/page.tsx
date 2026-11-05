@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { JsonLd } from "../json-ld";
 import { siteName, siteOrigin } from "../site-metadata";
+import { offerServiceJsonLd } from "../structured-data";
 import { OfferPageBody } from "./offer-page-body";
 
 const offerTitle = "Offre Diagnostic CI/CD & Observabilité — Jacques Maarek";
@@ -31,5 +33,10 @@ export const metadata: Metadata = {
 };
 
 export default function OfferPage() {
-  return <OfferPageBody />;
+  return (
+    <>
+      <JsonLd data={offerServiceJsonLd} />
+      <OfferPageBody />
+    </>
+  );
 }

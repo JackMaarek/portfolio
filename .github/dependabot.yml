@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Paris
+    open-pull-requests-limit: 5
+    groups:
+      # React and its RSC runtime must move together.
+      react:
+        patterns: ["react", "react-dom", "react-server-dom-webpack", "@types/react", "@types/react-dom"]
+      cloudflare:
+        patterns: ["wrangler", "@cloudflare/*"]
+      vite:
+        patterns: ["vite", "@vitejs/*", "vinext"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

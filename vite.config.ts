@@ -4,6 +4,11 @@ import { defineConfig } from "vite";
 const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
+  // Serve only through the jacques.podyourlife.fr custom domain: workers.dev and
+  // preview URLs bypass the zone's TLS, WAF and bot settings. Wrangler enables
+  // both by default, so every deploy would re-open them without these flags.
+  workers_dev: false,
+  preview_urls: false,
 };
 
 export default defineConfig(async () => {

@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // The Worker refuses the optimizer endpoints; serve every image as-is.
+  images: { unoptimized: true },
 };
 
 export default nextConfig;

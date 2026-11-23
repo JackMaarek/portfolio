@@ -14,7 +14,7 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
-    "@fiddle-digital/string-tune": "^1.2.1",
+    "@fiddle-digital/string-tune": "^1.2.7",
     "drizzle-orm": "0.45.2",
     "next": "16.4.6",
     "react": "19.3.1",
